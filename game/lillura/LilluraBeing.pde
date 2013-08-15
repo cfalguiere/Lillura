@@ -29,7 +29,7 @@ class LilluraBeing extends Being {
         _shape.draw();
   }
   
-  public void actionProtect() {
+  public void handleProtect() {
     _stroke = true;
   }
 }

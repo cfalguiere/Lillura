@@ -14,7 +14,7 @@ class LilluraInteractor extends Interactor<LilluraBeing, Robot> {
   }
 
   void handle(LilluraBeing being1, Robot robot) {
-        being1.actionProtect();
-        robot.actionStop();
+        being1.handleProtect();
+        robot.handleStop();
   }
 }

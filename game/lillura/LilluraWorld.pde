@@ -33,6 +33,7 @@ class LilluraWorld extends World {
         int y = WINDOW_HEIGHT - 50;
         Robot robot = new Robot(x, y);
         register(robot);
+        robot.subscribeToPostOffice(this);
         return robot;
   }
   
