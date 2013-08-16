@@ -8,7 +8,7 @@ class Robot extends Being {
   static final int DEFAULT_COLOR = 127; 
   color _c;
   boolean _isOn = false;
-  Direction _direction = Direction.UP;
+  PVector _velocity = PVector.fromAngle(-HALF_PI); // (0,-1)
 
   Robot(int x, int y, World w) {
         super(new Rectangle(x, y, WIDTH, HEIGHT));
@@ -16,30 +16,17 @@ class Robot extends Being {
         //Add your constructor info here
         println("creating robot at " + x + " " + y);
         
-         w.subscribe(this, POCodes.Key.UP);
+        w.subscribe(this, POCodes.Key.UP);
         w.subscribe(this, POCodes.Key.LEFT);
         w.subscribe(this, POCodes.Key.RIGHT);
         w.subscribe(this, POCodes.Key.SPACE);
         //w.subscribe(this, POCodes.Button.LEFT, robot.getShape());
         w.subscribe(this, POCodes.Button.LEFT);
-
   }
 
   public void update() {
-    if (! _isOn) return;
-    
-    // TODO move vector 
-    
-    if (_direction == Direction.UP) {
-        _position.y -= SPEED;    
-    }
-    
-    if (_direction == Direction.LEFT) {
-          _position.x -= SPEED;    
-    }
-
-    if (_direction == Direction.RIGHT) {
-          _position.x += SPEED;    //TODO PVector
+    if (_isOn) {
+      _position.add(_velocity);
     }
   }
 
@@ -61,20 +48,19 @@ class Robot extends Being {
   public void receive(KeyMessage m) {
     int code = m.getKeyCode();
     if (m.isPressed()) {
-      if (code == POCodes.Key.UP) {
-        _isOn = true;
-      } 
-      if (code == POCodes.Key.LEFT) {
-        _isOn = true;
-        _direction = Direction.LEFT;  
-      } 
-      if (code == POCodes.Key.RIGHT) {
-        _isOn = true;
-        _direction = Direction.RIGHT;  
-      } 
-      if (code == POCodes.Key.SPACE) {
-        _isOn = false;
-      } 
+      _isOn = (code == POCodes.Key.SPACE?false:true);
+
+      switch (code) {
+        case POCodes.Key.LEFT:
+          _velocity.rotate(-HALF_PI);
+          break;
+        case POCodes.Key.RIGHT:
+          _velocity.rotate(HALF_PI);
+          break;
+        default:
+          // go ahead
+          break;
+      }
     }
   }
   
