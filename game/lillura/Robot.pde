@@ -10,20 +10,19 @@ class Robot extends Being {
   boolean _isOn = false;
   Direction _direction = Direction.UP;
 
-  Robot(int x, int y) {
+  Robot(int x, int y, World w) {
         super(new Rectangle(x, y, WIDTH, HEIGHT));
         _c = color(DEFAULT_COLOR );
         //Add your constructor info here
         println("creating robot at " + x + " " + y);
-  }
-  
-  void subscribeToPostOffice(World w) {
-        w.subscribe(this, POCodes.Key.UP);
+        
+         w.subscribe(this, POCodes.Key.UP);
         w.subscribe(this, POCodes.Key.LEFT);
         w.subscribe(this, POCodes.Key.RIGHT);
         w.subscribe(this, POCodes.Key.SPACE);
         //w.subscribe(this, POCodes.Button.LEFT, robot.getShape());
         w.subscribe(this, POCodes.Button.LEFT);
+
   }
 
   public void update() {

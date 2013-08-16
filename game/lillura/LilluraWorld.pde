@@ -48,9 +48,8 @@ class LilluraWorld extends World {
   Robot createRobot(Terrain terrain) {
         int x = (int) (terrain.getBoundingBox().getWidth() / 2 + terrain.getBoundingBox().getAbsMin().x );
         int y = (int) (terrain.getBoundingBox().getHeight() + terrain.getBoundingBox().getAbsMin().y  - 50);
-        Robot robot = new Robot(x, y);
+        Robot robot = new Robot(x, y, this);
         register(robot);
-        robot.subscribeToPostOffice(this);
         return robot;
   }
   
