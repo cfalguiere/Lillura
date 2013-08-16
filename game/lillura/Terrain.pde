@@ -15,8 +15,5 @@ class Terrain extends Being {
         _shape.draw();
   }
 
-  public PVector getPosition() {
-    return _position;
-  }
 }
 

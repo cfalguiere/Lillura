@@ -13,6 +13,8 @@ import hermes.animation.*;
 import hermes.physics.*;
 import hermes.postoffice.*;
 
+import intel.pcsdk.*;
+
 ///////////////////////////////////////////////////
 // CONSTANTS
 ///////////////////////////////////////////////////
@@ -26,6 +28,10 @@ static final int TERRAIN_WIDTH = 600;
 static final int TERRAIN_HEIGHT = 600;
 static final int PORT_IN = 8080;
 static final int PORT_OUT = 8000; 
+
+static final int CAMERA_WIDTH = 640;
+static final int CAMERA_HEIGHT = 480;
+
 
 World currentWorld;
 World menuWorld;

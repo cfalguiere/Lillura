@@ -16,6 +16,12 @@ class LilluraWorld extends World {
     _terrain = createTerrain();
     Group group = createSquares(_terrain);
     Robot robot = createRobot(_terrain);
+    
+    PerCMessenger messenger = createPerCMessenger();
+    Hand hand = createHand(_terrain);
+    hand.subscribeToPerCMessenger(messenger);
+    
+    // interactors
     register(group,robot,new LilluraInteractor());
   }
   
@@ -39,7 +45,7 @@ class LilluraWorld extends World {
   }
   
   Robot createRobot(Terrain terrain) {
-        int x = (int) ((TERRAIN_WIDTH / 2) + terrain.getPosition().x);
+        int x = (int) ((TERRAIN_WIDTH / 2) + _terrain.getBoundingBox().getAbsMin().x);
         int y = TERRAIN_HEIGHT - 50;
         Robot robot = new Robot(x, y);
         register(robot);
@@ -50,6 +56,24 @@ class LilluraWorld extends World {
   public Terrain getTerrain() {
     return _terrain;
   }  
+
+  PerCMessenger createPerCMessenger() {
+        PerCMessenger messenger = new PerCMessenger(this);
+        register(messenger);
+        return messenger;
+  }
+
   
+  Hand createHand(Terrain terrain) {
+      int w = (int)CAMERA_WIDTH/3;
+      int h = (int)CAMERA_HEIGHT/3;
+      int y = (int)(TERRAIN_HEIGHT - h);
+        HandCanvas handCanvas = new HandCanvas(0, y, w, h);
+        register(handCanvas);
+        Hand hand = new Hand(0, y, w, h);
+        register(hand);
+        return hand;
+  }
+
 }
 
