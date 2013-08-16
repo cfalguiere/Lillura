@@ -13,7 +13,7 @@ import hermes.animation.*;
 import hermes.physics.*;
 import hermes.postoffice.*;
 
-import intel.pcsdk.*;
+//import intel.pcsdk.*;
 
 ///////////////////////////////////////////////////
 // CONSTANTS
@@ -50,12 +50,6 @@ void setup() {
   //Important: don't forget to add setup to TemplateWorld!
 
   currentWorld.start(); // this should be the last line in setup() method
-
-  menuWorld = new MenuWorld(PORT_IN + 1, PORT_OUT + 1);       
-
-  //Important: don't forget to add setup to TemplateWorld!
-
-  menuWorld.start(); // this should be the last line in setup() method
 }
 
 void draw() {
