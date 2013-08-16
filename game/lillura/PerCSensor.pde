@@ -1,0 +1,2 @@
+class PerCMessenger extends Being {
+}
