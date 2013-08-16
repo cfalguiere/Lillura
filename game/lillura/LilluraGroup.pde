@@ -15,8 +15,8 @@ class LilluraGroup extends Group<LilluraBeing> {
   }
 
   public void addSquare() {
-    int x = (int) (random(TERRAIN_WIDTH - 50) + _terrain.getPosition().x);
-    int y = (int) random(TERRAIN_HEIGHT - 50);
+    int x = (int) (random(_terrain.getBoundingBox().getWidth() -50) + _terrain.getBoundingBox().getAbsMin().x);
+    int y = (int) (random(_terrain.getBoundingBox().getHeight() -50) + _terrain.getBoundingBox().getAbsMin().y);
     color randomColor = pickColor();
     LilluraBeing b = new LilluraBeing(x, y, randomColor);
     _world.register(b);

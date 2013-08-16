@@ -44,8 +44,8 @@ class Robot extends Being {
     }
 
     if (_direction == Direction.RIGHT) {
-      if (_position.y < TERRAIN_WIDTH - 50) {
-          _position.x += SPEED;    
+      if (_position.y < WINDOW_WIDTH - 50) { //TODO
+          _position.x += SPEED;    //TODO PVector
       }
     }
   }

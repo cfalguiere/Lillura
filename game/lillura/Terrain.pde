@@ -1,7 +1,7 @@
 class Terrain extends Being {
   
-  Terrain(int x, int y) {
-        super(new Rectangle(x, y, TERRAIN_WIDTH, TERRAIN_HEIGHT));
+  Terrain(int x, int y, int w, int h) {
+        super(new Rectangle(x, y, w, h));
         println("creating terrain");
   }
   
