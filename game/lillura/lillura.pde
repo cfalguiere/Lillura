@@ -20,8 +20,10 @@ import hermes.postoffice.*;
  * Constants should go up here
  * Making more things constants makes them easier to adjust and play with!
  */
-static final int WINDOW_WIDTH = 600;
-static final int WINDOW_HEIGHT = 600;
+static final int LEFT_PANEL_WIDTH = 200;
+static final int RIGHT_PANEL_WIDTH = 200;
+static final int TERRAIN_WIDTH = 600;
+static final int TERRAIN_HEIGHT = 600;
 static final int PORT_IN = 8080;
 static final int PORT_OUT = 8000; 
 
@@ -32,7 +34,8 @@ World currentWorld;
 ///////////////////////////////////////////////////
 
 void setup() {
-  size(WINDOW_WIDTH, WINDOW_HEIGHT); 
+  int windowWidth = LEFT_PANEL_WIDTH + TERRAIN_WIDTH +  RIGHT_PANEL_WIDTH;
+  size(windowWidth, TERRAIN_HEIGHT); 
   Hermes.setPApplet(this);
 
   currentWorld = new LilluraWorld(PORT_IN, PORT_OUT);       

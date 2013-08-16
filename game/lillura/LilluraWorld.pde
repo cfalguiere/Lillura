@@ -5,6 +5,7 @@
 class LilluraWorld extends World {
   
   static final int SQUARE_NUM = 5;
+  Terrain _terrain;
   
   LilluraWorld(int portIn, int portOut) {
     super(portIn, portOut);
@@ -12,13 +13,22 @@ class LilluraWorld extends World {
 
   void setup() {
     //IMPORTANT: put all other setup hereterBeing(TemplateBeing);
-    Group group = createSquares();
-    Robot robot = createRobot();
+    _terrain = createTerrain();
+    Group group = createSquares(_terrain);
+    Robot robot = createRobot(_terrain);
     register(group,robot,new LilluraInteractor());
   }
   
-  Group createSquares() {
-    LilluraGroup group = new LilluraGroup(this);
+  Terrain createTerrain() {
+        int x = LEFT_PANEL_WIDTH ;
+        int y = 0;
+        Terrain terrain = new Terrain(x, y);
+        register(terrain);
+        return terrain;
+  }
+  
+  Group createSquares(Terrain terrain) {
+    LilluraGroup group = new LilluraGroup(this, terrain);
     register(group);
     
     for (int i = 0; i < SQUARE_NUM; i++) {
@@ -28,15 +38,18 @@ class LilluraWorld extends World {
     return group;
   }
   
-  Robot createRobot() {
-        int x = (int) (WINDOW_WIDTH / 2);
-        int y = WINDOW_HEIGHT - 50;
+  Robot createRobot(Terrain terrain) {
+        int x = (int) ((TERRAIN_WIDTH / 2) + terrain.getPosition().x);
+        int y = TERRAIN_HEIGHT - 50;
         Robot robot = new Robot(x, y);
         register(robot);
         robot.subscribeToPostOffice(this);
         return robot;
   }
   
-
+  public Terrain getTerrain() {
+    return _terrain;
+  }  
+  
 }
 

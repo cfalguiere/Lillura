@@ -44,7 +44,7 @@ class Robot extends Being {
     }
 
     if (_direction == Direction.RIGHT) {
-      if (_position.y < WINDOW_WIDTH - 50) {
+      if (_position.y < TERRAIN_WIDTH - 50) {
           _position.x += SPEED;    
       }
     }
@@ -72,9 +72,11 @@ class Robot extends Being {
         _isOn = true;
       } 
       if (code == POCodes.Key.LEFT) {
+        _isOn = true;
         _direction = Direction.LEFT;  
       } 
       if (code == POCodes.Key.RIGHT) {
+        _isOn = true;
         _direction = Direction.RIGHT;  
       } 
       if (code == POCodes.Key.SPACE) {

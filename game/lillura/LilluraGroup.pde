@@ -1,6 +1,9 @@
 class LilluraGroup extends Group<LilluraBeing> {
-   LilluraGroup(World w) {
+  Terrain _terrain;
+  
+  LilluraGroup(World w, Terrain terrain) {
     super(w);
+    _terrain = terrain;
   }
 
   public void update() {
@@ -12,8 +15,8 @@ class LilluraGroup extends Group<LilluraBeing> {
   }
 
   public void addSquare() {
-    int x = (int) random(WINDOW_WIDTH - 50);
-    int y = (int) random(WINDOW_HEIGHT - 50);
+    int x = (int) (random(TERRAIN_WIDTH - 50) + _terrain.getPosition().x);
+    int y = (int) random(TERRAIN_HEIGHT - 50);
     color randomColor = pickColor();
     LilluraBeing b = new LilluraBeing(x, y, randomColor);
     _world.register(b);
