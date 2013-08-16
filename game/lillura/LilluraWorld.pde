@@ -23,6 +23,7 @@ class LilluraWorld extends World {
 
     // interactors
     register(group,robot,new LilluraInteractor());
+    register(robot,_terrain,new RobotTerrainInteractor());
   }
   
   Terrain createTerrain() {

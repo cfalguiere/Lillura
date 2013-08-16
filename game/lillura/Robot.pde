@@ -32,21 +32,15 @@ class Robot extends Being {
     // TODO move vector 
     
     if (_direction == Direction.UP) {
-      if (_position.y > 50) {
         _position.y -= SPEED;    
-      }
     }
     
     if (_direction == Direction.LEFT) {
-      if (_position.y > 50) {
           _position.x -= SPEED;    
-      }
     }
 
     if (_direction == Direction.RIGHT) {
-      if (_position.y < WINDOW_WIDTH - 50) { //TODO
           _position.x += SPEED;    //TODO PVector
-      }
     }
   }
 
