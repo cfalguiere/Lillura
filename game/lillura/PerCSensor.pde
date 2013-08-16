@@ -1,2 +1,5 @@
-class PerCMessenger extends Being {
+class PerCSensor extends Being {
+  PerCSensor() {
+  }
+  
 }
