@@ -26,8 +26,8 @@ class LilluraWorld extends World {
   }
   
   Terrain createTerrain() {
-        int x = CAMERA_WIDTH/3 ;
-        int y = WINDOW_HEIGHT - CAMERA_HEIGHT;
+        int x = CAMERA_WIDTH/3 + HRZ_OFFSET*2;
+        int y = WINDOW_HEIGHT - CAMERA_HEIGHT -  + VRT_OFFSET;
         Terrain terrain = new Terrain(x, y, CAMERA_WIDTH, CAMERA_HEIGHT);
         register(terrain);
         return terrain;
@@ -46,7 +46,7 @@ class LilluraWorld extends World {
   
   Robot createRobot(Terrain terrain) {
         int x = (int) (terrain.getBoundingBox().getWidth() / 2 + terrain.getBoundingBox().getAbsMin().x );
-        int y = (int (terrain.getBoundingBox().getHeight() + terrain.getBoundingBox().getAbsMin().y  - 10);
+        int y = (int) (terrain.getBoundingBox().getHeight() + terrain.getBoundingBox().getAbsMin().y  - 50);
         Robot robot = new Robot(x, y);
         register(robot);
         robot.subscribeToPostOffice(this);
@@ -67,8 +67,8 @@ class LilluraWorld extends World {
   Hand createHand(Terrain terrain) {
       int w = (int)CAMERA_WIDTH/3;
       int h = (int)CAMERA_HEIGHT/3;
-      int y = (int)(WINDOW_HEIGHT - h);
-        HandCanvas handCanvas = new HandCanvas(0, y, w, h);
+      int y = (int)(WINDOW_HEIGHT - h) - VRT_OFFSET;
+        HandCanvas handCanvas = new HandCanvas(HRZ_OFFSET, y, w, h);
         register(handCanvas);
         Hand hand = new Hand(0, y, w, h);
         register(hand);
