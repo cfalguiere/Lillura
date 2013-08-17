@@ -6,6 +6,7 @@ class LilluraWorld extends World {
   
   static final int SQUARE_NUM = 5;
   Terrain _terrain;
+  PerCMessenger _perCMessenger;
   
   LilluraWorld(int portIn, int portOut) {
     super(portIn, portOut);
@@ -17,19 +18,21 @@ class LilluraWorld extends World {
     Group group = createSquares(_terrain);
     Robot robot = createRobot(_terrain);
   
-    _messenger = createPerCMessenger();
+    _perCMessenger = new PerCMessenger();
     Hand hand = createHand(_terrain);
-    hand.subscribeToPerCMessenger(messenger);
 
     // interactors
     register(group,robot,new LilluraInteractor());
     register(robot,_terrain,new RobotTerrainInteractor());
   }
 
-  void update() {
-    _messenger.checkMessage();  
+  void preUpdate() {
+    _perCMessenger.checkMessages();
   }
   
+  //
+  // World construction
+  //
   Terrain createTerrain() {
         int x = CAMERA_WIDTH/3 + HRZ_SPACER*2;
         int y = WINDOW_HEIGHT - CAMERA_HEIGHT -  + VRT_SPACER;
@@ -51,7 +54,7 @@ class LilluraWorld extends World {
   
   Robot createRobot(Terrain terrain) {
         int x = (int) (terrain.getBoundingBox().getWidth() / 2 + terrain.getBoundingBox().getAbsMin().x );
-        int y = (int) (terrain.getBoundingBox().getHeight() + terrain.getBoundingBox().getAbsMin().y  - 50);
+        int y = (int) (terrain.getBoundingBox().getHeight() + terrain.getBoundingBox().getAbsMin().y  - 50); //TODO use HSpace primitives
         Robot robot = new Robot(x, y, this);
         register(robot);
         return robot;
@@ -60,11 +63,6 @@ class LilluraWorld extends World {
   public Terrain getTerrain() {
     return _terrain;
   }  
-
-  PerCMessenger createPerCMessenger() {
-        PerCMessenger messenger = new PerCMessenger();
-        return messenger;
-  }
 
   
   Hand createHand(Terrain terrain) {
