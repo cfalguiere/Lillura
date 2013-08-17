@@ -1,5 +1,5 @@
 
-class Hand extends Being  {
+class Hand extends Being implements PerCSubscriber {
   static final int WIDTH = 30;
   static final int HEIGHT = 50;
   
@@ -13,19 +13,6 @@ class Hand extends Being  {
   }
 
 
- /*
-  synchronized public void receivePerCMessage(PXCMGesture.GeoNode handSensor) {
-    println(handSensor);
-    float openness = map(handSensor.openness, 0, 100, 0, 255);
-    col = (int)openness;
-    
-    handX = flipXAxisAndScale(handSensor.positionImage.x); 
-    handY = scaleYAxis(handSensor.positionImage.y); 
-    
-    handW = (int)map(handSensor.positionWorld.y, 0, 1, 30, 0);
-
-  }*/
-
   int flipXAxisAndScale(float x) { //flip our X axis by using the map fuction
     int canvasWidth = (int)getBoundingBox().getWidth();
     return (int)map(x, 0, CAMERA_WIDTH/2, canvasWidth, 0);
@@ -35,7 +22,8 @@ class Hand extends Being  {
     return (int)map(y*2, 0, CAMERA_HEIGHT, 0, canvasHeight); 
   }
 
-  public void update() {
+  void perCChanged(PerCMessage event) {
+    println("received perc changed " + event);
   }
 
   public void draw() {

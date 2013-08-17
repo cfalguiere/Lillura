@@ -1,65 +1,99 @@
+/*
+acquire data from the camera and dispatch to subscribers
+*/
 public class PerCMessenger {
   static final int PERC_MESSAGE_ANY = 0;
   
   //Maps that associate subscribers with messages they want to receive
-  private final HashMultimap<Integer, PerCSubscriber> _perCSubscribers;
+  private final ArrayList<PerCSubscriber> _perCSubscribers;
   //Stores messages as they are received, which are then picked off by checkMail()
-  private LinkedList<PerCMessage> _perCQueue;
+  private ArrayList<PerCMessage> _perCQueue;
+
+  PXCUPipeline session;
+  PXCMGesture.GeoNode hand = new PXCMGesture.GeoNode();
+  boolean _isActive = false;
 
   PerCMessenger() {
-    _perCSubs = HashMultimap.create();
-    _perCQueue = new LinkedList<PerCMessage>();
+    _perCSubscribers = new ArrayList<PerCSubscriber>();
+    _perCQueue = new ArrayList<PerCMessage>();
+    initSensor();
+  }
+  
+  void initSensor() {
+    session = new PXCUPipeline(  Hermes.getPApplet());
+    if(!session.Init(PXCUPipeline.GESTURE)) {
+      println("could not initialize PerC");
+    } else {
+      _isActive = true;
+      println("creating PerC session");
+    }
   }
 
   // update the state of the camera user and collect events 
   public void checkMessages() {
     // acquire events
-    println("acquire events");
-    firePerCChanged(1,2);
-    /*
-      //Send all the messages in each queue to the corresponding subscribers
-      synchronized(_keyQueue) {
-        _pressedKeys.clear();
-        while(!_keyQueue.isEmpty()) {
-          KeyMessage m = _keyQueue.poll();
-          int key = m.getKeyCode();
-          if(m.isPressed()) { //Add to the pressed key array if pressed
-            _pressedKeys.add(key);
-          }
-          Set<KeySubscriber> subs = _keySubs.get(key);
-          for(KeySubscriber sub : subs) {
-            sub.receive(m);
-          }
-        }
-      }*/
-  } 
-  
-    protected void firePerCChanged(double oldValue, double c) {
-      println("firing PerC change events");
-      /*
-            for(PerCListener listener : getPerCListeners()) {
-                listener.perCChanged(oldValue, oldValue);
-            }*/
+    if (_isActive)  {
+      println("acquire events");
+      acquireEvents();
     }
+  } 
+
+  void acquireEvents() { 
+    if(session.AcquireFrame(false))
+    {
+      println("acquires frame");
+      if(session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_OPENNESS_ANY, hand))
+      {
+       firePerCChanged(hand);
+      }
+//      PXCMGesture.Gesture gdata=new PXCMGesture.Gesture();
+//      if (pp.QueryGesture(PXCMGesture.GeoNode.LABEL_ANY,gdata)){
+//          print("gesture "+gdata.label+"\n");
+ //     }
+       
+       session.ReleaseFrame(); //must do tracking before frame is released
+    }
+  }
+   
+  protected void firePerCChanged(PXCMGesture.GeoNode hand) {
+    println("firing PerC change events to " + _perCSubscribers.size() + " subscribers");
+    for(PerCSubscriber subscriber : _perCSubscribers) {
+      PerCMessage event = new PerCMessage();
+      event.x = hand.positionImage.x;
+      event.y = hand.positionImage.y;
+      event.depth = hand.positionWorld.y;
+      event.openness = hand.openness;
+      subscriber.perCChanged(event);
+    }
+  }
 
   //
   // Subscriber management
   //
-  public void addPerCListener(PerCListener listener) {
-      listeners.add(PercHandListener.class, listener);
+  synchronized public void subscribe(PerCSubscriber subscriber) {
+    _perCSubscribers.add(subscriber);
   }
  
-  public void removePerCListener(PerCListener listener) {
-      listeners.remove(PerCListener.class, listener);
+  synchronized public void removeSubscriptions(PerCSubscriber subscriber) {
+    _perCSubscribers.remove(subscriber);
   }
   
-  public PerCListener[] getPerCListeners() {
-        return listeners.getListeners(PerCListener.class);
+
+}
+
+public interface PerCSubscriber {
+    void perCChanged(PerCMessage event);
+}
+
+public class PerCMessage {
+  public float x;
+  public float y;
+  public float depth;
+  public float openness;
+  public int gesture;
+  public String toString() {
+    return "x= " + x + " y=" + y + " depth=" + depth + " openness=" + openness;
   }
- 
-
 }
 
-public interface PerCListener extends EventListener {
-    void perCChanged(double oldValue, double newValue);
-}
+

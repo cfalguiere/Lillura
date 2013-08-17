@@ -20,6 +20,7 @@ class LilluraWorld extends World {
   
     _perCMessenger = new PerCMessenger();
     Hand hand = createHand(_terrain);
+    _perCMessenger.subscribe(hand);
 
     // interactors
     register(group,robot,new LilluraInteractor());

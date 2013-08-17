@@ -13,7 +13,7 @@ import hermes.animation.*;
 import hermes.physics.*;
 import hermes.postoffice.*;
 
-//import intel.pcsdk.*;
+import intel.pcsdk.*;
 
 
 ///////////////////////////////////////////////////
