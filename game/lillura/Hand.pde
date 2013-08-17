@@ -1,5 +1,5 @@
 
-class Hand extends Being implements PerCListener {
+class Hand extends Being  {
   static final int WIDTH = 30;
   static final int HEIGHT = 50;
   
@@ -12,10 +12,8 @@ class Hand extends Being implements PerCListener {
     super(new Rectangle(x, y, w, h));
   }
 
-  void subscribeToPerCMessenger(PerCMessenger m) {
-    m.subscribe(this);
-  }
 
+ /*
   synchronized public void receivePerCMessage(PXCMGesture.GeoNode handSensor) {
     println(handSensor);
     float openness = map(handSensor.openness, 0, 100, 0, 255);
@@ -26,7 +24,7 @@ class Hand extends Being implements PerCListener {
     
     handW = (int)map(handSensor.positionWorld.y, 0, 1, 30, 0);
 
-  }
+  }*/
 
   int flipXAxisAndScale(float x) { //flip our X axis by using the map fuction
     int canvasWidth = (int)getBoundingBox().getWidth();

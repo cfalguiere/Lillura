@@ -17,13 +17,17 @@ class LilluraWorld extends World {
     Group group = createSquares(_terrain);
     Robot robot = createRobot(_terrain);
   
-    PerCMessenger messenger = createPerCMessenger();
+    _messenger = createPerCMessenger();
     Hand hand = createHand(_terrain);
     hand.subscribeToPerCMessenger(messenger);
 
     // interactors
     register(group,robot,new LilluraInteractor());
     register(robot,_terrain,new RobotTerrainInteractor());
+  }
+
+  void update() {
+    _messenger.checkMessage();  
   }
   
   Terrain createTerrain() {
@@ -58,8 +62,7 @@ class LilluraWorld extends World {
   }  
 
   PerCMessenger createPerCMessenger() {
-        PerCMessenger messenger = new PerCMessenger(this);
-        register(messenger);
+        PerCMessenger messenger = new PerCMessenger();
         return messenger;
   }
 
