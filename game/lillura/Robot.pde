@@ -1,13 +1,14 @@
 /**
  * Template being
  */
-class Robot extends Being {
+class Robot extends Being implements PerCSubscriber {
   static final int WIDTH = 30;
   static final int HEIGHT = 30;
   static final int SPEED = 1;
   static final int DEFAULT_COLOR = 127; 
   color _c;
   boolean _isOn = false;
+  boolean _isGameOver = false;
   PVector _velocity = PVector.fromAngle(-HALF_PI); // (0,-1)
 
   Robot(int x, int y, World w) {
@@ -25,15 +26,19 @@ class Robot extends Being {
   }
 
   public void update() {
-    if (_isOn) {
+    if (_isOn && !_isGameOver) {
       _position.add(_velocity);
     }
   }
 
   public void draw() {
+    if (_isGameOver) {
+        fill(color(256,0,0));
+    } else {
         fill(_c);
-        noStroke();
-        _shape.draw();
+    }
+    noStroke();
+    _shape.draw();
   }
   
     
@@ -42,7 +47,7 @@ class Robot extends Being {
   }
   
   public void handleStop() {
-    _isOn = false;
+    _isGameOver = true;
   }
 
   public void receive(KeyMessage m) {
@@ -68,6 +73,10 @@ class Robot extends Being {
     if (m.getAction() == POCodes.Click.PRESSED) {
         _isOn = false;
     }
+  }
+
+  void perCChanged(PerCMessage handSensor) {
+    _isOn = handSensor.openness > 50;
   }
 
 }

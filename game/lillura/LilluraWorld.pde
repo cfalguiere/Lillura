@@ -16,11 +16,13 @@ class LilluraWorld extends World {
     //IMPORTANT: put all other setup hereterBeing(TemplateBeing);
     _terrain = createTerrain();
     Group group = createSquares(_terrain);
-    Robot robot = createRobot(_terrain);
   
     _perCMessenger = new PerCMessenger();
     Hand hand = createHand(_terrain);
     _perCMessenger.subscribe(hand);
+
+    Robot robot = createRobot(_terrain);
+    _perCMessenger.subscribe(robot);
 
     // interactors
     register(group,robot,new LilluraInteractor());

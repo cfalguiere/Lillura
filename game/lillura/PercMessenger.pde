@@ -31,9 +31,7 @@ public class PerCMessenger {
 
   // update the state of the camera user and collect events 
   public void checkMessages() {
-    // acquire events
     if (_isActive)  {
-      println("acquire events");
       acquireEvents();
     }
   } 
@@ -41,7 +39,6 @@ public class PerCMessenger {
   void acquireEvents() { 
     if(session.AcquireFrame(false))
     {
-      println("acquires frame");
       if(session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_OPENNESS_ANY, hand))
       {
        firePerCChanged(hand);
@@ -56,7 +53,7 @@ public class PerCMessenger {
   }
    
   protected void firePerCChanged(PXCMGesture.GeoNode hand) {
-    println("firing PerC change events to " + _perCSubscribers.size() + " subscribers");
+    //println("firing PerC change events to " + _perCSubscribers.size() + " subscribers");
     for(PerCSubscriber subscriber : _perCSubscribers) {
       PerCMessage event = new PerCMessage();
       event.x = hand.positionImage.x;

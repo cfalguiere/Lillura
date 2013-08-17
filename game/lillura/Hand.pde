@@ -7,6 +7,7 @@ class Hand extends Being implements PerCSubscriber {
   int handX;
   int handY;
   int handW;
+  float openness;
   
   Hand(int x, int y, int w, int h) {
     super(new Rectangle(x, y, w, h));
@@ -22,13 +23,24 @@ class Hand extends Being implements PerCSubscriber {
     return (int)map(y*2, 0, CAMERA_HEIGHT, 0, canvasHeight); 
   }
 
-  void perCChanged(PerCMessage event) {
-    println("received perc changed " + event);
+  void perCChanged(PerCMessage handSensor) {
+    println("received perc changed " + handSensor);
+    openness = map(handSensor.openness, 0, 100, 1, 2);
+    col = (int)map(handSensor.openness, 0, 100, 0, 255);
+    
+    handX = flipXAxisAndScale(handSensor.x); 
+    handY = scaleYAxis(handSensor.y); 
+    
+    handW = (int)map(handSensor.depth, 0, 1, 30, 0);
+  }
+  
+  public void update() {
+    //_stroke = false;
   }
 
   public void draw() {
     fill(col, 90, 30); 
-    ellipse(handX, handY, handW, handW*2);
+    ellipse(handX, handY, handW, handW*openness);
   }
 }
 
