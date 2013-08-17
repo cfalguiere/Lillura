@@ -11,11 +11,11 @@ class Robot extends Being implements PerCSubscriber {
   boolean _isGameOver = false;
   PVector _velocity = PVector.fromAngle(-HALF_PI); // (0,-1)
 
-  Robot(int x, int y, World w) {
-        super(new Rectangle(x, y, WIDTH, HEIGHT));
+  Robot(PVector position, World w) {
+        super(new Rectangle(position, WIDTH, HEIGHT));
         _c = color(DEFAULT_COLOR );
         //Add your constructor info here
-        println("creating robot at " + x + " " + y);
+        println("creating robot");
         
         w.subscribe(this, POCodes.Key.UP);
         w.subscribe(this, POCodes.Key.LEFT);

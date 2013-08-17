@@ -56,9 +56,9 @@ class LilluraWorld extends World {
   }
   
   Robot createRobot(Terrain terrain) {
-        int x = (int) (terrain.getBoundingBox().getWidth() / 2 + terrain.getBoundingBox().getAbsMin().x );
-        int y = (int) (terrain.getBoundingBox().getHeight() + terrain.getBoundingBox().getAbsMin().y  - 50); //TODO use HSpace primitives
-        Robot robot = new Robot(x, y, this);
+        PVector position = new PVector(terrain.getBoundingBox().getWidth() / 2, terrain.getBoundingBox().getHeight() -50);
+        position.add(terrain.getBoundingBox().getAbsMin());
+        Robot robot = new Robot(position, this);
         register(robot);
         return robot;
   }
@@ -72,11 +72,11 @@ class LilluraWorld extends World {
       int w = (int)CAMERA_WIDTH/3;
       int h = (int)CAMERA_HEIGHT/3;
       int y = (int)(WINDOW_HEIGHT - h) - VRT_SPACER;
-        HandCanvas handCanvas = new HandCanvas(HRZ_SPACER, y, w, h);
-        register(handCanvas);
-        Hand hand = new Hand(0, y, w, h);
-        register(hand);
-        return hand;
+      HandCanvas handCanvas = new HandCanvas(HRZ_SPACER, y, w, h);
+      register(handCanvas);
+      Hand hand = new Hand(0, y, w, h);
+      register(hand);
+      return hand;
   }
 
 }
