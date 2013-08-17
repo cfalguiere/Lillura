@@ -33,12 +33,15 @@ static final int PORT_OUT = 8000;
 static final int CAMERA_WIDTH = 640;
 static final int CAMERA_HEIGHT = 480;
 static final int HRZ_SPACER = 7;
+static final int VRT_HEADER = 30;
 static final int VRT_SPACER = 7;
 static final int LEFT_PANEL_WIDTH = CAMERA_WIDTH/3;
 static final int RIGHT_PANEL_WIDTH =  CAMERA_WIDTH/3;
 static final int WINDOW_WIDTH = CAMERA_WIDTH + LEFT_PANEL_WIDTH + RIGHT_PANEL_WIDTH + HRZ_SPACER*4;
 static final int WINDOW_HEIGHT = 600;
 
+static final int DARK_GREY = 72;
+static final int LIGHT_GREY = 208;
 
 World currentWorld;
 PerCWorld perCWorld;
@@ -62,7 +65,7 @@ void setup() {
 }
 
 void draw() {
-  background(color(72,72,72));
+  background(DARK_GREY);
   currentWorld.draw();
 }
 

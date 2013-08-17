@@ -9,11 +9,15 @@ class Robot extends Being implements PerCSubscriber {
   color _c;
   boolean _isOn = false;
   boolean _isGameOver = false;
+  boolean _isReset = false;
   PVector _velocity = PVector.fromAngle(-HALF_PI); // (0,-1)
+  PVector _zero;
 
   Robot(PVector position, World w) {
         super(new Rectangle(position, WIDTH, HEIGHT));
         _c = color(DEFAULT_COLOR );
+        _zero = new PVector();
+        _zero.set(position);
         //Add your constructor info here
         println("creating robot");
         
@@ -28,6 +32,10 @@ class Robot extends Being implements PerCSubscriber {
   public void update() {
     if (_isOn && !_isGameOver) {
       _position.add(_velocity);
+    }
+    if (_isReset) {
+      _position.set(_zero);
+      _isReset = false;
     }
   }
 
@@ -48,6 +56,11 @@ class Robot extends Being implements PerCSubscriber {
   
   public void handleStop() {
     _isGameOver = true;
+  }
+  
+  public void handleReset() {
+    println("resetting robot");
+    _isReset = true;
   }
 
   public void receive(KeyMessage m) {

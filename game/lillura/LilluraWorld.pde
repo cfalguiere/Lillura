@@ -4,10 +4,11 @@
  */
 class LilluraWorld extends World {
   
-  static final int SQUARE_NUM = 5;
-  Terrain _terrain;
   PerCWorld _perCWorld;
   LilluraMessenger _perCMessenger = null;
+  
+  Terrain _terrain;  
+  GameLevel _gameLevel;  
   
   LilluraWorld(int portIn, int portOut, PerCWorld pcw) {
     super(portIn, portOut);
@@ -17,7 +18,9 @@ class LilluraWorld extends World {
   void setup() {
     //IMPORTANT: put all other setup hereterBeing(TemplateBeing);
     _terrain = createTerrain();
-    Group group = createSquares(_terrain);
+    _gameLevel = new GameLevel(this, _terrain, _perCMessenger);
+  
+    createMenu(_terrain, _gameLevel);
   
     // wait until messenger is created
     while (_perCMessenger == null) {
@@ -26,14 +29,10 @@ class LilluraWorld extends World {
     Hand hand = createHand(_terrain);
     _perCMessenger.subscribe(hand);
 
-    Robot robot = createRobot(_terrain);
-    if (USE_PCC) {
-      _perCMessenger.subscribe(robot);
-    }
-
+    
     // interactors
-    register(group,robot,new LilluraInteractor());
-    register(robot,_terrain,new RobotTerrainInteractor());
+    register(_gameLevel.getSquares(), _gameLevel.getRobot(), new LilluraInteractor());
+    register(_gameLevel.getRobot(), _terrain, new RobotTerrainInteractor());
   }
 
   void preUpdate() {
@@ -51,24 +50,7 @@ class LilluraWorld extends World {
         return terrain;
   }
   
-  Group createSquares(Terrain terrain) {
-    LilluraGroup group = new LilluraGroup(this, terrain);
-    register(group);
-    
-    for (int i = 0; i < SQUARE_NUM; i++) {
-       group.addSquare();
-    }
-    
-    return group;
-  }
   
-  Robot createRobot(Terrain terrain) {
-        PVector position = new PVector(terrain.getBoundingBox().getWidth() / 2, terrain.getBoundingBox().getHeight() -50);
-        position.add(terrain.getBoundingBox().getAbsMin());
-        Robot robot = new Robot(position, this);
-        register(robot);
-        return robot;
-  }
   
   public Terrain getTerrain() {
     return _terrain;
@@ -86,5 +68,33 @@ class LilluraWorld extends World {
       return hand;
   }
 
+  MenuCanvas createMenuLeft() {
+        int x = HRZ_SPACER;
+        int y = VRT_SPACER;
+        int w =  (int)CAMERA_WIDTH/3;
+        int h = WINDOW_HEIGHT - VRT_SPACER*2;
+        MenuCanvas menuCanvas = new MenuCanvas(x, y, w, h);
+        register(menuCanvas);
+        return menuCanvas;
+  }
+  
+
+  MenuCanvas createMenu(Terrain terrain, GameLevel gameLevel) {
+        int x = (int)terrain.getBoundingBox().getAbsMin().x;
+        int y = VRT_HEADER + VRT_SPACER;
+        int w = (int)terrain.getBoundingBox().getWidth();
+        int h = (int)(WINDOW_HEIGHT - VRT_SPACER*3 - terrain.getBoundingBox().getHeight() - VRT_HEADER);
+        MenuCanvas menuCanvas = new MenuCanvas(x, y, w, h);
+        register(menuCanvas);
+        
+        float radius = h/2 * 0.8;
+        float center = h/2;
+        PVector position = new PVector(x + center, y + center);
+        MenuButtonReset reset = new MenuButtonReset(position, radius, this, _gameLevel);
+        register(reset);
+        
+        return menuCanvas;
+  }
+  
 }
 
