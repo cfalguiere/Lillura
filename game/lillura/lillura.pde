@@ -41,7 +41,7 @@ static final int WINDOW_HEIGHT = 600;
 
 
 World currentWorld;
-World menuWorld;
+PerCWorld perCWorld;
 
 ///////////////////////////////////////////////////
 // PAPPLET
@@ -51,7 +51,10 @@ void setup() {
   size(WINDOW_WIDTH, WINDOW_HEIGHT); 
   Hermes.setPApplet(this);
 
-  currentWorld = new LilluraWorld(PORT_IN, PORT_OUT);       
+  perCWorld = new PerCWorld(PORT_IN+1, PORT_OUT+1);
+  perCWorld.start(); // this should be the last line in setup() method
+  
+  currentWorld = new LilluraWorld(PORT_IN, PORT_OUT, perCWorld);
 
   //Important: don't forget to add setup to TemplateWorld!
 

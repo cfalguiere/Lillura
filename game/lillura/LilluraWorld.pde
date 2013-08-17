@@ -6,10 +6,12 @@ class LilluraWorld extends World {
   
   static final int SQUARE_NUM = 5;
   Terrain _terrain;
-  PerCMessenger _perCMessenger;
+  PerCWorld _perCWorld;
+  PerCMessenger _perCMessenger = null;
   
-  LilluraWorld(int portIn, int portOut) {
+  LilluraWorld(int portIn, int portOut, PerCWorld pcw) {
     super(portIn, portOut);
+    _perCWorld = pcw;
   }
 
   void setup() {
@@ -17,7 +19,10 @@ class LilluraWorld extends World {
     _terrain = createTerrain();
     Group group = createSquares(_terrain);
   
-    _perCMessenger = new PerCMessenger();
+    // wait until messenger is created
+    while (_perCMessenger == null) {
+      _perCMessenger = _perCWorld.getPerCMessenger();
+    }
     Hand hand = createHand(_terrain);
     _perCMessenger.subscribe(hand);
 
