@@ -17,6 +17,11 @@ class GameLevel {
       messenger.subscribe(_robot);
     }
 
+    
+    // interactors
+    world.register(_squares, _robot, new LilluraInteractor());
+    world.register(_robot, terrain, new RobotTerrainInteractor());
+
   }
 
   Group createSquares(Terrain terrain, World world) {

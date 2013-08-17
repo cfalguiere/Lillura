@@ -29,10 +29,6 @@ class LilluraWorld extends World {
     Hand hand = createHand(_terrain);
     _perCMessenger.subscribe(hand);
 
-    
-    // interactors
-    register(_gameLevel.getSquares(), _gameLevel.getRobot(), new LilluraInteractor());
-    register(_gameLevel.getRobot(), _terrain, new RobotTerrainInteractor());
   }
 
   void preUpdate() {
