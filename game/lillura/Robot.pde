@@ -76,7 +76,7 @@ class Robot extends Being implements PerCSubscriber {
   }
 
   void perCChanged(PerCMessage handSensor) {
-    _isOn = handSensor.openness > 50;
+    _isOn = handSensor.isHandOpen();
   }
 
 }

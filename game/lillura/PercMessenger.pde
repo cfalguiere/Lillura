@@ -91,6 +91,14 @@ public class PerCMessage {
   public String toString() {
     return "x= " + x + " y=" + y + " depth=" + depth + " openness=" + openness;
   }
+  
+  public boolean isHandOpen() {
+    return openness > 50;
+  }
+  
+  public boolean isTooFar() {
+    return depth > 0.4;
+  }
 }
 
 
