@@ -7,6 +7,8 @@
  * https://github.com/rdlester/hermes/wiki/Tutorial-Pt.-1:-Worlds-and-Beings
  */
 
+import java.util.LinkedList;
+
 import hermes.*;
 import hermes.hshape.*;
 import hermes.animation.*;

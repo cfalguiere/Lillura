@@ -7,7 +7,7 @@ public class PerCMessenger {
   //Maps that associate subscribers with messages they want to receive
   private final ArrayList<PerCSubscriber> _perCSubscribers;
   //Stores messages as they are received, which are then picked off by checkMail()
-  private ArrayList<PerCMessage> _perCQueue;
+  private LinkedList<PerCMessage> _perCQueue;
 
   PXCUPipeline session;
   PXCMGesture.GeoNode hand = new PXCMGesture.GeoNode();
@@ -15,7 +15,7 @@ public class PerCMessenger {
 
   PerCMessenger() {
     _perCSubscribers = new ArrayList<PerCSubscriber>();
-    _perCQueue = new ArrayList<PerCMessage>();
+    _perCQueue = new LinkedList<PerCMessage>();
     initSensor();
   }
   
@@ -33,6 +33,7 @@ public class PerCMessenger {
   public void checkMessages() {
     if (_isActive)  {
       acquireEvents();
+      firePerCChanged(hand);
     }
   } 
 
@@ -41,7 +42,14 @@ public class PerCMessenger {
     {
       if(session.QueryGeoNode(PXCMGesture.GeoNode.LABEL_BODY_HAND_PRIMARY|PXCMGesture.GeoNode.LABEL_OPENNESS_ANY, hand))
       {
-       firePerCChanged(hand);
+        PerCMessage event = new PerCMessage();
+        event.x = hand.positionImage.x;
+        event.y = hand.positionImage.y;
+        event.depth = hand.positionWorld.y;
+        event.openness = hand.openness;
+        synchronized(_perCQueue) {
+          _perCQueue.add(event);
+        }
       }
 //      PXCMGesture.Gesture gdata=new PXCMGesture.Gesture();
 //      if (pp.QueryGesture(PXCMGesture.GeoNode.LABEL_ANY,gdata)){
@@ -53,14 +61,11 @@ public class PerCMessenger {
   }
    
   protected void firePerCChanged(PXCMGesture.GeoNode hand) {
-    //println("firing PerC change events to " + _perCSubscribers.size() + " subscribers");
-    for(PerCSubscriber subscriber : _perCSubscribers) {
-      PerCMessage event = new PerCMessage();
-      event.x = hand.positionImage.x;
-      event.y = hand.positionImage.y;
-      event.depth = hand.positionWorld.y;
-      event.openness = hand.openness;
-      subscriber.perCChanged(event);
+    while(!_perCQueue.isEmpty()) {
+      PerCMessage m = _perCQueue.poll();
+      for(PerCSubscriber subscriber : _perCSubscribers) {
+        subscriber.perCChanged(event);
+      }
     }
   }
 
