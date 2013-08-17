@@ -15,7 +15,7 @@ import hermes.animation.*;
 import hermes.physics.*;
 import hermes.postoffice.*;
 
-import intel.pcsdk.*;
+//import intel.pcsdk.*;
 
 
 ///////////////////////////////////////////////////
@@ -25,8 +25,8 @@ import intel.pcsdk.*;
  * Constants should go up here
  * Making more things constants makes them easier to adjust and play with!
  */
-//static final int TERRAIN_WIDTH = 600;
-//static final int TERRAIN_HEIGHT = 600;
+static final boolean USE_PCC = false;
+
 static final int PORT_IN = 8080;
 static final int PORT_OUT = 8000; 
 

@@ -1,15 +1,19 @@
 class PerCWorld extends World {
-  PerCMessenger _perCMessenger;
+  LilluraMessenger _perCMessenger;
 
   PerCWorld(int portIn, int portOut) {
     super(portIn, portOut);
   }
   
   void setup() {
-    _perCMessenger = new PerCMessenger();
+    if (USE_PCC) {
+      //_perCMessenger = new PerCMessenger();
+    } else {
+      _perCMessenger = new LilluraMessenger();
+    }
   }
   
-  public PerCMessenger getPerCMessenger() {
+  public LilluraMessenger getPerCMessenger() {
     return _perCMessenger;
   }
   

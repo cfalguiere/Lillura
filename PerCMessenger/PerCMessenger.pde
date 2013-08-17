@@ -1,7 +1,7 @@
 /*
 acquire data from the camera and dispatch to subscribers
 */
-public class PerCMessenger {
+public class PerCMessenger extends LilluraMessenger {
   static final int PERC_MESSAGE_ANY = 0;
   
   //Maps that associate subscribers with messages they want to receive
@@ -64,7 +64,7 @@ public class PerCMessenger {
     while(!_perCQueue.isEmpty()) {
       PerCMessage m = _perCQueue.poll();
       for(PerCSubscriber subscriber : _perCSubscribers) {
-        subscriber.perCChanged(event);
+        subscriber.perCChanged(m);
       }
     }
   }

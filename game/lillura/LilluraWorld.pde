@@ -7,7 +7,7 @@ class LilluraWorld extends World {
   static final int SQUARE_NUM = 5;
   Terrain _terrain;
   PerCWorld _perCWorld;
-  PerCMessenger _perCMessenger = null;
+  LilluraMessenger _perCMessenger = null;
   
   LilluraWorld(int portIn, int portOut, PerCWorld pcw) {
     super(portIn, portOut);
@@ -27,7 +27,9 @@ class LilluraWorld extends World {
     _perCMessenger.subscribe(hand);
 
     Robot robot = createRobot(_terrain);
-    _perCMessenger.subscribe(robot);
+    if (USE_PCC) {
+      _perCMessenger.subscribe(robot);
+    }
 
     // interactors
     register(group,robot,new LilluraInteractor());
