@@ -12,14 +12,14 @@ class GameLevelWorld extends World implements MessageSubscriber {
   BlockGroup blocks; 
   Robot robot;
   
-  GameLevelWorld(int portIn, int portOut, LilluraWorld aMainWorld, Rectangle aWorldBoundingBox) {
+  GameLevelWorld(int portIn, int portOut, LilluraWorld aMainWorld, Rectangle aWorldBoundingBox, LilluraMessenger theMessenger) {
       super(portIn, portOut);
       mainWorld = aMainWorld;
       worldBoundingBox = aWorldBoundingBox;
+      messenger = theMessenger;
   }
 
   void setup() {
-      messenger = mainWorld.getMessenger(); 
       messenger.subscribe(this);
       
       createTerrain(); //TODO draw borders
@@ -38,6 +38,7 @@ class GameLevelWorld extends World implements MessageSubscriber {
       register(robot, blocks, new RobotBlockInteractor()); 
       register(robot, terrain, new RobotTerrainInteractor());
 
+      println("GameLevel world set up");
   }
 
   //
@@ -78,6 +79,7 @@ class GameLevelWorld extends World implements MessageSubscriber {
       position.add(worldBoundingBox.getAbsMin());
       robot = new Robot(position, this);
       register(robot);
+      messenger.subscribe(robot);
   }
   
 

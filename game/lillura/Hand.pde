@@ -15,6 +15,7 @@ class Hand extends Being implements MessageSubscriber {
     super(new Rectangle(x, y, w, h));
     //warning the boundingbox equals the canvas
     _c = color(256,256,256);
+    println("hand created");
   }
 
   

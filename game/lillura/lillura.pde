@@ -15,7 +15,7 @@ import hermes.animation.*;
 import hermes.physics.*;
 import hermes.postoffice.*;
 
-//import intel.pcsdk.*;
+import intel.pcsdk.*;
 
 
 ///////////////////////////////////////////////////
@@ -45,6 +45,7 @@ static final int MENU_BG = 96;
 static final int HAND_BG = 36;
 
 LilluraWorld mainWorld;
+MessengerWorld messengerWorld;
 //PerCWorld perCWorld;
 GameLevelWorld gameLevelWorld;
 
@@ -57,11 +58,14 @@ void setup() {
   Hermes.setPApplet(this);
   //Important: don't forget to add setup to TemplateWorld!
 
+  messengerWorld = new MessengerWorld(PORT_IN+1, PORT_OUT+1);
+  messengerWorld.start();
+
   //perCWorld = new PerCWorld(PORT_IN+1, PORT_OUT+1);
   //perCWorld.start(); // this should be the last line in setup() method
 
   Rectangle leftPanelBoundingBox = new Rectangle(HRZ_SPACER, VRT_SPACER, CAMERA_WIDTH/3, WINDOW_HEIGHT - VRT_SPACER*2);  
-  mainWorld = new LilluraWorld(PORT_IN, PORT_OUT, leftPanelBoundingBox);
+  mainWorld = new LilluraWorld(PORT_IN, PORT_OUT, leftPanelBoundingBox, messengerWorld.getMessenger());
   mainWorld.start(); // this should be the last line in setup() method
   
   
@@ -69,7 +73,7 @@ void setup() {
   int glY = WINDOW_HEIGHT - CAMERA_HEIGHT - VRT_SPACER;  
   Rectangle gameLevelBoundingBox = new Rectangle(glX, glY, CAMERA_WIDTH, CAMERA_HEIGHT);
 
-  gameLevelWorld = new GameLevelWorld(PORT_IN+2, PORT_OUT+2, mainWorld, gameLevelBoundingBox);
+  gameLevelWorld = new GameLevelWorld(PORT_IN+2, PORT_OUT+2, mainWorld, gameLevelBoundingBox, messengerWorld.getMessenger());
   gameLevelWorld.start(); // this should be the last line in setup() method
 
 }

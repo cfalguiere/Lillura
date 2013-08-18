@@ -6,18 +6,19 @@ class Robot extends Being implements MessageSubscriber {
   static final int HEIGHT = 30;
   static final int SPEED = 1;
   static final int DEFAULT_COLOR = 127; 
+
+  boolean isOn = false;
+  boolean isGameOver = false;
+  boolean isReset = false;
   color _c;
-  boolean _isOn = false;
-  boolean _isGameOver = false;
-  boolean _isReset = false;
   PVector _velocity = PVector.fromAngle(-HALF_PI); // (0,-1)
-  PVector _zero;
+  PVector zero;
 
   Robot(PVector position, World w) {
         super(new Rectangle(position, WIDTH, HEIGHT));
         _c = color(DEFAULT_COLOR );
-        _zero = new PVector();
-        _zero.set(position);
+        zero = new PVector();
+        zero.set(position);
         //Add your constructor info here
         println("creating robot");
         
@@ -30,17 +31,17 @@ class Robot extends Being implements MessageSubscriber {
   }
 
   public void update() {
-    if (_isOn && !_isGameOver) {
+    if (isOn && !isGameOver) {
       _position.add(_velocity);
     }
-    if (_isReset) {
-      _position.set(_zero);
-      _isReset = false;
+    if (isReset) {
+      _position.set(zero);
+      isReset = false;
     }
   }
 
   public void draw() {
-    if (_isGameOver) {
+    if (isGameOver) {
         fill(color(256,0,0));
     } else {
         fill(_c);
@@ -55,18 +56,20 @@ class Robot extends Being implements MessageSubscriber {
   }
   
   public void handleStop() {
-    _isGameOver = true;
+    isGameOver = true;
   }
   
   public void handleReset() {
     println("resetting robot");
-    _isReset = true;
+    isOn = false;
+    isGameOver = false;
+    isReset = true;
   }
 
   public void receive(KeyMessage m) {
     int code = m.getKeyCode();
     if (m.isPressed()) {
-      _isOn = (code == POCodes.Key.SPACE?false:true);
+      isOn = (code == POCodes.Key.SPACE?false:true);
 
       switch (code) {
         case POCodes.Key.LEFT:
@@ -84,12 +87,13 @@ class Robot extends Being implements MessageSubscriber {
   
   public void receive(MouseMessage m) {
     if (m.getAction() == POCodes.Click.PRESSED) {
-        _isOn = false;
+        isOn = false;
     }
   }
 
   void perCChanged(PerCMessage handSensor) {
-    _isOn = handSensor.isHandOpen();
+    println("robot received signal hand open");
+    isOn = handSensor.isHandOpen();
   }
 
   void actionSent(ActionMessage event) {

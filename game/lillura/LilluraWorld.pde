@@ -10,36 +10,34 @@ class LilluraWorld extends World {
   
   //GameLevel _gameLevel;  
   
-  LilluraWorld(int portIn, int portOut, Rectangle aBoundingBox) {
+  LilluraWorld(int portIn, int portOut, Rectangle aBoundingBox, LilluraMessenger theMessenger) {
       super(portIn, portOut);
       leftPanelBoundingBox = aBoundingBox;
+      messenger = theMessenger;
   }
 
   void setup() {
       //IMPORTANT: put all other setup hereterBeing(TemplateBeing);
-      messenger = new LilluraMessenger();
-    
       createMenu();
     
       createHand();
+            
+      println("Lillura world set up");
   }
 
-  void preUpdate() {
-      messenger.checkMessages();
-  }
-  
   //
   // World construction
   //
     
-  void createMenu() { 
-      PVector position = leftPanelBoundingBox.getAbsMin();
+  void createMenu() {      
       int w = (int)leftPanelBoundingBox.getWidth();
-      int h = (int)leftPanelBoundingBox.getWidth()/3;
+      int h = (int)leftPanelBoundingBox.getWidth()/4;
+      PVector position = leftPanelBoundingBox.getAbsMin();
+      position.add(new PVector(0,h));
       MenuCanvas menuCanvas = new MenuCanvas(position, w, h);
       register(menuCanvas);
       
-      float radius = h/2 * 0.8;
+      float radius = h/2 * 0.7;
       float center = h/2;
       PVector positionCenter = new PVector(position.x + center, position.y + center);
       MenuButtonReset reset = new MenuButtonReset(positionCenter, radius, this, messenger);
@@ -59,9 +57,5 @@ class LilluraWorld extends World {
       messenger.subscribe(hand);
   }
 
-  
-  LilluraMessenger getMessenger() {
-    return messenger;
-  }
 }
 

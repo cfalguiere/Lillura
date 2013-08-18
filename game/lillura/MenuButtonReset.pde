@@ -13,7 +13,7 @@ class MenuButtonReset extends Being {
     if (isPressed) {
         noStroke();
     } else {
-        strokeWeight(10);
+        strokeWeight(5);
         stroke(MENU_BG);
     }
     _shape.draw();

@@ -2,7 +2,7 @@ class HandCanvas extends Being {
   
   HandCanvas(int x, int y, int w, int h) {
         super(new Rectangle(x, y, w, h));
-        println("creating hand canvas");
+        println("hand canvas created");
   }
   
   public void update() {
