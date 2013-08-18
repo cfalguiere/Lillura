@@ -117,13 +117,13 @@ public class PerCMessage extends Message {
   }
   
   public boolean isHandOpen() {
-    return openness >= 50;
-    //return opennessState == PXCMGesture.GeoNode.LABEL_OPEN;
+    //return openness >= 50;
+    return opennessState == PXCMGesture.GeoNode.LABEL_OPEN;
   }
   
   public boolean isHandClose() {
-    return openness < 50;
-    //return opennessState == PXCMGesture.GeoNode.LABEL_CLOSE;
+    //return openness < 50;
+    return opennessState == PXCMGesture.GeoNode.LABEL_CLOSE;
   }
   
   public boolean isTooFar() {
