@@ -2,9 +2,9 @@
 acquire data from the camera and dispatch to subscribers
 */
 public class LilluraMessenger {
-  
+  /*
   PerCSensor perCSensor;
-  
+  */
   // subscriber
   private final ArrayList<MessageSubscriber> messageSubscribers;
   // message queue
@@ -15,19 +15,23 @@ public class LilluraMessenger {
     messageSubscribers = new ArrayList<MessageSubscriber>();
     actionMessageQueue = new LinkedList<ActionMessage>();
     perCMessageQueue = new LinkedList<PerCMessage>();
-    
+    /*
     perCSensor = new PerCSensor(this);
-    
+    */
     println("Messenger created");
   }
   
   void setup() {
+    /*
     perCSensor.setup();
+    */
     println("Messenger set up");
   }
   
   public void checkMessages() {
+    /*
     perCSensor.acquireEvents();
+    */
     fireMessages();
     firePerCChanged();
   } 
@@ -97,14 +101,15 @@ public class Message {
 }
 
 public class ActionMessage extends Message {
-  static final int ACTION_RESET = 0;
+  static final int ACTION_RESET = 10;
+  static final int ACTION_COMPLETED = 20;
   int action;
   ActionMessage(int anAction)  {
     action = anAction;
   }
 }
 
-
+//Mock
 public class PerCMessage extends Message {
   public float x;
   public float y;
@@ -112,22 +117,17 @@ public class PerCMessage extends Message {
   public float openness;
   public float opennessState;
   public int gesture;
-  public String toString() {
-    return "x= " + x + " y=" + y + " depth=" + depth + " openness=" + openness;
-  }
   
   public boolean isHandOpen() {
-    //return openness >= 50;
-    return opennessState == PXCMGesture.GeoNode.LABEL_OPEN;
+    return true;
   }
   
   public boolean isHandClose() {
-    //return openness < 50;
-    return opennessState == PXCMGesture.GeoNode.LABEL_CLOSE;
+    return false;
   }
   
   public boolean isTooFar() {
-    return depth > 0.4;
+    return false;
   }
 }
 

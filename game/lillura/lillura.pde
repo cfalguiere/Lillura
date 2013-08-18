@@ -15,8 +15,9 @@ import hermes.animation.*;
 import hermes.physics.*;
 import hermes.postoffice.*;
 
+/*
 import intel.pcsdk.*;
-
+*/
 
 ///////////////////////////////////////////////////
 // CONSTANTS
@@ -36,18 +37,20 @@ static final int HRZ_SPACER = 7;
 static final int VRT_HEADER = 30;
 static final int VRT_SPACER = 7;
 static final int LEFT_PANEL_WIDTH = CAMERA_WIDTH/3;
-static final int RIGHT_PANEL_WIDTH =  CAMERA_WIDTH/3;
+static final int RIGHT_PANEL_WIDTH =  CAMERA_WIDTH/6;
 static final int WINDOW_WIDTH = CAMERA_WIDTH + LEFT_PANEL_WIDTH + RIGHT_PANEL_WIDTH + HRZ_SPACER*4;
 static final int WINDOW_HEIGHT = CAMERA_HEIGHT + HRZ_SPACER*2;
 
 static final int FRAME_BG = 72;
 static final int MENU_BG = 96;
+static final int DECK_BG = 96;
 static final int HAND_BG = 36;
 
 LilluraWorld mainWorld;
 MessengerWorld messengerWorld;
 //PerCWorld perCWorld;
 GameLevelWorld gameLevelWorld;
+CardDeckWorld cardDeckWorld;
 
 ///////////////////////////////////////////////////
 // PAPPLET
@@ -64,17 +67,22 @@ void setup() {
   //perCWorld = new PerCWorld(PORT_IN+1, PORT_OUT+1);
   //perCWorld.start(); // this should be the last line in setup() method
 
-  Rectangle leftPanelBoundingBox = new Rectangle(HRZ_SPACER, VRT_SPACER, CAMERA_WIDTH/3, WINDOW_HEIGHT - VRT_SPACER*2);  
+  Rectangle leftPanelBoundingBox = new Rectangle(HRZ_SPACER, VRT_SPACER, LEFT_PANEL_WIDTH, WINDOW_HEIGHT - VRT_SPACER*2);  
   mainWorld = new LilluraWorld(PORT_IN, PORT_OUT, leftPanelBoundingBox, messengerWorld.getMessenger());
   mainWorld.start(); // this should be the last line in setup() method
   
   
-  int glX = (int)leftPanelBoundingBox.getMax().x + HRZ_SPACER;
+  int glX = (int)leftPanelBoundingBox.getAbsMax().x + HRZ_SPACER;
   int glY = WINDOW_HEIGHT - CAMERA_HEIGHT - VRT_SPACER;  
   Rectangle gameLevelBoundingBox = new Rectangle(glX, glY, CAMERA_WIDTH, CAMERA_HEIGHT);
 
   gameLevelWorld = new GameLevelWorld(PORT_IN+2, PORT_OUT+2, mainWorld, gameLevelBoundingBox, messengerWorld.getMessenger());
   gameLevelWorld.start(); // this should be the last line in setup() method
+
+  int cdX = (int)gameLevelBoundingBox.getAbsMax().x + HRZ_SPACER;
+  Rectangle cardDeckBoundingBox = new Rectangle(cdX , VRT_SPACER, RIGHT_PANEL_WIDTH, WINDOW_HEIGHT - VRT_SPACER*2);  
+  cardDeckWorld = new CardDeckWorld(PORT_IN+3, PORT_OUT+3, cardDeckBoundingBox, messengerWorld.getMessenger());
+  cardDeckWorld.start(); 
 
 }
 
@@ -82,5 +90,6 @@ void draw() {
   background(FRAME_BG);
   mainWorld.draw();
   gameLevelWorld.draw();
+  cardDeckWorld.draw();
 }
 

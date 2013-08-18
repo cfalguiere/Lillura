@@ -1,7 +1,9 @@
 /*
 This class responisbilities are to interface the camera, collect information and store the state of the interaction
 */
+/*
 class PerCSensor {
+  
   float[] mHandPos = new float[4];
   
   PXCUPipeline session;
@@ -53,4 +55,32 @@ class PerCSensor {
       }
   }
 }
+
+
+public class PerCMessage extends Message {
+  public float x;
+  public float y;
+  public float depth;
+  public float openness;
+  public float opennessState;
+  public int gesture;
+  public String toString() {
+    return "x= " + x + " y=" + y + " depth=" + depth + " openness=" + openness;
+  }
+  
+  public boolean isHandOpen() {
+    //return openness >= 50;
+    return opennessState == PXCMGesture.GeoNode.LABEL_OPEN;
+  }
+  
+  public boolean isHandClose() {
+    //return openness < 50;
+    return opennessState == PXCMGesture.GeoNode.LABEL_CLOSE;
+  }
+  
+  public boolean isTooFar() {
+    return depth > 0.4;
+  }
+}
+*/
 

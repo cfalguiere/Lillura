@@ -50,6 +50,7 @@ class GameLevelWorld extends World implements MessageSubscriber {
         robot.handleReset();
       }
     }
+    
     void perCChanged(PerCMessage event) {
       // don't care
     }
@@ -77,7 +78,7 @@ class GameLevelWorld extends World implements MessageSubscriber {
   void createRobot() { 
       PVector position = new PVector(worldBoundingBox.getWidth() / 2, worldBoundingBox.getHeight() -50);
       position.add(worldBoundingBox.getAbsMin());
-      robot = new Robot(position, this);
+      robot = new Robot(position, this, messenger);
       register(robot);
       messenger.subscribe(robot);
   }

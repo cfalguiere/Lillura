@@ -7,6 +7,8 @@ class Robot extends Being implements MessageSubscriber {
   static final int SPEED = 1;
   static final int DEFAULT_COLOR = 127; 
 
+  LilluraMessenger messenger;
+
   boolean isOn = false;
   boolean isGameOver = false;
   boolean isReset = false;
@@ -14,8 +16,10 @@ class Robot extends Being implements MessageSubscriber {
   PVector _velocity = PVector.fromAngle(-HALF_PI); // (0,-1)
   PVector zero;
 
-  Robot(PVector position, World w) {
+  Robot(PVector position, World w, LilluraMessenger theMessenger) {
         super(new Rectangle(position, WIDTH, HEIGHT));
+        messenger = theMessenger;
+        
         _c = color(DEFAULT_COLOR );
         zero = new PVector();
         zero.set(position);
@@ -55,6 +59,11 @@ class Robot extends Being implements MessageSubscriber {
      return color(int(random(256)), int(random(256)), int(random(256)));
   }
   
+  public void handlePause() {
+     isOn = false;
+     messenger.sendActionMessage(ActionMessage.ACTION_COMPLETED);
+  }
+  
   public void handleStop() {
     isGameOver = true;
   }
@@ -69,7 +78,11 @@ class Robot extends Being implements MessageSubscriber {
   public void receive(KeyMessage m) {
     int code = m.getKeyCode();
     if (m.isPressed()) {
-      isOn = (code == POCodes.Key.SPACE?false:true);
+      if (code == POCodes.Key.SPACE) {
+        handlePause();
+      } else {
+        isOn = true;
+      }
 
       switch (code) {
         case POCodes.Key.LEFT:
@@ -87,7 +100,7 @@ class Robot extends Being implements MessageSubscriber {
   
   public void receive(MouseMessage m) {
     if (m.getAction() == POCodes.Click.PRESSED) {
-        isOn = false;
+      handlePause();
     }
   }
 
