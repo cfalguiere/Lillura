@@ -10,7 +10,7 @@ class HandCanvas extends Being {
   }
 
   public void draw() {
-        fill(0);
+        fill(HAND_BG);
         noStroke();
         _shape.draw();
   }

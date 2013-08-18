@@ -19,7 +19,7 @@ class GameLevelWorld extends World {
   }
 
   void setup() {
-      //messenger = mainWorld.getMessenger(); //TODO remettre
+      messenger = mainWorld.getMessenger(); 
       
       createTerrain(); //TODO draw borders
   
@@ -27,7 +27,7 @@ class GameLevelWorld extends World {
       
       createRobot();
       if (USE_PCC) {
-        //messenger.subscribe(robot); // TODO
+        messenger.subscribe(robot);
       }
       
       // TOSO goal 

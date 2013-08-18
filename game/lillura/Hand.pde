@@ -1,5 +1,5 @@
 
-class Hand extends Being implements PerCSubscriber {
+class Hand extends Being implements MessageSubscriber {
   static final int WIDTH = 30;
   static final int HEIGHT = 50;
   

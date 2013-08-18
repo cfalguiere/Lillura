@@ -38,13 +38,14 @@ static final int VRT_SPACER = 7;
 static final int LEFT_PANEL_WIDTH = CAMERA_WIDTH/3;
 static final int RIGHT_PANEL_WIDTH =  CAMERA_WIDTH/3;
 static final int WINDOW_WIDTH = CAMERA_WIDTH + LEFT_PANEL_WIDTH + RIGHT_PANEL_WIDTH + HRZ_SPACER*4;
-static final int WINDOW_HEIGHT = 600;
+static final int WINDOW_HEIGHT = CAMERA_HEIGHT + HRZ_SPACER*2;
 
-static final int DARK_GREY = 72;
-static final int LIGHT_GREY = 208;
+static final int FRAME_BG = 72;
+static final int MENU_BG = 96;
+static final int HAND_BG = 36;
 
-LilluraWorld currentWorld;
-PerCWorld perCWorld;
+LilluraWorld mainWorld;
+//PerCWorld perCWorld;
 GameLevelWorld gameLevelWorld;
 
 ///////////////////////////////////////////////////
@@ -54,30 +55,28 @@ GameLevelWorld gameLevelWorld;
 void setup() {
   size(WINDOW_WIDTH, WINDOW_HEIGHT); 
   Hermes.setPApplet(this);
-
-  perCWorld = new PerCWorld(PORT_IN+1, PORT_OUT+1);
-  perCWorld.start(); // this should be the last line in setup() method
-  
-  currentWorld = new LilluraWorld(PORT_IN, PORT_OUT, perCWorld);
-
   //Important: don't forget to add setup to TemplateWorld!
 
-  currentWorld.start(); // this should be the last line in setup() method
-  
-  Rectangle leftPanelBoundinBox = new Rectangle(HRZ_SPACER, VRT_SPACER, CAMERA_WIDTH/3, WINDOW_HEIGHT - VRT_SPACER*2);
-  
-  int glX = (int)leftPanelBoundinBox.getMax().x + HRZ_SPACER;
-  int glY = WINDOW_HEIGHT - CAMERA_HEIGHT - VRT_SPACER;  
-  Rectangle gameLevelBoundinBox = new Rectangle(glX, glY, CAMERA_WIDTH, CAMERA_HEIGHT);
+  //perCWorld = new PerCWorld(PORT_IN+1, PORT_OUT+1);
+  //perCWorld.start(); // this should be the last line in setup() method
 
-  gameLevelWorld = new GameLevelWorld(PORT_IN+2, PORT_OUT+2, currentWorld, gameLevelBoundinBox);
+  Rectangle leftPanelBoundingBox = new Rectangle(HRZ_SPACER, VRT_SPACER, CAMERA_WIDTH/3, WINDOW_HEIGHT - VRT_SPACER*2);  
+  mainWorld = new LilluraWorld(PORT_IN, PORT_OUT, leftPanelBoundingBox);
+  mainWorld.start(); // this should be the last line in setup() method
+  
+  
+  int glX = (int)leftPanelBoundingBox.getMax().x + HRZ_SPACER;
+  int glY = WINDOW_HEIGHT - CAMERA_HEIGHT - VRT_SPACER;  
+  Rectangle gameLevelBoundingBox = new Rectangle(glX, glY, CAMERA_WIDTH, CAMERA_HEIGHT);
+
+  gameLevelWorld = new GameLevelWorld(PORT_IN+2, PORT_OUT+2, mainWorld, gameLevelBoundingBox);
   gameLevelWorld.start(); // this should be the last line in setup() method
 
 }
 
 void draw() {
-  background(DARK_GREY);
-  currentWorld.draw();
+  background(FRAME_BG);
+  mainWorld.draw();
   gameLevelWorld.draw();
 }
 
