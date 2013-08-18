@@ -92,7 +92,6 @@ class Robot extends Being implements MessageSubscriber {
   }
 
   void perCChanged(PerCMessage handSensor) {
-    println("robot received signal hand open");
     isOn = handSensor.isHandOpen() && !handSensor.isTooFar();
   }
 
