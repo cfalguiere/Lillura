@@ -1,14 +1,14 @@
 /**
- * Template being
+ * Block placed on the terrain
  */
-class LilluraBeing extends Being {
+class Block extends Being {
   static final int WIDTH = 50;
   static final int HEIGHT = 50;
   final color RED = color(256,0,0);
   color _c;
   boolean _stroke = false;
 
-  LilluraBeing(int x, int y, color pc) {
+  Block(int x, int y, color pc) {
         super(new Rectangle(x, y, WIDTH, HEIGHT));
         _c = pc;
         //Add your constructor info here

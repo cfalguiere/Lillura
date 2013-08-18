@@ -43,8 +43,9 @@ static final int WINDOW_HEIGHT = 600;
 static final int DARK_GREY = 72;
 static final int LIGHT_GREY = 208;
 
-World currentWorld;
+LilluraWorld currentWorld;
 PerCWorld perCWorld;
+GameLevelWorld gameLevelWorld;
 
 ///////////////////////////////////////////////////
 // PAPPLET
@@ -62,10 +63,21 @@ void setup() {
   //Important: don't forget to add setup to TemplateWorld!
 
   currentWorld.start(); // this should be the last line in setup() method
+  
+  Rectangle leftPanelBoundinBox = new Rectangle(HRZ_SPACER, VRT_SPACER, CAMERA_WIDTH/3, WINDOW_HEIGHT - VRT_SPACER*2);
+  
+  int glX = (int)leftPanelBoundinBox.getMax().x + HRZ_SPACER;
+  int glY = WINDOW_HEIGHT - CAMERA_HEIGHT - VRT_SPACER;  
+  Rectangle gameLevelBoundinBox = new Rectangle(glX, glY, CAMERA_WIDTH, CAMERA_HEIGHT);
+
+  gameLevelWorld = new GameLevelWorld(PORT_IN+2, PORT_OUT+2, currentWorld, gameLevelBoundinBox);
+  gameLevelWorld.start(); // this should be the last line in setup() method
+
 }
 
 void draw() {
   background(DARK_GREY);
   currentWorld.draw();
+  gameLevelWorld.draw();
 }
 

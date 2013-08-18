@@ -2,7 +2,15 @@
 acquire data from the camera and dispatch to subscribers
 */
 public class LilluraMessenger {
+  
+  // subscriber
+  private final ArrayList<MessageSubscriber> messageSubscribers;
+  // message queue
+  private LinkedList<Message> messageQueue;
+
   LilluraMessenger() {
+    messageSubscribers = new ArrayList<MessageSubscriber>();
+    messageQueue = new LinkedList<Message>();
   }
   
   public void checkMessages() {
@@ -14,20 +22,27 @@ public class LilluraMessenger {
   //
   // Subscriber management
   //
-  synchronized public void subscribe(PerCSubscriber subscriber) {
+  synchronized public void subscribe(MessageSubscriber subscriber) {
   }
  
-  synchronized public void removeSubscriptions(PerCSubscriber subscriber) {
+  synchronized public void removeSubscriptions(MessageSubscriber subscriber) {
   }
   
 
 }
 
-public interface PerCSubscriber {
+public interface MessageSubscriber {
     void perCChanged(PerCMessage event);
 }
 
-public class PerCMessage {
+public class MessageSubscriberAdapter {
+    void perCChanged(PerCMessage event) {}
+}
+
+public class Message {
+}
+
+public class PerCMessage extends Message {
   public float x;
   public float y;
   public float depth;

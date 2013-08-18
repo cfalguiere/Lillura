@@ -2,13 +2,11 @@ class MenuButtonReset extends Being {
   color _c;
   boolean _isPressed = false;
   World _world;
-  GameLevel _gameLevel;
   
-  MenuButtonReset(PVector position, float radius, World world, GameLevel gameLevel) {
+  MenuButtonReset(PVector position, float radius, World world) {
         super(new Circle(position, radius));
         world.subscribe(this, POCodes.Button.LEFT, _shape);
         _world = world;
-        _gameLevel = gameLevel;
   }
   
   public void draw() {
@@ -30,7 +28,7 @@ class MenuButtonReset extends Being {
     if (m.getAction() == POCodes.Click.RELEASED) {
         _isPressed = false;
         println("release reset");
-        _gameLevel.resetLevel();
+        //_gameLevel.resetLevel();  //TODO send message
     }
   }
 

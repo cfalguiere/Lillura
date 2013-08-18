@@ -1,7 +1,7 @@
 /**
  * Template being
  */
-class Robot extends Being implements PerCSubscriber {
+class Robot extends Being implements MessageSubscriber {
   static final int WIDTH = 30;
   static final int HEIGHT = 30;
   static final int SPEED = 1;

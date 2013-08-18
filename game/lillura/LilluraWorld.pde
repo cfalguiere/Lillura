@@ -5,10 +5,9 @@
 class LilluraWorld extends World {
   
   PerCWorld _perCWorld;
-  LilluraMessenger _perCMessenger = null;
+  LilluraMessenger _perCMessenger = null;  //TODO renommer
   
-  Terrain _terrain;  
-  GameLevel _gameLevel;  
+  //GameLevel _gameLevel;  
   
   LilluraWorld(int portIn, int portOut, PerCWorld pcw) {
     super(portIn, portOut);
@@ -17,16 +16,16 @@ class LilluraWorld extends World {
 
   void setup() {
     //IMPORTANT: put all other setup hereterBeing(TemplateBeing);
-    _terrain = createTerrain();
-    _gameLevel = new GameLevel(this, _terrain, _perCMessenger);
+    //_terrain = createTerrain();
+    //_gameLevel = new GameLevel(this, _terrain, _perCMessenger);
   
-    createMenu(_terrain, _gameLevel);
+    createMenu();
   
     // wait until messenger is created
-    while (_perCMessenger == null) {
+    while (_perCMessenger == null) { //TODO changer
       _perCMessenger = _perCWorld.getPerCMessenger();
     }
-    Hand hand = createHand(_terrain);
+    Hand hand = createHand();
     _perCMessenger.subscribe(hand);
 
   }
@@ -38,22 +37,10 @@ class LilluraWorld extends World {
   //
   // World construction
   //
-  Terrain createTerrain() {
-        int x = CAMERA_WIDTH/3 + HRZ_SPACER*2;
-        int y = WINDOW_HEIGHT - CAMERA_HEIGHT -  + VRT_SPACER;
-        Terrain terrain = new Terrain(x, y, CAMERA_WIDTH, CAMERA_HEIGHT);
-        register(terrain);
-        return terrain;
-  }
   
   
-  
-  public Terrain getTerrain() {
-    return _terrain;
-  }  
-
-  
-  Hand createHand(Terrain terrain) {
+    
+  Hand createHand() {
       int w = (int)CAMERA_WIDTH/3;
       int h = (int)CAMERA_HEIGHT/3;
       int y = (int)(WINDOW_HEIGHT - h) - VRT_SPACER;
@@ -75,22 +62,25 @@ class LilluraWorld extends World {
   }
   
 
-  MenuCanvas createMenu(Terrain terrain, GameLevel gameLevel) {
-        int x = (int)terrain.getBoundingBox().getAbsMin().x;
+  MenuCanvas createMenu() { //TODO bounding box
+        int x = CAMERA_WIDTH/3 + HRZ_SPACER*2;
         int y = VRT_HEADER + VRT_SPACER;
-        int w = (int)terrain.getBoundingBox().getWidth();
-        int h = (int)(WINDOW_HEIGHT - VRT_SPACER*3 - terrain.getBoundingBox().getHeight() - VRT_HEADER);
+        int w = CAMERA_WIDTH;
+        int h = (int)(WINDOW_HEIGHT - VRT_SPACER*3 - CAMERA_HEIGHT - VRT_HEADER);
         MenuCanvas menuCanvas = new MenuCanvas(x, y, w, h);
         register(menuCanvas);
         
         float radius = h/2 * 0.8;
         float center = h/2;
         PVector position = new PVector(x + center, y + center);
-        MenuButtonReset reset = new MenuButtonReset(position, radius, this, _gameLevel);
+        MenuButtonReset reset = new MenuButtonReset(position, radius, this);
         register(reset);
         
         return menuCanvas;
   }
   
+  LilluraMessenger getMessenger() {
+    return _perCMessenger;
+  }
 }
 
