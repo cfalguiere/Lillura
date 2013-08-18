@@ -1,4 +1,4 @@
-class GameLevelWorld extends World {
+class GameLevelWorld extends World implements MessageSubscriber {
   
   static final int SQUARE_NUM = 5;
   
@@ -20,6 +20,7 @@ class GameLevelWorld extends World {
 
   void setup() {
       messenger = mainWorld.getMessenger(); 
+      messenger.subscribe(this);
       
       createTerrain(); //TODO draw borders
   
@@ -39,6 +40,19 @@ class GameLevelWorld extends World {
 
   }
 
+  //
+  // behavior implementation 
+  //
+    void actionSent(ActionMessage event) {
+      if (event.action == ActionMessage.ACTION_RESET) {
+        println("requesting robot to reset");
+        robot.handleReset();
+      }
+    }
+    void perCChanged(PerCMessage event) {
+      // don't care
+    }
+  
   //
   // World construction 
   //

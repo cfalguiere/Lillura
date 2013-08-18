@@ -17,18 +17,6 @@ class Hand extends Being implements MessageSubscriber {
     _c = color(256,256,256);
   }
 
-
-  void perCChanged(PerCMessage handSensor) {
-    println("received perc changed " + handSensor);
-    openness = handSensor.openness;
-    
-    handX = flipXAxisAndScale(handSensor.x); 
-    handY = scaleYAxis(handSensor.y); 
-    
-    handW = (int)map(handSensor.depth, 0, 1, 30, 0);
-    
-    _isTooFar = handSensor.isTooFar();
-  }
   
   public void update() {
     if (_isTooFar) {    //_stroke = false;
@@ -55,5 +43,26 @@ class Hand extends Being implements MessageSubscriber {
     fill(_c); 
     ellipse(handX, handY, handW, handH);
   }
+  
+  //
+  // behavior
+  //
+  
+  void actionSent(ActionMessage event) {
+    // don't care
+  }
+
+  void perCChanged(PerCMessage handSensor) {
+    println("received perc changed " + handSensor);
+    openness = handSensor.openness;
+    
+    handX = flipXAxisAndScale(handSensor.x); 
+    handY = scaleYAxis(handSensor.y); 
+    
+    handW = (int)map(handSensor.depth, 0, 1, 30, 0);
+    
+    _isTooFar = handSensor.isTooFar();
+  }
+
 }
 

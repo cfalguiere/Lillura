@@ -6,15 +6,37 @@ public class LilluraMessenger {
   // subscriber
   private final ArrayList<MessageSubscriber> messageSubscribers;
   // message queue
-  private LinkedList<Message> messageQueue;
+  private LinkedList<ActionMessage> actionMessageQueue;
 
   LilluraMessenger() {
     messageSubscribers = new ArrayList<MessageSubscriber>();
-    messageQueue = new LinkedList<Message>();
+    actionMessageQueue = new LinkedList<ActionMessage>();
   }
   
   public void checkMessages() {
+    fireMessages();
   } 
+
+  protected void fireMessages() {
+    while(!actionMessageQueue.isEmpty()) {
+      println("firing messages");
+      ActionMessage m = actionMessageQueue.poll();
+      for(MessageSubscriber subscriber : messageSubscribers) {
+        subscriber.actionSent(m);
+      }
+    }
+  }
+
+/*
+  protected void firePerCChanged(PXCMGesture.GeoNode hand) {
+    while(!_perCQueue.isEmpty()) {
+      PerCMessage m = _perCQueue.poll();
+      for(PerCSubscriber subscriber : _perCSubscribers) {
+        subscriber.perCChanged(m);
+      }
+    }
+  }
+  */
   
   void acquireEvents() { 
   } 
@@ -23,24 +45,48 @@ public class LilluraMessenger {
   // Subscriber management
   //
   synchronized public void subscribe(MessageSubscriber subscriber) {
+     messageSubscribers.add(subscriber);
   }
  
   synchronized public void removeSubscriptions(MessageSubscriber subscriber) {
+    messageSubscribers.remove(subscriber);
+  }
+  
+  synchronized public void sendMessage(ActionMessage event) {
+    actionMessageQueue.add(event);
+  }
+  
+  synchronized public void sendActionMessage(int actionId) {
+    actionMessageQueue.add(new ActionMessage(actionId));
   }
   
 
 }
 
+//
+// subscriber interfaces
+//
+
 public interface MessageSubscriber {
+    void actionSent(ActionMessage event);
     void perCChanged(PerCMessage event);
 }
 
-public class MessageSubscriberAdapter {
-    void perCChanged(PerCMessage event) {}
-}
+//
+// messages
+//
 
 public class Message {
 }
+
+public class ActionMessage extends Message {
+  static final int ACTION_RESET = 0;
+  int action;
+  ActionMessage(int anAction)  {
+    action = anAction;
+  }
+}
+
 
 public class PerCMessage extends Message {
   public float x;

@@ -42,7 +42,7 @@ class LilluraWorld extends World {
       float radius = h/2 * 0.8;
       float center = h/2;
       PVector positionCenter = new PVector(position.x + center, position.y + center);
-      MenuButtonReset reset = new MenuButtonReset(positionCenter, radius, this);
+      MenuButtonReset reset = new MenuButtonReset(positionCenter, radius, this, messenger);
       register(reset);
   }
   

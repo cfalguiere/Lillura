@@ -92,5 +92,9 @@ class Robot extends Being implements MessageSubscriber {
     _isOn = handSensor.isHandOpen();
   }
 
+  void actionSent(ActionMessage event) {
+    // don't care
+  }
+
 }
 

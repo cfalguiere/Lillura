@@ -1,9 +1,11 @@
 class MenuButtonReset extends Being {
   boolean isPressed = false;
+  LilluraMessenger messenger;
   
-  MenuButtonReset(PVector position, float radius, World world) {
+  MenuButtonReset(PVector position, float radius, World theParentWorld, LilluraMessenger theMessenger) {
         super(new Circle(position, radius));
-        world.subscribe(this, POCodes.Button.LEFT, _shape);
+       theParentWorld.subscribe(this, POCodes.Button.LEFT, _shape);
+        messenger = theMessenger;
   }
   
   public void draw() {
@@ -19,13 +21,12 @@ class MenuButtonReset extends Being {
   
   public void receive(MouseMessage m) {
     if (m.getAction() == POCodes.Click.PRESSED) {
-      isPressed = true;
-      println("reset");
+        isPressed = true;
     }
     if (m.getAction() == POCodes.Click.RELEASED) {
         isPressed = false;
-        println("release reset");
-        //_gameLevel.resetLevel();  //TODO send message
+        println("sending reset request");
+        messenger.sendActionMessage(ActionMessage.ACTION_RESET);
     }
   }
 
