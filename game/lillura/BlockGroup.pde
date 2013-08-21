@@ -1,9 +1,12 @@
 class BlockGroup extends Group<Block> {
   Rectangle boundingBox;
   
+  ArrayList<Block> blocks; // FIXME getObjects seems empty
+  
   BlockGroup(World aParentWorld, Rectangle aBoundingBox) {
     super(aParentWorld);
     boundingBox = aBoundingBox;
+    blocks = new ArrayList<Block>();
   }
 
   public void update() {
@@ -15,9 +18,31 @@ class BlockGroup extends Group<Block> {
     int y = (int) (random(boundingBox.getHeight() -50) + boundingBox.getAbsMin().y);
     color randomColor = pickColor();
     Block b = new Block(x, y, randomColor);
+    avoidCollision(b);
     _world.register(b);
     add(b);
+    blocks.add(b);
   }
+
+  public void avoidCollision(Block newBlock) {
+    boolean hasMoved = true;
+    int i=0;
+    while (hasMoved) {
+      hasMoved = false;
+      println(" " + blocks.size() + " blocks");
+      for (Block block : blocks) {
+          println("check");
+        if (block.getShape().collide(newBlock.getShape())) {
+          PVector move = block.getShape().projectionVector(newBlock.getShape());
+          newBlock.getPosition().add(move);
+          hasMoved = (i<10?true:false);
+          println("moved");
+        }
+      }
+      i++;
+    }
+  }
+  
 
   private color pickColor() {
      return color(int(random(256)), int(random(256)), int(random(256)));

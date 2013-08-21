@@ -8,6 +8,7 @@
  */
 
 import java.util.LinkedList;
+import java.util.Iterator;
 
 import hermes.*;
 import hermes.hshape.*;

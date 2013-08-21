@@ -1,6 +1,6 @@
 class GameLevelWorld extends World implements MessageSubscriber {
   
-  static final int SQUARE_NUM = 5;
+  static final int SQUARE_NUM = 10;
   
   // environment
   LilluraWorld mainWorld;
