@@ -50,6 +50,7 @@ class Robot extends Being implements MessageSubscriber {
         
         initializeTriangleUp();
         currentAction = new RobotAction(MovementType.NONE, millis(), _position);
+        previousAction = currentAction;
   }
   
   void initializeTriangleUp() {

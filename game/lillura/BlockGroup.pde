@@ -30,9 +30,9 @@ class BlockGroup extends Group<Block> {
     int i=0;
     while (hasMoved) {
       hasMoved = false;
-      println(" " + blocks.size() + " blocks");
+      //println(" " + blocks.size() + " blocks");
       for (Block block : blocks) {
-          println("check");
+          //println("check");
         if (block.getShape().collide(newBlock.getShape())) {
           PVector move = block.getShape().projectionVector(newBlock.getShape());
           newBlock.getPosition().add(move);
