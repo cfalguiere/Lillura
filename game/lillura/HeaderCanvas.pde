@@ -1,7 +1,9 @@
 class HeaderCanvas extends Being {
-  
-  HeaderCanvas(Rectangle boundingBox) {
+  HashMap<String, Rectangle>  boundingBoxes;
+
+  HeaderCanvas(Rectangle boundingBox, HashMap<String, Rectangle>  allBoundingBoxes) {
         super(boundingBox);
+        boundingBoxes = allBoundingBoxes;
         println("header canvas created");
   }
   

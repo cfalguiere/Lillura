@@ -4,18 +4,20 @@
  */
 class LilluraWorld extends World  {
   
-  Rectangle leftPanelBoundingBox;
+  HashMap<String, Rectangle>  boundingBoxes;
   Rectangle headerBoundingBox;
+  Rectangle leftPanelBoundingBox;
   
   LilluraMessenger messenger = null;  
   
   //GameLevel _gameLevel;  
   
-  LilluraWorld(int portIn, int portOut, Rectangle aLPBoundingBox,  Rectangle aHeaderBoundingBox, LilluraMessenger theMessenger) {
+  LilluraWorld(int portIn, int portOut, HashMap<String, Rectangle> allBoundingBoxes,  LilluraMessenger theMessenger) {
       super(portIn, portOut);
-      leftPanelBoundingBox = aLPBoundingBox;
-      headerBoundingBox = aHeaderBoundingBox;
+      boundingBoxes = allBoundingBoxes;
       messenger = theMessenger;
+      headerBoundingBox = allBoundingBoxes.get(HEADER_BBOX);
+      leftPanelBoundingBox = allBoundingBoxes.get(LEFT_PANEL_BBOX);
   }
 
   void setup() {
@@ -35,7 +37,7 @@ class LilluraWorld extends World  {
   //
     
   void createHeader() {      
-      HeaderCanvas headerCanvas = new HeaderCanvas(headerBoundingBox);
+      HeaderCanvas headerCanvas = new HeaderCanvas(headerBoundingBox, boundingBoxes);
       register(headerCanvas);
   }
   

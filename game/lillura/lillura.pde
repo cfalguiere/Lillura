@@ -47,6 +47,11 @@ static final int MENU_BG = 96;
 static final int DECK_BG = 96;
 static final int HAND_BG = 36;
 
+static final String HEADER_BBOX = "HBB";
+static final String LEFT_PANEL_BBOX = "LPBB";
+static final String GAME_LEVEL_BBOX = "GLBB";
+static final String CARD_DECK_BBOX = "CDBB";
+
 LilluraWorld mainWorld;
 MessengerWorld messengerWorld;
 //PerCWorld perCWorld;
@@ -67,24 +72,28 @@ void setup() {
 
   //perCWorld = new PerCWorld(PORT_IN+1, PORT_OUT+1);
   //perCWorld.start(); // this should be the last line in setup() method
-
+  
+  HashMap<String, Rectangle> boundingBoxes = new HashMap<String, Rectangle>();
   int lpY = VRT_SPACER*2 + HEADER_HEIGHT;
-  Rectangle leftPanelBoundingBox = new Rectangle(HRZ_SPACER, lpY, LEFT_PANEL_WIDTH, WINDOW_HEIGHT - lpY);  
-  Rectangle headerBoundingBox = new Rectangle(HRZ_SPACER, VRT_SPACER, LEFT_PANEL_WIDTH, HEADER_HEIGHT);  
-  mainWorld = new LilluraWorld(PORT_IN, PORT_OUT, leftPanelBoundingBox, headerBoundingBox, messengerWorld.getMessenger());
-  mainWorld.start(); // this should be the last line in setup() method
-  
-  
+  boundingBoxes.put(HEADER_BBOX, new Rectangle(HRZ_SPACER, VRT_SPACER, LEFT_PANEL_WIDTH, HEADER_HEIGHT));
+  Rectangle leftPanelBoundingBox = new Rectangle(HRZ_SPACER, lpY, LEFT_PANEL_WIDTH, WINDOW_HEIGHT - lpY);
+  boundingBoxes.put(LEFT_PANEL_BBOX, leftPanelBoundingBox);
+
   int glX = (int)leftPanelBoundingBox.getAbsMax().x + HRZ_SPACER;
   int glY = WINDOW_HEIGHT - CAMERA_HEIGHT - VRT_SPACER;  
   Rectangle gameLevelBoundingBox = new Rectangle(glX, glY, CAMERA_WIDTH, CAMERA_HEIGHT);
+  boundingBoxes.put(GAME_LEVEL_BBOX, gameLevelBoundingBox);
 
+  int cdX = (int)gameLevelBoundingBox.getAbsMax().x + HRZ_SPACER;
+  boundingBoxes.put(CARD_DECK_BBOX,  new Rectangle(cdX , glY, RIGHT_PANEL_WIDTH, CAMERA_HEIGHT));
+
+  mainWorld = new LilluraWorld(PORT_IN, PORT_OUT, boundingBoxes, messengerWorld.getMessenger());
+  mainWorld.start(); // this should be the last line in setup() method
+  
   gameLevelWorld = new GameLevelWorld(PORT_IN+2, PORT_OUT+2, mainWorld, gameLevelBoundingBox, messengerWorld.getMessenger());
   gameLevelWorld.start(); // this should be the last line in setup() method
 
-  int cdX = (int)gameLevelBoundingBox.getAbsMax().x + HRZ_SPACER;
-  Rectangle cardDeckBoundingBox = new Rectangle(cdX , glY, RIGHT_PANEL_WIDTH, CAMERA_HEIGHT);  
-  cardDeckWorld = new CardDeckWorld(PORT_IN+3, PORT_OUT+3, cardDeckBoundingBox, messengerWorld.getMessenger());
+  cardDeckWorld = new CardDeckWorld(PORT_IN+3, PORT_OUT+3, boundingBoxes.get(CARD_DECK_BBOX), messengerWorld.getMessenger());
   cardDeckWorld.start(); 
 
 }
