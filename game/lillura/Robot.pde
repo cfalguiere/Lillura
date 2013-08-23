@@ -153,12 +153,12 @@ class Robot extends Being implements MessageSubscriber {
           handlePause();
           break;
         case POCodes.Key.LEFT:
-          if(lastCommand != COMMAND_LEFT || lastCommandTime >  millis()+STABILIZER) {
+          if(lastCommand != COMMAND_LEFT || lastCommandTime+STABILIZER >  millis()) {
             handleTurnLeft();
           }
           break;
         case POCodes.Key.RIGHT:
-          if(lastCommand != COMMAND_RIGHT || lastCommandTime >  millis()+STABILIZER) {
+          if(lastCommand != COMMAND_RIGHT || lastCommandTime+STABILIZER >  millis()) {
             handleTurnRight();
           }
           break;
