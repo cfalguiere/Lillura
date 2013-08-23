@@ -28,10 +28,12 @@ class Robot extends Being implements MessageSubscriber {
   long lastCommandTime;
   
   Polygon triangle;
+  RobotPath path;
 
-  Robot(PVector position, World w, LilluraMessenger theMessenger) {
+  Robot(PVector position, World w, LilluraMessenger theMessenger, RobotPath aPath) {  //FIxME decouping of robotpath
         super(new Rectangle(position, WIDTH, HEIGHT));
         messenger = theMessenger;
+        path = aPath;
         
         _c = color(DEFAULT_COLOR );
         zero = new PVector();
@@ -75,6 +77,7 @@ class Robot extends Being implements MessageSubscriber {
   public void update() {
     if (isOn && !isGameOver) {
       _position.add(_velocity);
+      //path.addPoint(_position);
     }
     if (isReset) {
       _position.set(zero);
