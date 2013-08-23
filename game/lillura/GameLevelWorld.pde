@@ -101,7 +101,7 @@ class GameLevelWorld extends World  implements MessageSubscriber {
   void createGoal() { 
       float terrainW = worldBoundingBox.getWidth();
       int x = (int) (random(terrainW/4,terrainW*3/4));
-      PVector position = new PVector(x, 10);
+      PVector position = new PVector(x, 5);
       position.add(worldBoundingBox.getAbsMin());
       goal = new Goal(position, worldBoundingBox);
       register(goal);

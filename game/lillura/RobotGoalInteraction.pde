@@ -13,12 +13,20 @@ class RobotGoalInteractor extends Interactor<Robot, Goal> {
   }
 
   boolean detect(Robot robot, Goal goal) {
-    return goal.getShape().getBoundingBox().contains(robot.getShape().getBoundingBox()) &&  robot.isOn;
+    return goal.getShape().collide(robot.getShape()) &&  robot.isOn;
   }
 
   void handle(Robot robot, Goal goal) {
+    if ( goal.getShape().getBoundingBox().contains(robot.getShape().getBoundingBox()) ) {
         goal.handleWin();
         robot.handleCompleted();
         messenger.sendActionMessage(ActionMessage.NOTIFICATION_WIN);
+    } else {
+        Rectangle r = new Rectangle( goal.getShape().getBoundingBox().getPosition(),  goal.getShape().getBoundingBox().getWidth(),  goal.getShape().getBoundingBox().getHeight()*2); 
+        if (! r.contains(robot.getShape().getBoundingBox())) {
+          robot.handleStop();
+          messenger.sendActionMessage(ActionMessage.NOTIFICATION_LOST);
+        }
+    } 
   }
 }
