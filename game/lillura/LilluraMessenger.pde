@@ -109,13 +109,13 @@ public class ActionMessage extends Message {
   static final int ACTION_COMPLETED = 20;
   
   int action = ACTION_NONE;
-  Movement movement;
+  MovementType movementType;
   ActionMessage(int anAction)  {
     action = anAction;
   }
-  ActionMessage(int anAction, Movement aMovement)  {
+  ActionMessage(int anAction, MovementType aMovementType)  {
     action = anAction;
-    movement = aMovement;
+    movementType = aMovementType;
   }
 }
 

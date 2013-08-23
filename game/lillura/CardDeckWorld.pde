@@ -41,7 +41,7 @@ class CardDeckWorld extends World implements MessageSubscriber  {
 
   void actionSent(ActionMessage event) {
     if (event.action == ActionMessage.ACTION_COMPLETED) {
-        cards.addCard(event.movement);
+        cards.addCard(event.movementType);
     }
   }
 

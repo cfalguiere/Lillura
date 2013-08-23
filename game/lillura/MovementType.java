@@ -1,3 +1,3 @@
-public enum Movement {
+public enum MovementType {
   NONE, FORWARD, LEFT, RIGHT
 };

@@ -26,9 +26,8 @@ class Robot extends Being implements MessageSubscriber {
   Polygon triangle;
   RobotPath path;
 
-  int lastCommand;
-  long lastCommandTime;
   RobotAction currentAction;
+  RobotAction previousAction;
 
   Robot(PVector position, World w, LilluraMessenger theMessenger, RobotPath aPath) {  //FIxME decouping of robotpath
         super(new Rectangle(position, WIDTH, HEIGHT));
@@ -49,6 +48,7 @@ class Robot extends Being implements MessageSubscriber {
         w.subscribe(this, POCodes.Button.LEFT);
         
         initializeTriangleUp();
+        currentAction = new RobotAction(MovementType.NONE, millis(), _position);
   }
   
   void initializeTriangleUp() {
@@ -108,31 +108,32 @@ class Robot extends Being implements MessageSubscriber {
   }
   
   public void handlePause() {
-     lastCommand = COMMAND_PAUSE;
+     currentAction = new RobotAction(MovementType.NONE, millis(), _position);
+
      isOn = false;
-     
-     messenger.sendMessage(new ActionMessage(ActionMessage.ACTION_COMPLETED, currentAction.movement));
+     sendActionCompleted();
   }
   
   public void handleTurnRight() {
-      lastCommand = COMMAND_RIGHT;
+      currentAction = new RobotAction(MovementType.RIGHT, millis(), _position);
       isOn = true;
       _velocity.rotate(HALF_PI);
       triangleOrientation += HALF_PI;
       createTriangle(triangleOrientation); 
+      sendActionCompleted();
   }
   
   public void handleTurnLeft() {
-      lastCommand = COMMAND_LEFT;
+      currentAction = new RobotAction(MovementType.LEFT, millis(), _position);
       isOn = true;
       _velocity.rotate(-HALF_PI);
       triangleOrientation += -HALF_PI;
       createTriangle(triangleOrientation); 
+      sendActionCompleted();
   }
   
   public void handleGoOn() {
-      lastCommand = COMMAND_UP;
-      currentAction = new RobotAction(Movement.FORWARD, millis(), _position);
+      currentAction = new RobotAction(MovementType.FORWARD, millis(), _position);
       isOn = true;
   }
   
@@ -141,7 +142,7 @@ class Robot extends Being implements MessageSubscriber {
   }
   
   public void handleReset() {
-    lastCommand = COMMAND_PAUSE;
+    currentAction = new RobotAction(MovementType.NONE, millis(), _position);
     println("resetting robot");
     initializeTriangleUp();
     isOn = false;
@@ -149,22 +150,27 @@ class Robot extends Being implements MessageSubscriber {
     isReset = true;
   }
 
+  
+  private void sendActionCompleted() {
+    if (previousAction.movementType != MovementType.NONE) 
+     messenger.sendMessage(new ActionMessage(ActionMessage.ACTION_COMPLETED, previousAction.movementType));
+  }
+
   public void receive(KeyMessage m) { //FIXME generates a command, and update do the switch
-    lastCommandTime = millis();
+    previousAction = currentAction;
     int code = m.getKeyCode();
-   int STABILIZER = 500; // in ms
     if (m.isPressed()) {
       switch (code) {
         case POCodes.Key.SPACE:
           handlePause();
           break;
         case POCodes.Key.LEFT:
-          if(lastCommand != COMMAND_LEFT || lastCommandTime+STABILIZER >  millis()) {
-            handleTurnLeft();
+          if (currentAction.isDistinct(MovementType.LEFT, millis())) {
+              handleTurnLeft();
           }
           break;
         case POCodes.Key.RIGHT:
-          if(lastCommand != COMMAND_RIGHT || lastCommandTime+STABILIZER >  millis()) {
+          if (currentAction.isDistinct(MovementType.RIGHT, millis())) {
             handleTurnRight();
           }
           break;
@@ -195,22 +201,23 @@ class Robot extends Being implements MessageSubscriber {
 }
 
 class RobotAction {
-  static final int STABILIZER = 500; // in ms
+  static final int STABILIZER = 100; // in ms
   
-  Movement movement;
+  MovementType movementType;
   long timeStarted;
   PVector startPosition;
   
-  RobotAction(Movement aMovement, long theTimeStarted, PVector theStartPosition) {
-    movement = aMovement;
+  RobotAction(MovementType aMovementType, long theTimeStarted, PVector theStartPosition) {
+    movementType = aMovementType;
     timeStarted = theTimeStarted;
     startPosition = new PVector();
     startPosition.set(theStartPosition);
   }
   
-  public boolean isDistinct(Movement aMovement, long aTimeStarted) {
-    return movement != aMovement || timeStarted+STABILIZER >  aTimeStarted;
+  public boolean isDistinct(MovementType aMovementType, long aTime) {
+    return movementType != aMovementType || timeStarted+STABILIZER <  aTime;
   }
+  
   
 }
 
