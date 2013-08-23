@@ -6,14 +6,12 @@ class Robot extends Being implements MessageSubscriber {
   static final int COMMAND_UP = 1;
   static final int COMMAND_LEFT = 2;
   static final int COMMAND_RIGHT = 3;
-  static final int STABILIZER = 500; // in ms
   
   static final int WIDTH = 30;
   static final int HEIGHT = 30;
   static final int SPEED = 1;
   static final int DEFAULT_COLOR = 127; 
   final PVector UP_VELOCITY  = PVector.fromAngle(-HALF_PI); // (0,-1)
-
 
   LilluraMessenger messenger;
 
@@ -24,11 +22,13 @@ class Robot extends Being implements MessageSubscriber {
   PVector _velocity = UP_VELOCITY;
   PVector zero;
   float triangleOrientation;
-  int lastCommand;
-  long lastCommandTime;
   
   Polygon triangle;
   RobotPath path;
+
+  int lastCommand;
+  long lastCommandTime;
+  RobotAction currentAction;
 
   Robot(PVector position, World w, LilluraMessenger theMessenger, RobotPath aPath) {  //FIxME decouping of robotpath
         super(new Rectangle(position, WIDTH, HEIGHT));
@@ -110,7 +110,8 @@ class Robot extends Being implements MessageSubscriber {
   public void handlePause() {
      lastCommand = COMMAND_PAUSE;
      isOn = false;
-     messenger.sendActionMessage(ActionMessage.ACTION_COMPLETED);
+     
+     messenger.sendMessage(new ActionMessage(ActionMessage.ACTION_COMPLETED, currentAction.movement));
   }
   
   public void handleTurnRight() {
@@ -131,6 +132,7 @@ class Robot extends Being implements MessageSubscriber {
   
   public void handleGoOn() {
       lastCommand = COMMAND_UP;
+      currentAction = new RobotAction(Movement.FORWARD, millis(), _position);
       isOn = true;
   }
   
@@ -150,6 +152,7 @@ class Robot extends Being implements MessageSubscriber {
   public void receive(KeyMessage m) { //FIXME generates a command, and update do the switch
     lastCommandTime = millis();
     int code = m.getKeyCode();
+   int STABILIZER = 500; // in ms
     if (m.isPressed()) {
       switch (code) {
         case POCodes.Key.SPACE:
@@ -189,7 +192,25 @@ class Robot extends Being implements MessageSubscriber {
     // don't care
   }
 
+}
 
-
+class RobotAction {
+  static final int STABILIZER = 500; // in ms
+  
+  Movement movement;
+  long timeStarted;
+  PVector startPosition;
+  
+  RobotAction(Movement aMovement, long theTimeStarted, PVector theStartPosition) {
+    movement = aMovement;
+    timeStarted = theTimeStarted;
+    startPosition = new PVector();
+    startPosition.set(theStartPosition);
+  }
+  
+  public boolean isDistinct(Movement aMovement, long aTimeStarted) {
+    return movement != aMovement || timeStarted+STABILIZER >  aTimeStarted;
+  }
+  
 }
 

@@ -101,11 +101,21 @@ public class Message {
 }
 
 public class ActionMessage extends Message {
-  static final int ACTION_RESET = 10;
+  static final int ACTION_NONE = 0;
+  static final int ACTION_CODE_NONE = 0;
+  
+  static final int ACTION_RESET = 10; //TODO new game / restart
+  
   static final int ACTION_COMPLETED = 20;
-  int action;
+  
+  int action = ACTION_NONE;
+  Movement movement;
   ActionMessage(int anAction)  {
     action = anAction;
+  }
+  ActionMessage(int anAction, Movement aMovement)  {
+    action = anAction;
+    movement = aMovement;
   }
 }
 

@@ -13,7 +13,7 @@ class CardGroup extends Group<Card> {
   }
 
   
-  public void addCard() {
+  public void addCard(Movement movement) {
     int pos = size();
     PVector position = new PVector();
     position.set(offset);
@@ -21,7 +21,7 @@ class CardGroup extends Group<Card> {
     position.add(boundingBox.getAbsMin());
     position.add(new PVector(HRZ_SPACER, 0));
 
-    Card c = new Card(position);
+    Card c = new Card(position, movement);
     _world.register(c);
     add(c);
   }
