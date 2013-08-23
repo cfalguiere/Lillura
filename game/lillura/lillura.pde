@@ -34,8 +34,8 @@ static final int PORT_OUT = 8000;
 
 static final int CAMERA_WIDTH = 640;
 static final int CAMERA_HEIGHT = 480;
-static final int HRZ_SPACER = 7;
-static final int VRT_SPACER = 7;
+static final int HRZ_SPACER = 5;
+static final int VRT_SPACER = 5;
 static final int HEADER_HEIGHT = 50;
 static final int LEFT_PANEL_WIDTH = CAMERA_WIDTH/3;
 static final int RIGHT_PANEL_WIDTH =  CAMERA_WIDTH/6;
@@ -46,6 +46,9 @@ static final int FRAME_BG = 72;
 static final int MENU_BG = 96;
 static final int DECK_BG = 96;
 static final int HAND_BG = 36;
+final color GOLD = color(256, 200, 32); 
+final color GREEN = color(160, 200, 160); 
+  
 
 static final String HEADER_BBOX = "HBB";
 static final String LEFT_PANEL_BBOX = "LPBB";
