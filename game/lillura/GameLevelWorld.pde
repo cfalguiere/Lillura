@@ -11,6 +11,7 @@ class GameLevelWorld extends World implements MessageSubscriber {
   Terrain terrain;  
   BlockGroup blocks; 
   Robot robot;
+  Goal goal;
   
   GameLevelWorld(int portIn, int portOut, LilluraWorld aMainWorld, Rectangle aWorldBoundingBox, LilluraMessenger theMessenger) {
       super(portIn, portOut);
@@ -31,12 +32,15 @@ class GameLevelWorld extends World implements MessageSubscriber {
         messenger.subscribe(robot);
       }
       
+      createGoal();
+      
       // TOSO goal 
       // TODO origin
       
       // interactors
       register(robot, blocks, new RobotBlockInteractor()); 
       register(robot, terrain, new RobotTerrainInteractor());
+      register(robot, goal, new RobotGoalInteractor());
 
       println("GameLevel world set up");
   }
@@ -48,6 +52,7 @@ class GameLevelWorld extends World implements MessageSubscriber {
       if (event.action == ActionMessage.ACTION_RESET) {
         println("requesting robot to reset");
         robot.handleReset();
+        goal.handleReset();
       }
     }
     
@@ -81,6 +86,13 @@ class GameLevelWorld extends World implements MessageSubscriber {
       robot = new Robot(position, this, messenger);
       register(robot);
       messenger.subscribe(robot);
+  }
+  
+  void createGoal() { 
+      PVector position = new PVector(worldBoundingBox.getWidth() / 2, 10);
+      position.add(worldBoundingBox.getAbsMin());
+      goal = new Goal(position, worldBoundingBox);
+      register(goal);
   }
   
 
