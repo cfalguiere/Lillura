@@ -16,7 +16,7 @@ class HeaderCanvas extends Being {
     
     float x = selectedArea.getAbsMin().x - _shape.getBoundingBox().getAbsMin().x;
     float y = _shape.getBoundingBox().getHeight();
-    marker = new HeaderMarker(x, y, selectedArea.getWidth(), MARKER_HEIGHT, GOLD);
+    marker = new HeaderMarker(x, y, selectedArea.getWidth(), MARKER_HEIGHT, GOLD_75);
   }
   
   private Rectangle getSelectedArea() {
