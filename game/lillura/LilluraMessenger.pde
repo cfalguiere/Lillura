@@ -38,8 +38,8 @@ public class LilluraMessenger {
 
   protected void fireMessages() {
     while(!actionMessageQueue.isEmpty()) {
-      println("firing messages");
       ActionMessage m = actionMessageQueue.poll();
+      println("firing message " + m);
       for(MessageSubscriber subscriber : messageSubscribers) {
         subscriber.actionSent(m);
       }
@@ -109,7 +109,7 @@ public class ActionMessage extends Message {
   static final int NOTIFICATION_WIN = 21; 
   static final int NOTIFICATION_LOST = 22; 
   
-  static final int ACTION_COMPLETED = 20;
+  static final int ACTION_COMPLETED = 30;
   
   int action = ACTION_NONE;
   MovementType movementType;
@@ -119,6 +119,10 @@ public class ActionMessage extends Message {
   ActionMessage(int anAction, MovementType aMovementType)  {
     action = anAction;
     movementType = aMovementType;
+  }
+  
+  public String toString() {
+    return "[ " + action  + " " + movementType + " ]"; 
   }
 }
 

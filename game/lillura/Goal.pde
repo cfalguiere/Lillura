@@ -2,7 +2,7 @@
  * materializes the exit 
  */
 class Goal extends Being  {
-  static final int WIDTH = 30;
+  static final int WIDTH = 60;
   static final int HEIGHT = 30;
   static final int DEFAULT_COLOR = 127; 
   
@@ -18,8 +18,9 @@ class Goal extends Being  {
   }
 
   public void draw() {
-    fill(_c);
-    noStroke();
+    noFill();
+    strokeWeight(3);
+    stroke(_c);
     _shape.draw();
   }
 

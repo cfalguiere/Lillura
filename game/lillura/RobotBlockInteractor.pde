@@ -13,7 +13,7 @@ class RobotBlockInteractor extends Interactor<Robot,Block> {
   }
 
   boolean detect(Robot robot, Block block) {
-    return block.getShape().collide(robot.getShape());
+    return block.getShape().collide(robot.getShape()) &&  robot.isOn;
   }
 
   void handle(Robot robot, Block block) {

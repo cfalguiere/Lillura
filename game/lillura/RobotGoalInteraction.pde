@@ -13,13 +13,12 @@ class RobotGoalInteractor extends Interactor<Robot, Goal> {
   }
 
   boolean detect(Robot robot, Goal goal) {
-    return robot.getShape().collide(goal.getShape()) && ! robot.isGameOver;
+    return goal.getShape().getBoundingBox().contains(robot.getShape().getBoundingBox()) &&  robot.isOn;
   }
 
   void handle(Robot robot, Goal goal) {
         goal.handleWin();
-        robot.handlePause();
-        robot.handleStop();
+        robot.handleCompleted();
         messenger.sendActionMessage(ActionMessage.NOTIFICATION_WIN);
   }
 }

@@ -17,6 +17,7 @@ class Robot extends Being implements MessageSubscriber {
 
   boolean isOn = false;
   boolean isGameOver = false;
+  boolean hasCompleted = false;
   boolean isReset = false;
   color _c;
   PVector _velocity = UP_VELOCITY;
@@ -90,6 +91,8 @@ class Robot extends Being implements MessageSubscriber {
     
     if (isGameOver) {
         fill(color(256,0,0));
+    } else  if (hasCompleted) {
+        fill(GREEN);
     } else {
         fill(_c);
     }
@@ -138,15 +141,27 @@ class Robot extends Being implements MessageSubscriber {
   }
   
   public void handleStop() {
-    isGameOver = true;
+      if (!isGameOver) 
+       sendActionCompleted();
+      isGameOver = true;
+      isOn = false;
+  }
+  
+  public void handleCompleted() {
+      if (!hasCompleted) 
+       sendActionCompleted();
+      hasCompleted = true;
+      isOn = false;
   }
   
   public void handleReset() {
     currentAction = new RobotAction(MovementType.NONE, millis(), _position);
+    previousAction = currentAction;
     println("resetting robot");
     initializeTriangleUp();
     isOn = false;
     isGameOver = false;
+    hasCompleted = false;
     isReset = true;
   }
 

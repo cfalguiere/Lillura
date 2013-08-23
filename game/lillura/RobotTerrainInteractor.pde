@@ -13,7 +13,8 @@ class RobotTerrainInteractor extends Interactor<Robot, Terrain> {
   }
 
   boolean detect(Robot robot, Terrain terrain) {
-    return ! terrain.getShape().getBoundingBox().contains(robot.getShape().getBoundingBox());
+    return ! terrain.getShape().getBoundingBox().contains(robot.getShape().getBoundingBox())
+            &&  robot.isOn;
   }
 
   void handle(Robot robot, Terrain terrain) {
