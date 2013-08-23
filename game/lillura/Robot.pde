@@ -16,6 +16,7 @@ class Robot extends Being implements MessageSubscriber {
   color _c;
   PVector _velocity = UP_VELOCITY;
   PVector zero;
+  float triangleOrientation;
   
   Polygon triangle;
 
@@ -36,33 +37,27 @@ class Robot extends Being implements MessageSubscriber {
         //w.subscribe(this, POCodes.Button.LEFT, robot.getShape());
         w.subscribe(this, POCodes.Button.LEFT);
         
-        initializeTriangle();
+        initializeTriangleUp();
   }
   
-  void initializeTriangle() {
+  void initializeTriangleUp() {
+    triangleOrientation = -HALF_PI;
+    createTriangle(triangleOrientation); 
+  }
+  
+  void createTriangle(float angle) {
         ArrayList<PVector> points = new ArrayList<PVector>();
-        points.add(new PVector(0, HEIGHT)); // bottom  left
-        points.add(new PVector(WIDTH, HEIGHT)); // bottom  right
-        points.add(new PVector((int)WIDTH/2, 0)); // top
+        for (int i=0; i<3; i++, angle+=TWO_PI/3) {
+          PVector vertex1 = PVector.fromAngle(angle);
+          vertex1.mult(WIDTH/2);
+          vertex1.add(new PVector(WIDTH/2, HEIGHT/2));
+          points.add(vertex1);
+        } 
         triangle =  new Polygon(getCenter(), points);
   }
 
-//fixme depends on actual direction
-  void initializeTriangleRight() {
-        ArrayList<PVector> points = new ArrayList<PVector>();
-        points.add(new PVector(0, 0)); // top  left
-        points.add(new PVector(WIDTH, (int)HEIGHT/2)); // top
-        points.add(new PVector(0, HEIGHT)); // bottom  left
-        triangle =  new Polygon(getCenter(), points);
-  }
 
-  void initializeTriangleLeft() {
-        ArrayList<PVector> points = new ArrayList<PVector>();
-        points.add(new PVector(WIDTH, 0)); // top  right
-        points.add(new PVector(0, (int)HEIGHT/2)); // top
-        points.add(new PVector(WIDTH, HEIGHT)); // bottom  right
-        triangle =  new Polygon(getCenter(), points);
-  }
+
 
   PVector getCenter() {
     return new Rectangle(_shape.getPosition(), WIDTH, HEIGHT).getCenter();
@@ -79,14 +74,17 @@ class Robot extends Being implements MessageSubscriber {
   }
 
   public void draw() {
+     stroke(color(256,0,0));
+    noFill();
+    _shape.draw();
+    
     if (isGameOver) {
         fill(color(256,0,0));
     } else {
         fill(_c);
     }
     noStroke();
-    _shape.draw();
-    //triangle.draw();
+    triangle.draw();
   }
   
     
@@ -102,13 +100,15 @@ class Robot extends Being implements MessageSubscriber {
   public void handleTurnRight() {
       isOn = true;
       _velocity.rotate(HALF_PI);
-      initializeTriangleRight();
+      triangleOrientation += HALF_PI;
+      createTriangle(triangleOrientation); 
   }
   
   public void handleTurnLeft() {
       isOn = true;
       _velocity.rotate(-HALF_PI);
-      initializeTriangleLeft();
+      triangleOrientation += -HALF_PI;
+      createTriangle(triangleOrientation); 
   }
   
   public void handleGoOn() {
@@ -121,7 +121,7 @@ class Robot extends Being implements MessageSubscriber {
   
   public void handleReset() {
     println("resetting robot");
-    initializeTriangle();
+    initializeTriangleUp();
     isOn = false;
     isGameOver = false;
     isReset = true;
@@ -163,6 +163,8 @@ class Robot extends Being implements MessageSubscriber {
   void actionSent(ActionMessage event) {
     // don't care
   }
+
+
 
 }
 
