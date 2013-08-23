@@ -35,12 +35,12 @@ static final int PORT_OUT = 8000;
 static final int CAMERA_WIDTH = 640;
 static final int CAMERA_HEIGHT = 480;
 static final int HRZ_SPACER = 7;
-static final int VRT_HEADER = 30;
 static final int VRT_SPACER = 7;
+static final int HEADER_HEIGHT = 50;
 static final int LEFT_PANEL_WIDTH = CAMERA_WIDTH/3;
 static final int RIGHT_PANEL_WIDTH =  CAMERA_WIDTH/6;
 static final int WINDOW_WIDTH = CAMERA_WIDTH + LEFT_PANEL_WIDTH + RIGHT_PANEL_WIDTH + HRZ_SPACER*4;
-static final int WINDOW_HEIGHT = CAMERA_HEIGHT + HRZ_SPACER*2;
+static final int WINDOW_HEIGHT = CAMERA_HEIGHT + HEADER_HEIGHT + HRZ_SPACER*3;
 
 static final int FRAME_BG = 72;
 static final int MENU_BG = 96;
@@ -68,8 +68,10 @@ void setup() {
   //perCWorld = new PerCWorld(PORT_IN+1, PORT_OUT+1);
   //perCWorld.start(); // this should be the last line in setup() method
 
-  Rectangle leftPanelBoundingBox = new Rectangle(HRZ_SPACER, VRT_SPACER, LEFT_PANEL_WIDTH, WINDOW_HEIGHT - VRT_SPACER*2);  
-  mainWorld = new LilluraWorld(PORT_IN, PORT_OUT, leftPanelBoundingBox, messengerWorld.getMessenger());
+  int lpY = VRT_SPACER*2 + HEADER_HEIGHT;
+  Rectangle leftPanelBoundingBox = new Rectangle(HRZ_SPACER, lpY, LEFT_PANEL_WIDTH, WINDOW_HEIGHT - lpY);  
+  Rectangle headerBoundingBox = new Rectangle(HRZ_SPACER, VRT_SPACER, LEFT_PANEL_WIDTH, HEADER_HEIGHT);  
+  mainWorld = new LilluraWorld(PORT_IN, PORT_OUT, leftPanelBoundingBox, headerBoundingBox, messengerWorld.getMessenger());
   mainWorld.start(); // this should be the last line in setup() method
   
   
@@ -81,7 +83,7 @@ void setup() {
   gameLevelWorld.start(); // this should be the last line in setup() method
 
   int cdX = (int)gameLevelBoundingBox.getAbsMax().x + HRZ_SPACER;
-  Rectangle cardDeckBoundingBox = new Rectangle(cdX , VRT_SPACER, RIGHT_PANEL_WIDTH, WINDOW_HEIGHT - VRT_SPACER*2);  
+  Rectangle cardDeckBoundingBox = new Rectangle(cdX , glY, RIGHT_PANEL_WIDTH, CAMERA_HEIGHT);  
   cardDeckWorld = new CardDeckWorld(PORT_IN+3, PORT_OUT+3, cardDeckBoundingBox, messengerWorld.getMessenger());
   cardDeckWorld.start(); 
 

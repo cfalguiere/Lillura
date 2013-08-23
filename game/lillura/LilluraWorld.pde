@@ -5,19 +5,24 @@
 class LilluraWorld extends World  {
   
   Rectangle leftPanelBoundingBox;
+  Rectangle headerBoundingBox;
   
   LilluraMessenger messenger = null;  
   
   //GameLevel _gameLevel;  
   
-  LilluraWorld(int portIn, int portOut, Rectangle aBoundingBox, LilluraMessenger theMessenger) {
+  LilluraWorld(int portIn, int portOut, Rectangle aLPBoundingBox,  Rectangle aHeaderBoundingBox, LilluraMessenger theMessenger) {
       super(portIn, portOut);
-      leftPanelBoundingBox = aBoundingBox;
+      leftPanelBoundingBox = aLPBoundingBox;
+      headerBoundingBox = aHeaderBoundingBox;
       messenger = theMessenger;
   }
 
   void setup() {
       //IMPORTANT: put all other setup hereterBeing(TemplateBeing);
+      
+      createHeader();
+      
       createMenu();
     
       createHand();
@@ -29,11 +34,16 @@ class LilluraWorld extends World  {
   // World construction
   //
     
+  void createHeader() {      
+      HeaderCanvas headerCanvas = new HeaderCanvas(headerBoundingBox);
+      register(headerCanvas);
+  }
+  
+
   void createMenu() {      
       int w = (int)leftPanelBoundingBox.getWidth();
       int h = (int)leftPanelBoundingBox.getWidth()/4;
       PVector position = leftPanelBoundingBox.getAbsMin();
-      position.add(new PVector(0,h));
       MenuCanvas menuCanvas = new MenuCanvas(position, w, h);
       register(menuCanvas);
       
