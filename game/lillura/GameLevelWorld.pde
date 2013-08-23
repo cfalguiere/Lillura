@@ -1,4 +1,4 @@
-class GameLevelWorld extends World implements MessageSubscriber {
+class GameLevelWorld extends World  implements MessageSubscriber {
   
   static final int SQUARE_NUM = 10;
   
@@ -50,9 +50,7 @@ class GameLevelWorld extends World implements MessageSubscriber {
   //
     void actionSent(ActionMessage event) {
       if (event.action == ActionMessage.ACTION_RESET) {
-        println("requesting robot to reset");
-        robot.handleReset();
-        goal.handleReset();
+         resetWold();
       }
     }
     
@@ -60,6 +58,16 @@ class GameLevelWorld extends World implements MessageSubscriber {
       // don't care
     }
   
+    void resetWold() {
+        println("requesting game to reset");
+        robot.handleReset();
+        goal.handleReset();
+        blocks.destroy();
+        createBlocks();
+    }
+
+
+    
   //
   // World construction 
   //
@@ -71,6 +79,7 @@ class GameLevelWorld extends World implements MessageSubscriber {
       register(terrain);
   }
   
+
   void createBlocks() {
       blocks = new BlockGroup(this, worldBoundingBox); 
       register(blocks);

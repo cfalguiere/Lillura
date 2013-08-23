@@ -2,7 +2,7 @@
  * Template World
  * You'll need to add stuff to setup().
  */
-class LilluraWorld extends World {
+class LilluraWorld extends World  {
   
   Rectangle leftPanelBoundingBox;
   
@@ -37,10 +37,8 @@ class LilluraWorld extends World {
       MenuCanvas menuCanvas = new MenuCanvas(position, w, h);
       register(menuCanvas);
       
-      float radius = h/2 * 0.7;
-      float center = h/2;
-      PVector positionCenter = new PVector(position.x + center, position.y + center);
-      MenuButtonReset reset = new MenuButtonReset(positionCenter, radius, this, messenger);
+      Rectangle boundingBox = new Rectangle(position, h, h);
+      MenuButtonReset reset = new MenuButtonReset(boundingBox, this, messenger);
       register(reset);
   }
   

@@ -24,6 +24,7 @@ class BlockGroup extends Group<Block> {
     blocks.add(b);
   }
 
+
   public void avoidCollision(Block newBlock) {
     boolean hasMoved = true;
     int i=0;
