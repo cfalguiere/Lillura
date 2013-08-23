@@ -12,22 +12,22 @@ class HeaderCanvas extends Being {
   }
   
   public void update() {
+    Rectangle selectedArea = getSelectedArea();
+    
+    float x = selectedArea.getAbsMin().x - _shape.getBoundingBox().getAbsMin().x;
+    float y = _shape.getBoundingBox().getHeight();
+    marker = new HeaderMarker(x, y, selectedArea.getWidth(), MARKER_HEIGHT, GOLD);
+  }
+  
+  private Rectangle getSelectedArea() {
     PVector mouseVector = new PVector(mouseX, mouseY);
-    Rectangle selectedArea = null;
+    Rectangle selectedArea = boundingBoxes.get(GAME_LEVEL_BBOX);
     for(Rectangle  area : boundingBoxes.values()) {
       if (area.contains(mouseX, mouseY)) {
         selectedArea = area;
       }
     }
-    if (selectedArea != null) {
-      float x = selectedArea.getAbsMin().x - _shape.getBoundingBox().getAbsMin().x;
-      float y = _shape.getBoundingBox().getHeight();
-      println("x= " + x + " y=" + y);
-      marker = new HeaderMarker(x, y, selectedArea.getWidth(), MARKER_HEIGHT, GOLD);
-    } else {
-      marker = null;
-    }
-    
+    return selectedArea;
   }
 
   public void draw() {
