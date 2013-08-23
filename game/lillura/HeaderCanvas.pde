@@ -1,14 +1,22 @@
-class HeaderCanvas extends Being {
+class HeaderCanvas extends Being implements MessageSubscriber  {
   
   static final int MARKER_HEIGHT = 3;
 
   HashMap<String, Rectangle>  boundingBoxes;
   HeaderMarker marker;
+  
+  String message;
+  PVector messagePosition;
 
   HeaderCanvas(Rectangle boundingBox, HashMap<String, Rectangle>  allBoundingBoxes) {
         super(boundingBox);
         boundingBoxes = allBoundingBoxes;
         println("header canvas created");
+        
+        Rectangle glArea = boundingBoxes.get(GAME_LEVEL_BBOX);
+        message = "Hello";
+        messagePosition = new PVector( glArea.getAbsMin().x +  glArea.getWidth()/2 - _shape.getBoundingBox().getAbsMin().x, 40);
+        //messagePosition = new PVector( _shape.getBoundingBox().getAbsMin().x + _shape.getBoundingBox().getWidth()/2, 40);
   }
   
   public void update() {
@@ -31,13 +39,49 @@ class HeaderCanvas extends Being {
   }
 
   public void draw() {
-      fill(GOLD);
-      textSize(48);
-      text("Lillura", 5, 40); 
-      if (marker != null) {
-        marker.draw();
-      }
+    fill(FRAME_BG);
+    noStroke();
+    _shape.draw();
+    
+    fill(GOLD);
+    textAlign(LEFT);
+    textSize(48);
+    text("Lillura", 5, 40); 
+    if (marker != null) {
+      marker.draw();
+    }
+      
+    fill(64, 208, 224, 256);
+    //fill(GREEN);
+    textSize(32);
+    textAlign(CENTER);
+    text(message, messagePosition.x, messagePosition.y); 
   }
+  
+  //
+  // behavior implementation 
+  //
+    void actionSent(ActionMessage event) {
+      switch (event.action) {
+         case ActionMessage.NOTIFICATION_WIN :
+           message = "You Win !";
+           break;
+         case ActionMessage.NOTIFICATION_LOST :
+           message = "Game Over !";
+           break;
+         case ActionMessage.ACTION_RESET :
+           message = "New Game";
+           break;
+         default :
+           message = "";
+           break;
+      }
+    }
+    
+    void perCChanged(PerCMessage event) {
+      // don't care
+    }
+
 }
 
 class HeaderMarker  {

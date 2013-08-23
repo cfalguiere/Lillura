@@ -4,9 +4,12 @@
  * the names of the Being-types you want to interact
  */
 class RobotGoalInteractor extends Interactor<Robot, Goal> {
-  RobotGoalInteractor() {
+  LilluraMessenger messenger;
+  
+  RobotGoalInteractor(LilluraMessenger theMessenger) {
     super();
     //Add your constructor info here
+    messenger = theMessenger;
   }
 
   boolean detect(Robot robot, Goal goal) {
@@ -17,5 +20,6 @@ class RobotGoalInteractor extends Interactor<Robot, Goal> {
         goal.handleWin();
         robot.handlePause();
         robot.handleStop();
+        messenger.sendActionMessage(ActionMessage.NOTIFICATION_WIN);
   }
 }

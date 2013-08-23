@@ -104,7 +104,10 @@ public class ActionMessage extends Message {
   static final int ACTION_NONE = 0;
   static final int ACTION_CODE_NONE = 0;
   
-  static final int ACTION_RESET = 10; //TODO new game / restart
+  static final int ACTION_RESET = 11; //TODO new game / restart
+  
+  static final int NOTIFICATION_WIN = 21; 
+  static final int NOTIFICATION_LOST = 22; 
   
   static final int ACTION_COMPLETED = 20;
   

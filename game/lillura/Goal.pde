@@ -21,11 +21,6 @@ class Goal extends Being  {
     fill(_c);
     noStroke();
     _shape.draw();
-    if (isCompleted) {
-      fill(0, 102, 153, 204);
-      textSize(64);
-      text("You Win !", -parentBoundingBox.getWidth()/4, parentBoundingBox.getHeight()/2); 
-    }
   }
 
   public void handleWin() {

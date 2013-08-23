@@ -4,9 +4,12 @@
  * the names of the Being-types you want to interact
  */
 class RobotBlockInteractor extends Interactor<Robot,Block> {
-  RobotBlockInteractor() {
+  LilluraMessenger messenger;
+  
+  RobotBlockInteractor(LilluraMessenger theMessenger) {
     super();
     //Add your constructor info here
+    messenger = theMessenger;
   }
 
   boolean detect(Robot robot, Block block) {
@@ -16,5 +19,6 @@ class RobotBlockInteractor extends Interactor<Robot,Block> {
   void handle(Robot robot, Block block) {
         block.handleProtect();
         robot.handleStop();
+        messenger.sendActionMessage(ActionMessage.NOTIFICATION_LOST);
   }
 }

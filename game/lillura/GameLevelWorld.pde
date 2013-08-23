@@ -38,9 +38,9 @@ class GameLevelWorld extends World  implements MessageSubscriber {
       // TODO origin
       
       // interactors
-      register(robot, blocks, new RobotBlockInteractor()); 
-      register(robot, terrain, new RobotTerrainInteractor());
-      register(robot, goal, new RobotGoalInteractor());
+      register(robot, blocks, new RobotBlockInteractor(messenger)); 
+      register(robot, terrain, new RobotTerrainInteractor(messenger));
+      register(robot, goal, new RobotGoalInteractor(messenger));
 
       println("GameLevel world set up");
   }

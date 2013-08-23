@@ -2,11 +2,12 @@
  * Template World
  * You'll need to add stuff to setup().
  */
-class LilluraWorld extends World  {
+class LilluraWorld extends World {
   
   HashMap<String, Rectangle>  boundingBoxes;
   Rectangle headerBoundingBox;
   Rectangle leftPanelBoundingBox;
+  String message;
   
   LilluraMessenger messenger = null;  
   
@@ -32,6 +33,7 @@ class LilluraWorld extends World  {
       println("Lillura world set up");
   }
 
+
   //
   // World construction
   //
@@ -39,6 +41,7 @@ class LilluraWorld extends World  {
   void createHeader() {      
       HeaderCanvas headerCanvas = new HeaderCanvas(headerBoundingBox, boundingBoxes);
       register(headerCanvas);
+      messenger.subscribe(headerCanvas);
   }
   
 

@@ -4,9 +4,12 @@
  * the names of the Being-types you want to interact
  */
 class RobotTerrainInteractor extends Interactor<Robot, Terrain> {
-  RobotTerrainInteractor() {
+  LilluraMessenger messenger;
+
+  RobotTerrainInteractor(LilluraMessenger theMessenger) {
     super();
     //Add your constructor info here
+    messenger = theMessenger;
   }
 
   boolean detect(Robot robot, Terrain terrain) {
@@ -15,5 +18,6 @@ class RobotTerrainInteractor extends Interactor<Robot, Terrain> {
 
   void handle(Robot robot, Terrain terrain) {
         robot.handleStop();
+        messenger.sendActionMessage(ActionMessage.NOTIFICATION_LOST);
   }
 }
