@@ -60,7 +60,7 @@ class GameLevelWorld extends World  implements MessageSubscriber {
     void resetWold() {
         println("requesting game to reset");
         robot.handleReset();
-        goal.handleReset();
+        goal.handleReset(getGoalPosition() );
         blocks.destroy();
         createBlocks();
     }
@@ -99,13 +99,17 @@ class GameLevelWorld extends World  implements MessageSubscriber {
   }
   
   void createGoal() { 
-      float terrainW = worldBoundingBox.getWidth();
-      int x = (int) (random(terrainW/4,terrainW*3/4));
-      PVector position = new PVector(x, 5);
-      position.add(worldBoundingBox.getAbsMin());
-      goal = new Goal(position, worldBoundingBox);
+      goal = new Goal(getGoalPosition(), worldBoundingBox);
       register(goal);
   }
   
+  PVector getGoalPosition() {
+     float terrainW = worldBoundingBox.getWidth();
+     int x =  (int) (random(terrainW/4,terrainW*3/4));
+     PVector position = new PVector(x, 5);
+     position.add(worldBoundingBox.getAbsMin());
+     return position;
+  }
+
 
 }

@@ -33,8 +33,10 @@ class Goal extends Being  {
      isCompleted = true;
   }
 
-  public void handleReset() {
+  public void handleReset(PVector position) {
      isCompleted = false;
+     
+     _position = position;
   }
 
 }
