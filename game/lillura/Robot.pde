@@ -2,11 +2,18 @@
  * Template being
  */
 class Robot extends Being implements MessageSubscriber {
+  static final int COMMAND_PAUSE = 0;
+  static final int COMMAND_UP = 1;
+  static final int COMMAND_LEFT = 2;
+  static final int COMMAND_RIGHT = 3;
+  static final int STABILIZER = 500; // in ms
+  
   static final int WIDTH = 30;
   static final int HEIGHT = 30;
   static final int SPEED = 1;
   static final int DEFAULT_COLOR = 127; 
   final PVector UP_VELOCITY  = PVector.fromAngle(-HALF_PI); // (0,-1)
+
 
   LilluraMessenger messenger;
 
@@ -17,6 +24,8 @@ class Robot extends Being implements MessageSubscriber {
   PVector _velocity = UP_VELOCITY;
   PVector zero;
   float triangleOrientation;
+  int lastCommand;
+  long lastCommandTime;
   
   Polygon triangle;
 
@@ -74,9 +83,7 @@ class Robot extends Being implements MessageSubscriber {
   }
 
   public void draw() {
-     stroke(color(256,0,0));
-    noFill();
-    _shape.draw();
+    //drawBoxForDebug();
     
     if (isGameOver) {
         fill(color(256,0,0));
@@ -87,17 +94,24 @@ class Robot extends Being implements MessageSubscriber {
     triangle.draw();
   }
   
+  private void drawBoxForDebug() {
+     stroke(color(256,0,0));
+    noFill();
+    _shape.draw();
+  }
     
   private color defaultColor() {
      return color(int(random(256)), int(random(256)), int(random(256)));
   }
   
   public void handlePause() {
+     lastCommand = COMMAND_PAUSE;
      isOn = false;
      messenger.sendActionMessage(ActionMessage.ACTION_COMPLETED);
   }
   
   public void handleTurnRight() {
+      lastCommand = COMMAND_RIGHT;
       isOn = true;
       _velocity.rotate(HALF_PI);
       triangleOrientation += HALF_PI;
@@ -105,6 +119,7 @@ class Robot extends Being implements MessageSubscriber {
   }
   
   public void handleTurnLeft() {
+      lastCommand = COMMAND_LEFT;
       isOn = true;
       _velocity.rotate(-HALF_PI);
       triangleOrientation += -HALF_PI;
@@ -112,6 +127,7 @@ class Robot extends Being implements MessageSubscriber {
   }
   
   public void handleGoOn() {
+      lastCommand = COMMAND_UP;
       isOn = true;
   }
   
@@ -120,6 +136,7 @@ class Robot extends Being implements MessageSubscriber {
   }
   
   public void handleReset() {
+    lastCommand = COMMAND_PAUSE;
     println("resetting robot");
     initializeTriangleUp();
     isOn = false;
@@ -127,7 +144,8 @@ class Robot extends Being implements MessageSubscriber {
     isReset = true;
   }
 
-  public void receive(KeyMessage m) {
+  public void receive(KeyMessage m) { //FIXME generates a command, and update do the switch
+    lastCommandTime = millis();
     int code = m.getKeyCode();
     if (m.isPressed()) {
       switch (code) {
@@ -135,10 +153,14 @@ class Robot extends Being implements MessageSubscriber {
           handlePause();
           break;
         case POCodes.Key.LEFT:
-          handleTurnLeft();
+          if(lastCommand != COMMAND_LEFT || lastCommandTime >  millis()+STABILIZER) {
+            handleTurnLeft();
+          }
           break;
         case POCodes.Key.RIGHT:
-          handleTurnRight();
+          if(lastCommand != COMMAND_RIGHT || lastCommandTime >  millis()+STABILIZER) {
+            handleTurnRight();
+          }
           break;
         case POCodes.Key.UP:
           handleGoOn();

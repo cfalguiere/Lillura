@@ -15,7 +15,7 @@ class BlockGroup extends Group<Block> {
   
   public void addBlock() {
     int x = (int) (random(boundingBox.getWidth() -50) + boundingBox.getAbsMin().x);
-    int y = (int) (random(boundingBox.getHeight() -50) + boundingBox.getAbsMin().y);
+    int y = (int) (random(boundingBox.getHeight() -200) + boundingBox.getAbsMin().y + 100);
     color randomColor = pickColor();
     Block b = new Block(x, y, randomColor);
     avoidCollision(b);
