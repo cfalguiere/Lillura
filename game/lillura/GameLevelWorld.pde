@@ -60,9 +60,10 @@ class GameLevelWorld extends World  implements MessageSubscriber {
     void resetWold() {
         println("requesting game to reset");
         robot.handleReset();
-        goal.handleReset(getGoalPosition() );
+        goal.handleReset(getGoalPosition());
         blocks.destroy();
         createBlocks();
+        register(robot, blocks, new RobotBlockInteractor(messenger)); 
     }
 
 

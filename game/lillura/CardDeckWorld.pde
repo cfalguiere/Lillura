@@ -23,6 +23,25 @@ class CardDeckWorld extends World implements MessageSubscriber  {
   }
 
   //
+  // behavior implementation 
+  //
+    void actionSent(ActionMessage event) {
+      switch (event.action) {
+         case ActionMessage.ACTION_COMPLETED :
+            cards.addCard(event.movementType);
+            break;
+         case ActionMessage.ACTION_RESET :
+            resetDeck();
+            break;
+         default :
+             break;
+      }
+    }
+    
+    void perCChanged(PerCMessage event) {
+      // don't care
+    }
+  //
   // World construction
   //
     
@@ -34,16 +53,11 @@ class CardDeckWorld extends World implements MessageSubscriber  {
       register(cards);
   }
 
-
-  void perCChanged(PerCMessage handSensor) {
-    // don't care
+  void resetDeck() {
+       cards.destroy();
+       createDeck();
   }
 
-  void actionSent(ActionMessage event) {
-    if (event.action == ActionMessage.ACTION_COMPLETED) {
-        cards.addCard(event.movementType);
-    }
-  }
 
 }
 
