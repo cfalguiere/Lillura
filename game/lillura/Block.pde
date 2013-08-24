@@ -10,7 +10,7 @@ class Block extends Being {
   
   Polygon house;
 
-  Block(int x, int y, color pc) {
+  Block(float x, float y, color pc) {
         super(new Rectangle(x, y, WIDTH, HEIGHT));
         _c = pc;
         //Add your constructor info here

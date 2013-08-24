@@ -1,6 +1,6 @@
 class GameLevelWorld extends World  implements MessageSubscriber {
   
-  static final int SQUARE_NUM = 10;
+  static final int BLOCK_NUM = 10;
   
   // environment
   LilluraWorld mainWorld;
@@ -84,9 +84,34 @@ class GameLevelWorld extends World  implements MessageSubscriber {
       blocks = new BlockGroup(this, worldBoundingBox); 
       register(blocks);
       
-      for (int i = 0; i < SQUARE_NUM; i++) {
-         blocks.addBlock();
-      }
+     // for (int i = 0; i < SQUARE_NUM; i++) {
+     //    blocks.addBlock();
+     // }
+      
+      randomSeed(millis());
+      float gridWidthOffset = 20;
+      float gridMaxWidth = worldBoundingBox.getWidth() - gridWidthOffset*2;
+      float gridHeightOffset = 100;
+      float gridMaxHeight = worldBoundingBox.getHeight() - gridHeightOffset*2;
+      int cols = (int)(gridMaxWidth / Block.WIDTH);
+      int lines = (int)(gridMaxHeight / Block.HEIGHT);
+     int remainingBlocks = BLOCK_NUM;
+      for (int ic=0; ic<cols; ic++) {
+         for (int il=0; il<lines; il++) {
+          //float acceptMax = 100 - ((remainingBlocks-1) * 100.0 / BLOCK_NUM); 
+           float remainingCells = (lines-il-1) + (cols-ic-1)*lines;
+           float rate = remainingBlocks/remainingCells;
+           float dice =  random(1) ;
+           println("ic=" + ic + "/" + cols + " il=" + il + "/" + lines + " dice=" + dice + " remainingBlocks=" + remainingBlocks + " rate=" + rate + " remainingCells=" + remainingCells);
+           boolean hasBlock = dice <  rate;
+           if (hasBlock && remainingBlocks>0) {
+               PVector cellPosition = new PVector(ic*Block.WIDTH + gridWidthOffset, il*Block.HEIGHT + gridHeightOffset);
+               cellPosition.add(worldBoundingBox.getAbsMin());
+               blocks.addBlock(cellPosition); 
+               remainingBlocks--;
+           }
+         }
+     }
   }
 
   void createRobot() {     

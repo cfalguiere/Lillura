@@ -13,6 +13,14 @@ class BlockGroup extends Group<Block> {
   }
 
   
+  public void addBlock(PVector position) {
+      color randomColor = pickColor();
+      Block b = new Block(position.x, position.y, randomColor);
+      _world.register(b);
+      add(b);
+      blocks.add(b);
+  }
+  
   public void addBlock() {
     int x = (int) (random(boundingBox.getWidth() -50) + boundingBox.getAbsMin().x);
     int y = (int) (random(boundingBox.getHeight() -200) + boundingBox.getAbsMin().y + 100);
