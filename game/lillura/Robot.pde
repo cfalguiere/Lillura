@@ -168,7 +168,7 @@ class Robot extends Being implements MessageSubscriber {
 
   
   private void sendActionCompleted() {
-    currentAction.endPosition = _position;
+    if (currentAction != null) currentAction.endPosition = _position;
     if (currentAction != null && currentAction.movementType != MovementType.NONE) {
          //println("SEND " + currentAction.movementType.name() + " " + currentAction.startPosition + " -> " +  currentAction.endPosition  + " distance " + currentAction.distance());
          messenger.sendMessage(new ActionMessage(ActionMessage.ACTION_COMPLETED, currentAction.movementType, currentAction.distance()));
