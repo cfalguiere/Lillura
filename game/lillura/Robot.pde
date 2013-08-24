@@ -199,6 +199,7 @@ class Robot extends Being implements MessageSubscriber {
   }
   
   public void receive(MouseMessage m) {
+    previousAction = currentAction;
     if (m.getAction() == POCodes.Click.PRESSED) {
       if (_shape.getBoundingBox().contains(mouseX, mouseY)) {
         handlePause();
