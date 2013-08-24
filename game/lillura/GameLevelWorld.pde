@@ -8,10 +8,13 @@ class GameLevelWorld extends World  implements MessageSubscriber {
   LilluraMessenger messenger;
 
   // world objects
-  Terrain terrain;  
+  Terrain terrain;
+  GridLayoutManager grid; 
+   
   BlockGroup blocks; 
   Robot robot;
   Goal goal;
+  
   
   GameLevelWorld(int portIn, int portOut, LilluraWorld aMainWorld, Rectangle aWorldBoundingBox, LilluraMessenger theMessenger) {
       super(portIn, portOut);
@@ -77,6 +80,10 @@ class GameLevelWorld extends World  implements MessageSubscriber {
       int y = WINDOW_HEIGHT - CAMERA_HEIGHT -  + VRT_SPACER;
       terrain = new Terrain(x, y, CAMERA_WIDTH, CAMERA_HEIGHT);
       register(terrain);
+      
+      float terrainWidth = worldBoundingBox.getWidth();
+      float terrainHeight = worldBoundingBox.getHeight();
+      grid = new GridLayoutManager(worldBoundingBox.getAbsMin(), terrainWidth, terrainHeight);
   }
   
 
@@ -84,13 +91,10 @@ class GameLevelWorld extends World  implements MessageSubscriber {
       blocks = new BlockGroup(this, worldBoundingBox); 
       register(blocks);
       
-      float terrainWidth = worldBoundingBox.getWidth();
-      float terrainHeight = worldBoundingBox.getHeight();
-      BlockPlacementDelegate delegate = new BlockPlacementDelegate(terrainWidth, terrainHeight);
-      ArrayList<PVector> blockCoordinates = delegate.computeCoordinates(BLOCK_NUM);
-      ArrayList<PVector> blockPositions = delegate.getRelativePositions(blockCoordinates, worldBoundingBox.getAbsMin());
+      ArrayList<PVector> blockCoordinates = grid.computeBlockCoordinates(BLOCK_NUM);
+      ArrayList<PVector> blockPositions = grid.getPositions(blockCoordinates);
       for (PVector position : blockPositions) {
-         blocks.addBlock(position); 
+         blocks.addBlock(position, grid.GRID_CELL_WIDTH, grid.GRID_CELL_HEIGHT); 
       }
 
  }
@@ -122,35 +126,42 @@ class GameLevelWorld extends World  implements MessageSubscriber {
 
 }
 
-class BlockPlacementDelegate {
+class GridLayoutManager {
+    static final int GRID_CELL_WIDTH = 50;
+    static final int GRID_CELL_HEIGHT = 50;
     static final int GRID_WIDTH_OFFSET = 20;
-    static final int GRID_HEIGHT_OFFSET = 100;
+    static final int GRID_HEIGHT_OFFSET = 20;
+    static final int TOP_LINES_OFFSET = 1;
+    static final int BOTTOM_LINES_OFFSET = 1;
   
+    final PVector origin;
     final float surfaceWidth;
     final float surfaceHeight;
     final int nrCols;
     final int nrLines;
   
-    BlockPlacementDelegate(float aTerrainWidth, float aTerrainHeight) {
+    GridLayoutManager(PVector anOrigin, float aTerrainWidth, float aTerrainHeight) {
         surfaceWidth = aTerrainWidth - GRID_WIDTH_OFFSET*2;
         surfaceHeight = aTerrainHeight - GRID_HEIGHT_OFFSET*2;
-        nrCols = (int)(surfaceWidth / Block.WIDTH);
-        nrLines = (int)(surfaceHeight / Block.HEIGHT);
+        nrCols = (int)(surfaceWidth / GRID_CELL_WIDTH);
+        nrLines = (int)(surfaceHeight / GRID_CELL_HEIGHT);
+        origin = anOrigin;
     }
     
-    ArrayList<PVector> computeCoordinates(int numberOfBlocks) {
+    ArrayList<PVector> computeBlockCoordinates(int numberOfBlocks) {
         ArrayList<PVector> cellCoordinates = new ArrayList<PVector>();
         randomSeed(millis());
         int remainingBlocks = numberOfBlocks;
+        int nrLinesOfBlocks = nrLines - TOP_LINES_OFFSET - BOTTOM_LINES_OFFSET;
         for (int ic=0; ic<nrCols; ic++) {
-           for (int il=0; il<nrLines; il++) {
-             float remainingCells = (nrLines-il-1) + (nrCols-ic-1)*nrLines;
+           for (int il=0; il<nrLinesOfBlocks; il++) {
+             float remainingCells = (nrLinesOfBlocks-il-1) + (nrCols-ic-1)*nrLinesOfBlocks;
              float rate = remainingBlocks/remainingCells;
              float dice =  random(1) ;
-             println("ic=" + ic + "/" + nrCols + " il=" + il + "/" + nrLines + " dice=" + dice + " remainingBlocks=" + remainingBlocks + " rate=" + rate + " remainingCells=" + remainingCells);
+             println("ic=" + ic + "/" + nrCols + " il=" + il + "/" + nrLinesOfBlocks + " dice=" + dice + " remainingBlocks=" + remainingBlocks + " rate=" + rate + " remainingCells=" + remainingCells);
              boolean hasBlock = dice <  rate;
              if (hasBlock && remainingBlocks>0) {
-                 PVector cellCoordinate = new PVector(ic, il);
+                 PVector cellCoordinate = new PVector(ic, il + TOP_LINES_OFFSET);
                  cellCoordinates.add(cellCoordinate);
                  remainingBlocks--;
              }
@@ -159,15 +170,20 @@ class BlockPlacementDelegate {
        return cellCoordinates;
     }
     
-    ArrayList<PVector> getRelativePositions(ArrayList<PVector>  coordinates, PVector origin) {
+    
+    ArrayList<PVector> getPositions(ArrayList<PVector>  coordinates) {
       ArrayList<PVector> blockPositions = new ArrayList<PVector>();
       for (PVector coordinate : coordinates) {
-         PVector position = new PVector(coordinate.x*Block.WIDTH, coordinate.y*Block.HEIGHT);
-         position.add(new PVector(GRID_WIDTH_OFFSET, GRID_HEIGHT_OFFSET));
-         position.add(origin);
-         blockPositions.add(position); 
+         blockPositions.add( getPosition(coordinate)); 
       }
        return blockPositions;
+    }
+
+    PVector getPosition(PVector  coordinate) {
+       PVector position = new PVector(coordinate.x*GRID_CELL_WIDTH, coordinate.y*GRID_CELL_HEIGHT);
+       position.add(new PVector(GRID_WIDTH_OFFSET, GRID_HEIGHT_OFFSET));
+       position.add(origin);
+       return position;
     }
 
 }
