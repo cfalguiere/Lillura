@@ -46,11 +46,12 @@ class CardDeckWorld extends World implements MessageSubscriber  {
   //
     
   void createDeck() {      
-      CardDeckCanvas cardDeck = new CardDeckCanvas(deckBoundingBox); 
-      register(cardDeck);
-      
       cards = new CardGroup(this, deckBoundingBox); 
       register(cards);
+      subscribe(cards, POCodes.Button.LEFT, deckBoundingBox);
+      
+      CardDeckCanvas cardDeck = new CardDeckCanvas(deckBoundingBox, cards); 
+      register(cardDeck);
   }
 
   void resetDeck() {

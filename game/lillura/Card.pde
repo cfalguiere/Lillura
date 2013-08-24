@@ -6,6 +6,7 @@ class Card extends Being {
   static final int HEIGHT = 60;
   MovementType movementType;
   int distance;
+  boolean isSelected = false;
 
   Card(PVector position, MovementType aMovementType, int aDistance) {
       super(new Rectangle(position, WIDTH, HEIGHT));
@@ -19,8 +20,20 @@ class Card extends Being {
     //_stroke = false;
   }
 
+  public void select() {
+    isSelected = true;
+  }
+  
+  public void deselect() {
+    isSelected = false;
+  }
+  
   public void draw() {
-      fill(color(256,256,256));
+      if (isSelected) {
+        fill(color(GREEN));
+      } else {
+        fill(color(256,256,256));
+      }
       strokeWeight(1);
       stroke(0);
       _shape.draw();
@@ -37,5 +50,9 @@ class Card extends Being {
       text(" " + distance, 10, HEIGHT - 20);
   }
    
+  public String toString() {
+    return movementType.name() + " " + distance;
+  }
+  
 }
 
