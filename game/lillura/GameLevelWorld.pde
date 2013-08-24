@@ -84,35 +84,17 @@ class GameLevelWorld extends World  implements MessageSubscriber {
       blocks = new BlockGroup(this, worldBoundingBox); 
       register(blocks);
       
-     // for (int i = 0; i < SQUARE_NUM; i++) {
-     //    blocks.addBlock();
-     // }
-      
-      randomSeed(millis());
-      float gridWidthOffset = 20;
-      float gridMaxWidth = worldBoundingBox.getWidth() - gridWidthOffset*2;
-      float gridHeightOffset = 100;
-      float gridMaxHeight = worldBoundingBox.getHeight() - gridHeightOffset*2;
-      int cols = (int)(gridMaxWidth / Block.WIDTH);
-      int lines = (int)(gridMaxHeight / Block.HEIGHT);
-     int remainingBlocks = BLOCK_NUM;
-      for (int ic=0; ic<cols; ic++) {
-         for (int il=0; il<lines; il++) {
-          //float acceptMax = 100 - ((remainingBlocks-1) * 100.0 / BLOCK_NUM); 
-           float remainingCells = (lines-il-1) + (cols-ic-1)*lines;
-           float rate = remainingBlocks/remainingCells;
-           float dice =  random(1) ;
-           println("ic=" + ic + "/" + cols + " il=" + il + "/" + lines + " dice=" + dice + " remainingBlocks=" + remainingBlocks + " rate=" + rate + " remainingCells=" + remainingCells);
-           boolean hasBlock = dice <  rate;
-           if (hasBlock && remainingBlocks>0) {
-               PVector cellPosition = new PVector(ic*Block.WIDTH + gridWidthOffset, il*Block.HEIGHT + gridHeightOffset);
-               cellPosition.add(worldBoundingBox.getAbsMin());
-               blocks.addBlock(cellPosition); 
-               remainingBlocks--;
-           }
-         }
-     }
-  }
+      float terrainWidth = worldBoundingBox.getWidth();
+      float terrainHeight = worldBoundingBox.getHeight();
+      BlockPlacementDelegate delegate = new BlockPlacementDelegate(terrainWidth, terrainHeight);
+      ArrayList<PVector> blockCoordinates = delegate.computeCoordinates(BLOCK_NUM);
+      ArrayList<PVector> blockPositions = delegate.getRelativePositions(blockCoordinates, worldBoundingBox.getAbsMin());
+      for (PVector position : blockPositions) {
+         blocks.addBlock(position); 
+      }
+
+ }
+  
 
   void createRobot() {     
       RobotPath path =  new RobotPath(worldBoundingBox);
@@ -137,5 +119,55 @@ class GameLevelWorld extends World  implements MessageSubscriber {
      return position;
   }
 
+
+}
+
+class BlockPlacementDelegate {
+    static final int GRID_WIDTH_OFFSET = 20;
+    static final int GRID_HEIGHT_OFFSET = 100;
+  
+    final float surfaceWidth;
+    final float surfaceHeight;
+    final int nrCols;
+    final int nrLines;
+  
+    BlockPlacementDelegate(float aTerrainWidth, float aTerrainHeight) {
+        surfaceWidth = aTerrainWidth - GRID_WIDTH_OFFSET*2;
+        surfaceHeight = aTerrainHeight - GRID_HEIGHT_OFFSET*2;
+        nrCols = (int)(surfaceWidth / Block.WIDTH);
+        nrLines = (int)(surfaceHeight / Block.HEIGHT);
+    }
+    
+    ArrayList<PVector> computeCoordinates(int numberOfBlocks) {
+        ArrayList<PVector> cellCoordinates = new ArrayList<PVector>();
+        randomSeed(millis());
+        int remainingBlocks = numberOfBlocks;
+        for (int ic=0; ic<nrCols; ic++) {
+           for (int il=0; il<nrLines; il++) {
+             float remainingCells = (nrLines-il-1) + (nrCols-ic-1)*nrLines;
+             float rate = remainingBlocks/remainingCells;
+             float dice =  random(1) ;
+             println("ic=" + ic + "/" + nrCols + " il=" + il + "/" + nrLines + " dice=" + dice + " remainingBlocks=" + remainingBlocks + " rate=" + rate + " remainingCells=" + remainingCells);
+             boolean hasBlock = dice <  rate;
+             if (hasBlock && remainingBlocks>0) {
+                 PVector cellCoordinate = new PVector(ic, il);
+                 cellCoordinates.add(cellCoordinate);
+                 remainingBlocks--;
+             }
+           }
+       }
+       return cellCoordinates;
+    }
+    
+    ArrayList<PVector> getRelativePositions(ArrayList<PVector>  coordinates, PVector origin) {
+      ArrayList<PVector> blockPositions = new ArrayList<PVector>();
+      for (PVector coordinate : coordinates) {
+         PVector position = new PVector(coordinate.x*Block.WIDTH, coordinate.y*Block.HEIGHT);
+         position.add(new PVector(GRID_WIDTH_OFFSET, GRID_HEIGHT_OFFSET));
+         position.add(origin);
+         blockPositions.add(position); 
+      }
+       return blockPositions;
+    }
 
 }
