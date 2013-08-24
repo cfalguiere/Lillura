@@ -136,7 +136,7 @@ class Robot extends Being implements MessageSubscriber {
   public void handleGoOn() {
       if (currentAction == null || currentAction.movementType == MovementType.NONE) {
         currentAction = new RobotAction(MovementType.FORWARD, millis(), _position);
-        println("CREATE currentAction " + currentAction.movementType.name() + " "+ currentAction.startPosition);
+        //println("CREATE currentAction " + currentAction.movementType.name() + " "+ currentAction.startPosition);
       }
       isOn = true;
   }
@@ -170,7 +170,7 @@ class Robot extends Being implements MessageSubscriber {
   private void sendActionCompleted() {
     currentAction.endPosition = _position;
     if (currentAction != null && currentAction.movementType != MovementType.NONE) {
-         println("SEND " + currentAction.movementType.name() + " " + currentAction.startPosition + " -> " +  currentAction.endPosition  + " distance " + currentAction.distance());
+         //println("SEND " + currentAction.movementType.name() + " " + currentAction.startPosition + " -> " +  currentAction.endPosition  + " distance " + currentAction.distance());
          messenger.sendMessage(new ActionMessage(ActionMessage.ACTION_COMPLETED, currentAction.movementType, currentAction.distance()));
          previousAction = currentAction;
     }
