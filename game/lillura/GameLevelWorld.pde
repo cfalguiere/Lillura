@@ -86,8 +86,8 @@ class GameLevelWorld extends World  implements MessageSubscriber {
       grid = new GridLayoutManager(worldBoundingBox.getAbsMin(), terrainWidth, terrainHeight);
       
       //DEBUG
-      //ArrayList<PVector> allCells = grid.getPositions(grid.getAllCells());
-      //terrain.showGrid(allCells, grid.GRID_CELL_WIDTH, grid.GRID_CELL_HEIGHT);
+      ArrayList<PVector> allCells = grid.getPositions(grid.getAllCells());
+      terrain.showGrid(allCells, grid.GRID_CELL_WIDTH, grid.GRID_CELL_HEIGHT);
   }
   
 
@@ -130,7 +130,7 @@ class GridLayoutManager {
     static final int GRID_CELL_WIDTH = 50;
     static final int GRID_CELL_HEIGHT = 50;
     static final int GRID_WIDTH_OFFSET = 20;
-    static final int GRID_HEIGHT_OFFSET = 10;
+    static final int GRID_HEIGHT_OFFSET = 15;
     static final int TOP_LINES_OFFSET = 1;
     static final int BOTTOM_LINES_OFFSET = 1;
   

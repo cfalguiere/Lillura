@@ -19,7 +19,16 @@ class Terrain extends Being {
       fill(color(256,256,256));
       noStroke();
       _shape.draw();
-      
+/*
+      strokeWeight(15);
+      stroke(GREEN);
+      float w =  _shape.getBoundingBox().getWidth();
+      float h =  _shape.getBoundingBox().getHeight();
+      line(0, 0, w, 0);
+      line(0, 0, 0, h);
+      line(w, 0, w, h);
+      line(0, h, w, h);
+ */       
       if (shouldShowGrid) {
         pushMatrix();
         translate(-_shape.getBoundingBox().getAbsMin().x, -_shape.getBoundingBox().getAbsMin().y);

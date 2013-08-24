@@ -24,7 +24,7 @@ class Goal extends Being  {
     //_shape.draw();
     float w =  _shape.getBoundingBox().getWidth();
     float h =  _shape.getBoundingBox().getHeight();
-    line(0, 0, w, 0);
+    //line(0, 0, w, 0);
     line(0, 0, 0, h);
     line(w, 0, w, h);
   }
