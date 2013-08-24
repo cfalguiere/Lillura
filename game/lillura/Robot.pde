@@ -77,7 +77,7 @@ class Robot extends Being implements MessageSubscriber {
   }
   
   public void update() {
-    if (isOn && !isGameOver) {
+    if (isOn) {
       _position.add(_velocity);
       //path.addPoint(_position);
     }
