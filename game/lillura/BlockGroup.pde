@@ -46,7 +46,13 @@ class BlockGroup extends Group<Block> {
   
 
   private color pickColor() {
-     return color(int(random(256)), int(random(256)), int(random(256)));
+     float sat = 0;
+     color c = color(128);
+     while (sat < 64 || sat > 128) {
+       c = color(int(random(256)), int(random(256)), int(random(256)));
+       sat = saturation(c);
+     }
+     return c;
   }
 
 
