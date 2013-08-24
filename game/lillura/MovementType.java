@@ -1,3 +1,4 @@
 public enum MovementType {
-  NONE, FORWARD, LEFT, RIGHT
+  NONE, RIGHT, BACKWARD, LEFT, FORWARD
 };
+// Should be keep ordered clockwise

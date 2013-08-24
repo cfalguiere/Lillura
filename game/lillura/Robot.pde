@@ -52,7 +52,7 @@ class Robot extends Being implements MessageSubscriber {
   }
   
   void initializeTriangleUp() {
-    triangleOrientation = -HALF_PI;
+    triangleOrientation = -HALF_PI + TWO_PI;
     createTriangle(triangleOrientation); 
   }
   
@@ -120,7 +120,7 @@ class Robot extends Being implements MessageSubscriber {
       currentAction = new RobotAction(MovementType.RIGHT, millis(), _position);
       isOn = true;
       _velocity.rotate(HALF_PI);
-      triangleOrientation += HALF_PI;
+      triangleOrientation = (triangleOrientation + HALF_PI) % TWO_PI;
       createTriangle(triangleOrientation); 
       sendActionCompleted();
   }
@@ -129,7 +129,7 @@ class Robot extends Being implements MessageSubscriber {
       currentAction = new RobotAction(MovementType.LEFT, millis(), _position);
       isOn = true;
       _velocity.rotate(-HALF_PI);
-      triangleOrientation += -HALF_PI;
+      triangleOrientation = (triangleOrientation - HALF_PI) % TWO_PI;
       createTriangle(triangleOrientation); 
       sendActionCompleted();
   }
@@ -202,10 +202,56 @@ class Robot extends Being implements MessageSubscriber {
     if (m.getAction() == POCodes.Click.PRESSED) {
       if (_shape.getBoundingBox().contains(mouseX, mouseY)) {
         handlePause();
+      } else {
+        MovementType mt = convertToMovement3();
+        switch (mt) {
+          case LEFT:
+             handleTurnLeft();
+             break;
+          case RIGHT:
+            handleTurnRight();
+            break;
+          case FORWARD:
+            handleGoOn();
+            break;
+        }
       }
     }
   }
-
+  
+  MovementType convertToMovement3() {
+    float mouseAngle = atan2(mouseY-_position.y, mouseX-_position.x);
+    if (mouseAngle < 0) mouseAngle += TWO_PI;
+    mouseAngle %= TWO_PI;
+    println("mouseAngle " + mouseAngle);    
+    if (triangleOrientation < 0) triangleOrientation += TWO_PI;
+    triangleOrientation %= TWO_PI;
+    println("triangleOrientation " + triangleOrientation);    
+    float delta = (triangleOrientation - mouseAngle);
+    println("delta " + delta + " Q "  + HALF_PI  + "  " + PI + " "  + 3*PI/2);    
+    MovementType mt = MovementType.NONE;
+    if (abs(delta) < HALF_PI/2) {
+      // going up 3PI/2 click ahead 3PI/2 delta 0
+      mt = MovementType.FORWARD;
+    } else {
+      if (delta<0) delta+=TWO_PI;
+      // going up 3PI/2 click back PI/2 delta  PI
+      if (abs(delta-3*PI/2) < HALF_PI) {
+        // going up 3PI/2 click right 0 delta 3PI/2 == -PI/2
+        // going right 0 click right PI/2 delta  -PI/2 
+        // going left PI click right 3PI/2 delta -PI/2
+        mt = MovementType.RIGHT;
+      } else if (abs(delta-HALF_PI) < HALF_PI) {
+        // going up 3PI/2 click left PI delta  PI/2
+        // going right 0 click left 3PI/2  delta -3PI/2 = PI/2
+        // going left PI click left PI/2  delta PI/2
+        mt = MovementType.LEFT;
+      } 
+    }  
+    return mt;
+  }
+  
+  
   void perCChanged(PerCMessage handSensor) {
     isOn = handSensor.isHandOpen() && !handSensor.isTooFar();
   }
