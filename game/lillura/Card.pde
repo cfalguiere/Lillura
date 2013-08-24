@@ -5,12 +5,14 @@ class Card extends Being {
   static final int WIDTH = 80;
   static final int HEIGHT = 60;
   MovementType movementType;
+  int distance;
 
-  Card(PVector position, MovementType aMovementType) {
+  Card(PVector position, MovementType aMovementType, int aDistance) {
       super(new Rectangle(position, WIDTH, HEIGHT));
       //Add your constructor info here
       println("creating card at " + position);
       movementType = aMovementType;
+      distance = aDistance;
   }
 
   public void update() {
@@ -32,6 +34,7 @@ class Card extends Being {
       } else if (movementType ==  MovementType.LEFT) {
           text("Left", 10, 20);
       }
+      text(" " + distance, 10, HEIGHT - 20);
   }
    
 }

@@ -47,8 +47,7 @@ class Robot extends Being implements MessageSubscriber {
         w.subscribe(this, POCodes.Key.SPACE);
        
         initializeTriangleUp();
-        currentAction = new RobotAction(MovementType.NONE, millis(), _position);
-        previousAction = currentAction;
+        previousAction = new RobotAction(MovementType.NONE, millis(), position);
   }
   
   void initializeTriangleUp() {
@@ -110,38 +109,41 @@ class Robot extends Being implements MessageSubscriber {
   }
   
   public void handlePause() {
-     currentAction = new RobotAction(MovementType.NONE, millis(), _position);
-
      isOn = false;
+     println("PAUSE");
      sendActionCompleted();
+     currentAction = new RobotAction(MovementType.NONE, millis(), _position);
   }
   
   public void handleTurnRight() {
+      sendActionCompleted();
       currentAction = new RobotAction(MovementType.RIGHT, millis(), _position);
       isOn = true;
       _velocity.rotate(HALF_PI);
       triangleOrientation = (triangleOrientation + HALF_PI) % TWO_PI;
       createTriangle(triangleOrientation); 
-      sendActionCompleted();
   }
   
   public void handleTurnLeft() {
+      sendActionCompleted();
       currentAction = new RobotAction(MovementType.LEFT, millis(), _position);
       isOn = true;
       _velocity.rotate(-HALF_PI);
       triangleOrientation = (triangleOrientation - HALF_PI) % TWO_PI;
       createTriangle(triangleOrientation); 
-      sendActionCompleted();
   }
   
   public void handleGoOn() {
-      currentAction = new RobotAction(MovementType.FORWARD, millis(), _position);
+      if (currentAction == null || currentAction.movementType == MovementType.NONE) {
+        currentAction = new RobotAction(MovementType.FORWARD, millis(), _position);
+        println("CREATE currentAction " + currentAction.movementType.name() + " "+ currentAction.startPosition);
+      }
       isOn = true;
   }
   
   public void handleStop() {
-      if (!isGameOver) 
-       sendActionCompleted();
+      //if (!isGameOver) 
+      // sendActionCompleted();
       isGameOver = true;
       isOn = false;
   }
@@ -166,12 +168,15 @@ class Robot extends Being implements MessageSubscriber {
 
   
   private void sendActionCompleted() {
-    if (previousAction.movementType != MovementType.NONE) 
-     messenger.sendMessage(new ActionMessage(ActionMessage.ACTION_COMPLETED, previousAction.movementType));
+    currentAction.endPosition = _position;
+    if (currentAction != null && currentAction.movementType != MovementType.NONE) {
+         println("SEND " + currentAction.movementType.name() + " " + currentAction.startPosition + " -> " +  currentAction.endPosition  + " distance " + currentAction.distance());
+         messenger.sendMessage(new ActionMessage(ActionMessage.ACTION_COMPLETED, currentAction.movementType, currentAction.distance()));
+         previousAction = currentAction;
+    }
   }
 
   public void receive(KeyMessage m) { //FIXME generates a command, and update do the switch
-    previousAction = currentAction;
     int code = m.getKeyCode();
     if (m.isPressed()) {
       switch (code) {
@@ -199,7 +204,6 @@ class Robot extends Being implements MessageSubscriber {
   }
   
   public void receive(MouseMessage m) {
-    previousAction = currentAction;
     if (m.getAction() == POCodes.Click.PRESSED) {
       if (_shape.getBoundingBox().contains(mouseX, mouseY)) {
         handlePause();
@@ -272,6 +276,7 @@ class RobotAction {
   MovementType movementType;
   long timeStarted;
   PVector startPosition;
+  PVector endPosition;
   
   RobotAction(MovementType aMovementType, long theTimeStarted, PVector theStartPosition) {
     movementType = aMovementType;
@@ -284,6 +289,8 @@ class RobotAction {
     return movementType != aMovementType || timeStarted+STABILIZER <  aTime;
   }
   
-  
+  int distance() {
+    return int(abs(startPosition.x -  endPosition.x + startPosition.y -  endPosition.y));
+  }
 }
 

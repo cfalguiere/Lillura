@@ -113,12 +113,14 @@ public class ActionMessage extends Message {
   
   int action = ACTION_NONE;
   MovementType movementType;
+  int value;
   ActionMessage(int anAction)  {
     action = anAction;
   }
-  ActionMessage(int anAction, MovementType aMovementType)  {
+  ActionMessage(int anAction, MovementType aMovementType, int aValue)  {
     action = anAction;
     movementType = aMovementType;
+    value = aValue;
   }
   
   public String toString() {

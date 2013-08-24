@@ -28,7 +28,7 @@ class CardDeckWorld extends World implements MessageSubscriber  {
     void actionSent(ActionMessage event) {
       switch (event.action) {
          case ActionMessage.ACTION_COMPLETED :
-            cards.addCard(event.movementType);
+            cards.addCard(event.movementType, event.value);
             break;
          case ActionMessage.ACTION_RESET :
             resetDeck();
