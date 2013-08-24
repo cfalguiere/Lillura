@@ -84,6 +84,10 @@ class GameLevelWorld extends World  implements MessageSubscriber {
       float terrainWidth = worldBoundingBox.getWidth();
       float terrainHeight = worldBoundingBox.getHeight();
       grid = new GridLayoutManager(worldBoundingBox.getAbsMin(), terrainWidth, terrainHeight);
+      
+      //DEBUG
+      //ArrayList<PVector> allCells = grid.getPositions(grid.getAllCells());
+      //terrain.showGrid(allCells, grid.GRID_CELL_WIDTH, grid.GRID_CELL_HEIGHT);
   }
   
 
@@ -102,25 +106,21 @@ class GameLevelWorld extends World  implements MessageSubscriber {
 
   void createRobot() {     
       RobotPath path =  new RobotPath(worldBoundingBox);
-      PVector position = new PVector(worldBoundingBox.getWidth() / 2, worldBoundingBox.getHeight() -30);
-      position.add(worldBoundingBox.getAbsMin());
+      PVector position = grid.getPositionBottomCentered(grid.computeRobotCoordinate(), Robot.WIDTH, Robot.HEIGHT);
       robot = new Robot(position, this, messenger,path);
       register(robot);
       register(path);
       messenger.subscribe(robot);
+      subscribe(robot, POCodes.Button.LEFT, worldBoundingBox);
   }
   
   void createGoal() { 
-      goal = new Goal(getGoalPosition(), worldBoundingBox);
+      goal = new Goal( getGoalPosition(), worldBoundingBox);
       register(goal);
   }
   
   PVector getGoalPosition() {
-     float terrainW = worldBoundingBox.getWidth();
-     int x =  (int) (random(terrainW/4,terrainW*3/4));
-     PVector position = new PVector(x, 5);
-     position.add(worldBoundingBox.getAbsMin());
-     return position;
+      return grid.getPosition( grid.computeGoalCoordinate() );
   }
 
 
@@ -130,7 +130,7 @@ class GridLayoutManager {
     static final int GRID_CELL_WIDTH = 50;
     static final int GRID_CELL_HEIGHT = 50;
     static final int GRID_WIDTH_OFFSET = 20;
-    static final int GRID_HEIGHT_OFFSET = 20;
+    static final int GRID_HEIGHT_OFFSET = 10;
     static final int TOP_LINES_OFFSET = 1;
     static final int BOTTOM_LINES_OFFSET = 1;
   
@@ -171,6 +171,30 @@ class GridLayoutManager {
     }
     
     
+    PVector computeGoalCoordinate() {
+        randomSeed(millis());
+        int goalLine = 0;
+        int dice =  int(random(1, nrCols-1));
+        return new PVector(dice, goalLine);
+    }
+    
+    PVector computeRobotCoordinate() {
+        int robotLine = nrLines-1;
+        int robotCol = int(nrCols/2);
+        return new PVector(robotCol, robotLine);
+    }
+    
+    
+    ArrayList<PVector> getAllCells() {
+       ArrayList<PVector> cellCoordinates = new ArrayList<PVector>();
+       for (int ic=0; ic<nrCols; ic++) {
+           for (int il=0; il<nrLines; il++) {
+                cellCoordinates.add(new PVector(ic, il));
+           }
+       }
+       return cellCoordinates;
+    }
+
     ArrayList<PVector> getPositions(ArrayList<PVector>  coordinates) {
       ArrayList<PVector> blockPositions = new ArrayList<PVector>();
       for (PVector coordinate : coordinates) {
@@ -183,6 +207,14 @@ class GridLayoutManager {
        PVector position = new PVector(coordinate.x*GRID_CELL_WIDTH, coordinate.y*GRID_CELL_HEIGHT);
        position.add(new PVector(GRID_WIDTH_OFFSET, GRID_HEIGHT_OFFSET));
        position.add(origin);
+       return position;
+    }
+
+    PVector getPositionBottomCentered(PVector  coordinate, float aWidth, float aHeight) {
+       PVector position = getPosition(coordinate);
+       float vertOffset = GRID_CELL_WIDTH - aHeight;
+       float hrzOffset = (GRID_CELL_HEIGHT - aWidth)/2;
+       position.add(new PVector(hrzOffset, vertOffset));
        return position;
     }
 

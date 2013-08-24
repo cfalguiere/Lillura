@@ -33,13 +33,10 @@ class Goal extends Being  {
      isCompleted = true;
   }
 
-  public void handleReset(PVector position) {
+  public void handleReset(PVector aNewPosition) {
      isCompleted = false;
      
-     float w = parentBoundingBox.getWidth();
-     float x = random(w * 0.25, w * 0.75);
-     float dX = x - _position.x;
-     _position.add(new PVector(dX, 0));
+     _position.set(aNewPosition);
   }
 
 }

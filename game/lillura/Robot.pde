@@ -45,9 +45,7 @@ class Robot extends Being implements MessageSubscriber {
         w.subscribe(this, POCodes.Key.LEFT);
         w.subscribe(this, POCodes.Key.RIGHT);
         w.subscribe(this, POCodes.Key.SPACE);
-        //w.subscribe(this, POCodes.Button.LEFT, robot.getShape());
-        w.subscribe(this, POCodes.Button.LEFT);
-        
+       
         initializeTriangleUp();
         currentAction = new RobotAction(MovementType.NONE, millis(), _position);
         previousAction = currentAction;
@@ -202,7 +200,9 @@ class Robot extends Being implements MessageSubscriber {
   
   public void receive(MouseMessage m) {
     if (m.getAction() == POCodes.Click.PRESSED) {
-      handlePause();
+      if (_shape.getBoundingBox().contains(mouseX, mouseY)) {
+        handlePause();
+      }
     }
   }
 
