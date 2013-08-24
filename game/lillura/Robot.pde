@@ -203,7 +203,7 @@ class Robot extends Being implements MessageSubscriber {
       if (_shape.getBoundingBox().contains(mouseX, mouseY)) {
         handlePause();
       } else {
-        MovementType mt = convertToMovement3();
+        MovementType mt = convertToMovement();
         switch (mt) {
           case LEFT:
              handleTurnLeft();
@@ -219,16 +219,13 @@ class Robot extends Being implements MessageSubscriber {
     }
   }
   
-  MovementType convertToMovement3() {
-    float mouseAngle = atan2(mouseY-_position.y, mouseX-_position.x);
-    if (mouseAngle < 0) mouseAngle += TWO_PI;
-    mouseAngle %= TWO_PI;
-    println("mouseAngle " + mouseAngle);    
-    if (triangleOrientation < 0) triangleOrientation += TWO_PI;
-    triangleOrientation %= TWO_PI;
-    println("triangleOrientation " + triangleOrientation);    
+  MovementType convertToMovement() {
+    float mouseAngle = normAngle(atan2(mouseY-_position.y, mouseX-_position.x));
+    //println("mouseAngle " + mouseAngle);    
+    triangleOrientation = normAngle(triangleOrientation);
+    //println("triangleOrientation " + triangleOrientation);    
     float delta = (triangleOrientation - mouseAngle);
-    println("delta " + delta + " Q "  + HALF_PI  + "  " + PI + " "  + 3*PI/2);    
+    //println("delta " + delta + " Q "  + HALF_PI  + "  " + PI + " "  + 3*PI/2);    
     MovementType mt = MovementType.NONE;
     if (abs(delta) < HALF_PI/2) {
       // going up 3PI/2 click ahead 3PI/2 delta 0
@@ -251,6 +248,12 @@ class Robot extends Being implements MessageSubscriber {
     return mt;
   }
   
+  float normAngle(float aRad) {
+    float rad =  aRad;
+    if (rad < 0) rad += TWO_PI;
+    rad %= TWO_PI;
+    return rad;
+  }
   
   void perCChanged(PerCMessage handSensor) {
     isOn = handSensor.isHandOpen() && !handSensor.isTooFar();
