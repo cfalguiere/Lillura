@@ -5,6 +5,7 @@
 class Controller extends HObject implements MessageSubscriber {
     World parentWorld;
     LilluraMessenger messenger;
+    boolean isActive = true;
   
     Controller(World aParentWorld, LilluraMessenger theMessenger) {
          parentWorld = aParentWorld;
@@ -28,6 +29,13 @@ class Controller extends HObject implements MessageSubscriber {
       // does nothing
     }
  
+    void enable() {
+        isActive = true;
+    }
+ 
+    void disable() {
+        isActive = false;
+    }
 }
 
 //
@@ -61,6 +69,10 @@ class RobotMouseMovementController extends Controller {
 
     public void receive(MouseMessage m) {
       //if (isReplaying) return; //TODO handle replay
+      
+      if (m.getButton() != POCodes.Button.LEFT) {
+          return;
+      }
       
       if (m.getAction() == POCodes.Click.PRESSED) {
           if (robot.getBoundingBox().contains(mouseX, mouseY)) {
@@ -144,26 +156,26 @@ class RobotKeyMovementController extends Controller {
       
       int code = m.getKeyCode();
       if (m.isPressed()) {
-        switch (code) {
-          case POCodes.Key.SPACE:
-            robot.handlePause();
-            break;
-          case POCodes.Key.LEFT:
-            if (currentAction==null || robot.getCurrentAction().isDistinct(MovementType.LEFT, millis())) {
-                robot.handleTurnLeft();
-            }
-            break;
-          case POCodes.Key.RIGHT:
-            if (currentAction==null || robot.getCurrentAction().isDistinct(MovementType.RIGHT, millis())) {
-              robot.handleTurnRight();
-            }
-            break;
-          case POCodes.Key.UP:
-            robot.handleGoOn();
-            break;
-          default:
-            // go ahead
-            break;
+          switch (code) {
+              case POCodes.Key.SPACE:
+                  robot.handlePause();
+                  break;
+              case POCodes.Key.LEFT:
+                  if (currentAction==null || robot.getCurrentAction().isDistinct(MovementType.LEFT, millis())) {
+                      robot.handleTurnLeft();
+                  }
+                  break;
+              case POCodes.Key.RIGHT:
+                  if (currentAction==null || robot.getCurrentAction().isDistinct(MovementType.RIGHT, millis())) {
+                    robot.handleTurnRight();
+                  }
+                  break;
+              case POCodes.Key.UP:
+                  robot.handleGoOn();
+                  break;
+              default:
+                  // go ahead
+                  break;
         }
       }
     }
@@ -177,6 +189,7 @@ class RobotKeyMovementController extends Controller {
 
 class RobotPerceptualMovementController extends Controller {
     Robot robot;
+    float lastMouseX;
     
     RobotPerceptualMovementController(Robot aRobot, World aParentWorld, LilluraMessenger theMessenger) {
         super(aParentWorld, theMessenger);
@@ -184,11 +197,181 @@ class RobotPerceptualMovementController extends Controller {
     }
   
     void perCChanged(PerCMessage handSensor) {
+      if (! isActive) return;
+      
       //if (isReplaying) return;
   
       if (handSensor.isHandOpen() && !handSensor.isTooFar()) {
           robot.handleGoOn();
+      } else {
+          robot.handlePause();
       }
     }
-   
+
+    void actionSent(ActionMessage message) {
+        if (! isActive) return;
+
+        switch(message.eventType) {
+            case PERCEPTUAL_HAND_OPEN:
+                robot.handleGoOn();
+                break;
+            case PERCEPTUAL_HAND_CLOSE:
+                robot.handlePause();
+                break;
+            case PERCEPTUAL_HAND_MOVED_CENTER:
+                robot.handleGoOn();
+                break;
+            case PERCEPTUAL_HAND_MOVED_RIGHT:
+                robot.handleTurnRight();
+                break;
+            case PERCEPTUAL_HAND_MOVED_LEFT:
+                robot.handleTurnLeft();
+                break;
+            case PERCEPTUAL_HAND_MOVED_BOTTOM_LEFT:
+                robot.handleReset();
+                break;
+            default:
+                // ignore other events
+        }
+    }
+ 
+    // emulation of position with right button
+    public void receive(MouseMessage m) {
+        //if (isReplaying) return; //TODO handle replay
+        
+        if (m.getAction() == POCodes.Click.PRESSED) {
+            boolean top = (mouseY<height*0.2);
+            boolean bottom = (mouseY>height*0.8);
+            boolean left = (mouseX<width*0.33);
+            boolean right = (mouseX>width*0.66);
+        
+            EventType et = EventType.PERCEPTUAL_HAND_MOVED_CENTER;
+            
+            if (top) {
+                 if (left) {
+                    et = EventType.PERCEPTUAL_HAND_MOVED_TOP_LEFT;
+                 } else if (right) {
+                    et = EventType.PERCEPTUAL_HAND_MOVED_TOP_RIGHT;
+                 }  
+            } else if (bottom) { 
+                 if (left) {
+                    et = EventType.PERCEPTUAL_HAND_MOVED_BOTTOM_LEFT;
+                 } 
+            } else {
+                if (left) {
+                    et = EventType.PERCEPTUAL_HAND_MOVED_LEFT;
+                } else if (right) {
+                    et = EventType.PERCEPTUAL_HAND_MOVED_CENTER;
+                } else {
+                    et = EventType.PERCEPTUAL_HAND_MOVED_RIGHT;
+                }
+            }
+            
+            messenger.sendMessage(new ActionMessage(et));
+        }
+    }
+
+    // emulation of close / open with keyboard C and O
+    public void receive(KeyMessage m) { //FIXME generates a command, and update do the switch
+      //if (isReplaying) return; //TODO replay
+      
+      int code = m.getKeyCode();
+      if (m.isPressed()) {
+          switch (code) {
+              case POCodes.Key.C:
+                  messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_HAND_CLOSE));
+                  break;
+              case POCodes.Key.O:
+                  messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_HAND_OPEN));
+                  break;
+            default:
+                // ignore other events
+          }
+      }
+    }   
+}
+
+class CardDeckController extends Controller {
+    CardGroup cards;
+    CardDeckCanvas cardDeckCanvas;
+
+    float hoverPosition = -1;
+    int actionCardIndex = -1;
+    
+    CardDeckController(CardDeckCanvas aCardDeckCanvas, CardGroup aCardGroup, World aParentWorld, LilluraMessenger theMessenger) {
+        super(aParentWorld, theMessenger);
+        cards = aCardGroup;
+        cardDeckCanvas = aCardDeckCanvas;
+    }
+    
+    void selectCurrentCard() {
+        actionCardIndex = int(hoverPosition);
+        Card card = cards.getCard(actionCardIndex);
+        println("select card " + actionCardIndex + " "  + card);
+        card.select();
+    }
+    
+    void deselectCurrentCard() {
+        Card card = cards.getCard(actionCardIndex);
+        float index = cards.getCardIndexForMouse(mouseY);
+        int newPos = (index == int(index)) ? floor(index) : ceil(index);
+        cards.moveCardTo(card, newPos);
+        println("deselect card " + actionCardIndex + " "  + card);
+        card.deselect();
+        actionCardIndex = -1;
+    }
+}
+
+class CardDeckMouseController extends CardDeckController {
+    
+    CardDeckMouseController(CardDeckCanvas aCardDeckCanvas, CardGroup aCardGroup, World aParentWorld, LilluraMessenger theMessenger) {
+        super(aCardDeckCanvas, aCardGroup, aParentWorld, theMessenger);
+    }
+
+    public void preUpdate() {
+        if (cardDeckCanvas.getBoundingBox().contains(mouseX, mouseY)) {
+            hoverPosition = cards.getCardIndexForMouse(mouseY);
+        } else {
+            hoverPosition = -1;
+        }   
+        if (hoverPosition == int(hoverPosition)) cards.setSelectedCardIndex(floor(hoverPosition));
+    }
+    
+    public void receive(MouseMessage m) {
+      if (hoverPosition < 0) return;
+      
+      if (m.getAction() == POCodes.Click.PRESSED) {
+          selectCurrentCard();
+      }  
+      if (m.getAction() == POCodes.Click.RELEASED) {
+          deselectCurrentCard();
+      }  
+    }
+
+}
+
+class CardDeckPerceptualController extends CardDeckController {
+    
+    CardDeckPerceptualController(CardDeckCanvas aCardDeckCanvas, CardGroup aCardGroup, World aParentWorld, LilluraMessenger theMessenger) {
+        super(aCardDeckCanvas, aCardGroup, aParentWorld, theMessenger);
+    }
+
+    public void preUpdate() {
+        if (cardDeckCanvas.getBoundingBox().contains(mouseX, mouseY)) {
+            hoverPosition = cards.getCardIndexForMouse(mouseY);
+        } else {
+            hoverPosition = -1;
+        }   
+    }
+    
+    public void receive(MouseMessage m) {
+      if (hoverPosition < 0) return;
+      
+      if (m.getAction() == POCodes.Click.PRESSED) {
+           selectCurrentCard();
+      }  
+      if (m.getAction() == POCodes.Click.RELEASED) {
+            deselectCurrentCard();
+      }  
+    }
 }

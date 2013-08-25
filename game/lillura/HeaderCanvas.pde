@@ -7,6 +7,8 @@ class HeaderCanvas extends Being implements MessageSubscriber  {
   
   String gameMessage;
   PVector messagePosition;
+  
+  String activeArea;
 
   HeaderCanvas(Rectangle boundingBox, HashMap<String, Rectangle>  allBoundingBoxes) {
         super(boundingBox);
@@ -17,10 +19,13 @@ class HeaderCanvas extends Being implements MessageSubscriber  {
         gameMessage = "Hello";
         messagePosition = new PVector( glArea.getAbsMin().x +  glArea.getWidth()/2 - _shape.getBoundingBox().getAbsMin().x, 40);
         //messagePosition = new PVector( _shape.getBoundingBox().getAbsMin().x + _shape.getBoundingBox().getWidth()/2, 40);
+        
+        activeArea = GAME_LEVEL_BBOX;
   }
   
   public void update() {
-    Rectangle selectedArea = getSelectedArea();
+    //Rectangle selectedArea = getSelectedArea();
+    Rectangle selectedArea = boundingBoxes.get(activeArea);
     
     float x = selectedArea.getAbsMin().x - _shape.getBoundingBox().getAbsMin().x;
     float y = _shape.getBoundingBox().getHeight();
@@ -64,23 +69,32 @@ class HeaderCanvas extends Being implements MessageSubscriber  {
     void actionSent(ActionMessage aMessage) {
       switch (aMessage.eventType) {
          case NOTIFICATION_PLAYER_WON :
-           gameMessage = "You Win !";
-           break;
+             gameMessage = "You Win !";
+             break;
          case NOTIFICATION_PLAYER_LOST :
-           gameMessage = "Game Over !";
-           break;
+             gameMessage = "Game Over !";
+             break;
          case COMMAND_NEWGAME :
-           gameMessage = "New Game";
-           break;
+             gameMessage = "New Game";
+             break;
          case COMMAND_RESTART :
-           gameMessage = "Restart";
-           break;
+             gameMessage = "Restart";
+             break;
          case COMMAND_PLAY :
-           gameMessage = "Playing robot program ...";
-           break;
+             gameMessage = "Playing robot program ...";
+             break;
+         case PERCEPTUAL_HAND_MOVED_TOP_LEFT:
+             activeArea = LEFT_PANEL_BBOX;
+             break;
+         case PERCEPTUAL_HAND_MOVED_TOP_CENTER:
+             activeArea = GAME_LEVEL_BBOX;
+             break;
+         case PERCEPTUAL_HAND_MOVED_TOP_RIGHT:
+             activeArea = CARD_DECK_BBOX;
+             break;
          default :
-           gameMessage = "";
-           break;
+             gameMessage = "";
+             break;
       }
     }
     

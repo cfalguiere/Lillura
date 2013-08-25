@@ -57,23 +57,30 @@ class GameLevelWorld extends World  implements MessageSubscriber {
   }
   
   
-  //
-  // behavior implementation 
-  //
+    //
+    // behavior implementation 
+    //
     void actionSent(ActionMessage message) {
-      switch(message.eventType) {
-        case COMMAND_NEWGAME:
-         resetLevel();
-        break;
-        case COMMAND_RESTART:
-         restartLevel();
-        break;
-        case PLAY_PROGRAM:
-         replayLevel(message.program);
-        break;
-        default:
-         // ignore other actions
-      }
+        switch(message.eventType) {
+            case COMMAND_NEWGAME:
+                resetLevel();
+                break;
+            case COMMAND_RESTART:
+                restartLevel();
+                break;
+            case PLAY_PROGRAM:
+                replayLevel(message.program);
+                break;
+            case PERCEPTUAL_HAND_MOVED_BOTTOM_RIGHT:
+                robotPerceptualMovementController.disable();
+                break;
+            case PERCEPTUAL_HAND_MOVED_BOTTOM_LEFT:
+            case PERCEPTUAL_HAND_MOVED_BOTTOM_CENTER:
+                robotPerceptualMovementController.enable();
+                break;
+            default:
+                 // ignore other events
+          }
     }
     
     void perCChanged(PerCMessage event) {
@@ -98,7 +105,6 @@ class GameLevelWorld extends World  implements MessageSubscriber {
         println("requesting a replay of the level");
         robot.handleReplay(program);
     }
-
 
     
   //
@@ -152,6 +158,9 @@ class GameLevelWorld extends World  implements MessageSubscriber {
       
       robotPerceptualMovementController =  new RobotPerceptualMovementController(robot, this, messenger);
       messenger.subscribe(robotPerceptualMovementController);
+      subscribe(robotPerceptualMovementController, POCodes.Button.RIGHT /*, worldBoundingBox*/);
+      subscribe(robotPerceptualMovementController, POCodes.Key.C);
+      subscribe(robotPerceptualMovementController, POCodes.Key.O);
   }
   
   void createGoal() { 
