@@ -69,11 +69,14 @@ class HeaderCanvas extends Being implements MessageSubscriber  {
          case NOTIFICATION_PLAYER_LOST :
            gameMessage = "Game Over !";
            break;
-         case COMMAND_RESET :
+         case COMMAND_NEWGAME :
            gameMessage = "New Game";
            break;
          case COMMAND_RESTART :
            gameMessage = "Restart";
+           break;
+         case COMMAND_REPLAY :
+           gameMessage = "Replaying ...";
            break;
          default :
            gameMessage = "";

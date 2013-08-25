@@ -118,8 +118,23 @@ class MenuButtonRestart extends  MenuButton {
   }
   
   void execute() {
-        println("sending reset request");
+        println("sending restart request");
         messenger.sendActionMessage(EventType.COMMAND_RESTART);
+  }
+}
+
+//
+// MenuButtonReplay : replay button
+// 
+
+class MenuButtonReplay extends  MenuButton {
+  MenuButtonReplay(Rectangle aBoundingBox, World theParentWorld, LilluraMessenger theMessenger) {
+    super("Replay", aBoundingBox, theParentWorld, theMessenger);
+  }
+  
+  void execute() {
+        println("sending replay request");
+        messenger.sendActionMessage(EventType.COMMAND_REPLAY);
   }
 }
 

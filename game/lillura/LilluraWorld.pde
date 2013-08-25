@@ -52,19 +52,28 @@ class LilluraWorld extends World {
       MenuCanvas menuCanvas = new MenuCanvas(position, w, h);
       register(menuCanvas);
       
-      PVector positionNewGame = new PVector();
-      positionNewGame.set(leftPanelBoundingBox.getAbsMin());
-      Rectangle boundingBoxNewGame = new Rectangle(positionNewGame, h, h);
-      MenuButtonNewGame newGame = new MenuButtonNewGame(boundingBoxNewGame, this, messenger);
+      int pos = 0;
+      
+      MenuButtonNewGame newGame = new MenuButtonNewGame(getMenuButtonBoundingBox(pos++), this, messenger);
       register(newGame);
       
-      PVector positionRestart = new PVector();
-      positionRestart.set(positionNewGame);
-      positionRestart.add(new PVector(h, 0));
-      Rectangle boundingBoxRestart = new Rectangle(positionRestart, h, h);
-      MenuButtonRestart restart = new MenuButtonRestart(boundingBoxRestart, this, messenger);
+      MenuButtonRestart restart = new MenuButtonRestart(getMenuButtonBoundingBox(pos++), this, messenger);
       register(restart);
+
+      MenuButtonReplay replay = new MenuButtonReplay(getMenuButtonBoundingBox(pos++), this, messenger);
+      register(replay);
+
   }
+  
+  Rectangle getMenuButtonBoundingBox(int aPos) {
+      int h = (int)leftPanelBoundingBox.getWidth()/4;
+      PVector position = new PVector();
+      position.set(leftPanelBoundingBox.getAbsMin());
+      position.add(new PVector(h*aPos, 0)); // zero based
+      Rectangle buttonBoundingBox = new Rectangle(position, h, h);
+      return buttonBoundingBox;
+  }
+  
   
   void createHand() {
       int w = (int)leftPanelBoundingBox.getWidth();

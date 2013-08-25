@@ -58,6 +58,9 @@ class GameLevelWorld extends World  implements MessageSubscriber {
         case COMMAND_RESTART:
          restartLevel();
         break;
+        case COMMAND_REPLAY:
+         replayLevel();
+        break;
         default:
          // ignore other actions
       }
@@ -79,6 +82,11 @@ class GameLevelWorld extends World  implements MessageSubscriber {
     void restartLevel() {
         println("requesting level to restart");
         robot.handleReset();
+    }
+
+    void replayLevel() {
+        println("requesting level to restart");
+        robot.handleReplay();
     }
 
 

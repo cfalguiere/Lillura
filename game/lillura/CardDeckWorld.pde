@@ -34,6 +34,9 @@ class CardDeckWorld extends World implements MessageSubscriber  {
          case COMMAND_RESTART :
             resetDeck();
             break;
+         case COMMAND_REPLAY :
+            resetDeck();
+            break;
          default :
              break;
       }

@@ -19,6 +19,7 @@ class Robot extends Being implements MessageSubscriber {
   boolean isGameOver = false;
   boolean hasCompleted = false;
   boolean isReset = false;
+  boolean isReplaying = false; //TODO state machine
   color _c;
   PVector _velocity = UP_VELOCITY;
   PVector zero;
@@ -164,9 +165,15 @@ class Robot extends Being implements MessageSubscriber {
     isGameOver = false;
     hasCompleted = false;
     isReset = true;
+    isReplaying = false;
   }
 
   
+  public void handleReplay() {
+     handleReset();
+     isReplaying = true;
+  }
+   
   private void sendActionCompleted() {
     if (currentAction != null) currentAction.endPosition = _position;
     if (currentAction != null && currentAction.movementType != MovementType.NONE) {
@@ -177,6 +184,8 @@ class Robot extends Being implements MessageSubscriber {
   }
 
   public void receive(KeyMessage m) { //FIXME generates a command, and update do the switch
+    if (isReplaying) return;
+    
     int code = m.getKeyCode();
     if (m.isPressed()) {
       switch (code) {
@@ -204,6 +213,8 @@ class Robot extends Being implements MessageSubscriber {
   }
   
   public void receive(MouseMessage m) {
+    if (isReplaying) return;
+
     if (m.getAction() == POCodes.Click.PRESSED) {
       if (_shape.getBoundingBox().contains(mouseX, mouseY)) {
         handlePause();
@@ -261,6 +272,8 @@ class Robot extends Being implements MessageSubscriber {
   }
   
   void perCChanged(PerCMessage handSensor) {
+    if (isReplaying) return;
+
     isOn = handSensor.isHandOpen() && !handSensor.isTooFar();
   }
 
