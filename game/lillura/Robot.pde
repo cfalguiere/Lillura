@@ -81,8 +81,6 @@ class Robot extends Being  {
       currentAction = new RobotAction(MovementType.RIGHT, millis(), _position);
       isOn = true;
       _velocity.rotate(HALF_PI);
-      //triangleOrientation = (triangleOrientation + HALF_PI) % TWO_PI;
-      //createTriangle(triangleOrientation); 
       robotShape.rotateRight();
   }
   
@@ -91,8 +89,6 @@ class Robot extends Being  {
       currentAction = new RobotAction(MovementType.LEFT, millis(), _position);
       isOn = true;
       _velocity.rotate(-HALF_PI);
-      //triangleOrientation = (triangleOrientation - HALF_PI) % TWO_PI;
-      //createTriangle(triangleOrientation); 
       robotShape.rotateLeft();
   }
   
