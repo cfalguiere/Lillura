@@ -5,7 +5,6 @@ class Robot extends Being  {
   static final int WIDTH = 30;
   static final int HEIGHT = 30;
   static final int SPEED = 1;
-  static final int DEFAULT_COLOR = 127; 
   final PVector UP_VELOCITY  = PVector.fromAngle(-HALF_PI); // (0,-1)
 
   LilluraMessenger messenger;
@@ -15,7 +14,6 @@ class Robot extends Being  {
   boolean hasCompleted = false;
   boolean isReset = false;
   boolean isReplaying = false; //TODO state machine
-  color _c;
   PVector _velocity = UP_VELOCITY;
   PVector zero;
   
@@ -31,7 +29,6 @@ class Robot extends Being  {
       messenger = theMessenger;
       path = aPath;
       
-      _c = color(DEFAULT_COLOR );
       zero = new PVector();
       zero.set(position);
       //Add your constructor info here
@@ -51,30 +48,26 @@ class Robot extends Being  {
       _position.set(zero);
       isReset = false;
     }
+    
+    if (isGameOver) {
+        robotShape.setColorToBroken();
+    } else  if (hasCompleted) {
+        robotShape.setColorToCompleted();
+    } else {
+        robotShape.setColorToDefault();
+    }
+
   }
 
   public void draw() {
     //drawBoxForDebug();
-    
-    if (isGameOver) {
-        fill(color(256,0,0));
-    } else  if (hasCompleted) {
-        fill(GREEN);
-    } else {
-        fill(_c);
-    }
-    noStroke();
     robotShape.draw();
   }
   
   private void drawBoxForDebug() {
       stroke(color(256,0,0));
-       noFill();
+      noFill();
       _shape.draw();
-  }
-    
-  private color defaultColor() {
-      return color(int(random(256)), int(random(256)), int(random(256)));
   }
   
   public void handlePause() {
@@ -169,15 +162,18 @@ class Robot extends Being  {
 
 class RobotShape {
     static final float INITIAL_ORIENTATION = -HALF_PI + TWO_PI; //TODO remove two_pi
+    static final int DEFAULT_COLOR = 127; 
 
     Rectangle boundingBox;
     float orientation;
     Polygon triangle;
+    color c;
     
     RobotShape(Rectangle aBoundingBox) {
         boundingBox = aBoundingBox;
         orientation = INITIAL_ORIENTATION;
         initialize();
+        setColorToDefault();
     }
     
     void initialize() {
@@ -209,6 +205,18 @@ class RobotShape {
         initialize();
     }
 
+    public void setColorToBroken() {
+      c = color(256,0,0);
+    }
+    
+    public void setColorToCompleted() {
+      c = color(GREEN);
+    }
+    
+    public void setColorToDefault() {
+        c = color(DEFAULT_COLOR);
+    }
+
     PVector getCenter() {
       return boundingBox.getCenter();
     }
@@ -218,6 +226,8 @@ class RobotShape {
     }
     
     public void draw() {
+      fill(c);
+      noStroke();
       triangle.draw();
     }
 }
