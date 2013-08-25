@@ -63,13 +63,13 @@ class HeaderCanvas extends Being implements MessageSubscriber  {
   //
     void actionSent(ActionMessage aMessage) {
       switch (aMessage.eventType) {
-         case ActionMessage.EVENT_NOTIFICATION_WIN :
+         case NOTIFICATION_PLAYER_WON :
            gameMessage = "You Win !";
            break;
-         case ActionMessage.EVENT_NOTIFICATION_LOST :
+         case NOTIFICATION_PLAYER_LOST :
            gameMessage = "Game Over !";
            break;
-         case ActionMessage.EVENT_COMMAND_RESET :
+         case COMMAND_RESET :
            gameMessage = "New Game";
            break;
          default :

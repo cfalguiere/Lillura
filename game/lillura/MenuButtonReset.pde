@@ -55,7 +55,7 @@ class MenuButtonReset extends Being {
     if (m.getAction() == POCodes.Click.RELEASED) {
         isPressed = false;
         println("sending reset request");
-        messenger.sendActionMessage(ActionMessage.EVENT_COMMAND_RESET);
+        messenger.sendActionMessage(EventType.COMMAND_RESET);
     }
   }
 

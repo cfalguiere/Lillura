@@ -51,7 +51,7 @@ class GameLevelWorld extends World  implements MessageSubscriber {
   // behavior implementation 
   //
     void actionSent(ActionMessage message) {
-      if (message.eventType == ActionMessage.EVENT_COMMAND_RESET) {
+      if (message.eventType == EventType.COMMAND_RESET) {
          resetWold();
       }
     }

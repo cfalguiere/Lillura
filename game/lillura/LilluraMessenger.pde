@@ -67,12 +67,12 @@ public class LilluraMessenger {
     messageSubscribers.remove(subscriber);
   }
   
-  synchronized public void sendMessage(ActionMessage event) {
-    actionMessageQueue.add(event);
+  synchronized public void sendMessage(ActionMessage message) {
+    actionMessageQueue.add(message);
   }
   
-  synchronized public void sendActionMessage(int actionId) {
-    actionMessageQueue.add(new ActionMessage(actionId));
+  synchronized public void sendActionMessage(EventType eventType) {
+    actionMessageQueue.add(new ActionMessage(eventType));
   }
 
   synchronized public void sendPerCMessage(PerCMessage event) {
@@ -101,33 +101,25 @@ public class Message {
 }
 
 public class ActionMessage extends Message {
-  static final int EVENT_NONE = 0;
-  
-  static final int EVENT_COMMAND_RESET = 11; //TODO new game / restart
-  
-  static final int EVENT_NOTIFICATION_WIN = 21; 
-  static final int EVENT_NOTIFICATION_LOST = 22; 
-  
-  static final int EVENT_ROBOT_ACTION_COMPLETED = 30;
-  
-  int eventType = EVENT_NONE;
-  
+
+  EventType eventType = EventType.NONE;
   RobotAction robotAction;
   
-  ActionMessage(int anEventType)  {
+  ActionMessage(EventType anEventType)  {
     eventType = anEventType;
   }
-  ActionMessage(int anEventType, RobotAction aRobotAction)  {
+  
+  ActionMessage(EventType anEventType, RobotAction aRobotAction)  {
     eventType = anEventType;
     robotAction = aRobotAction;
   }
   
   public String toString() {
     String message;
-    if (eventType == EVENT_ROBOT_ACTION_COMPLETED) {
-        message = "[ " + eventType  + " " + robotAction.movementType + " " + robotAction.distance() + " ]"; 
+    if (eventType == EventType.ROBOT_ACTION_COMPLETED) {
+        message = "[ " + eventType.name()  + " " + robotAction.movementType.name() + " " + robotAction.distance() + " ]"; 
     } else {
-        message = "[ " + eventType  + " ]"; 
+        message = "[ " + eventType.name()  + " ]"; 
     }
     return message; 
   }

@@ -27,10 +27,10 @@ class CardDeckWorld extends World implements MessageSubscriber  {
   //
     void actionSent(ActionMessage message) {
       switch (message.eventType) {
-         case ActionMessage.EVENT_ROBOT_ACTION_COMPLETED :
+         case ROBOT_ACTION_COMPLETED :
             cards.addCard(message.robotAction.movementType, message.robotAction.distance());
             break;
-         case ActionMessage.EVENT_COMMAND_RESET :
+         case COMMAND_RESET :
             resetDeck();
             break;
          default :

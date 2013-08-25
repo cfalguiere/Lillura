@@ -19,6 +19,6 @@ class RobotTerrainInteractor extends Interactor<Robot, Terrain> {
 
   void handle(Robot robot, Terrain terrain) {
         robot.handleStop();
-        messenger.sendActionMessage(ActionMessage.EVENT_NOTIFICATION_LOST);
+        messenger.sendActionMessage(EventType.NOTIFICATION_PLAYER_LOST);
   }
 }

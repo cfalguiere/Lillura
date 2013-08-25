@@ -19,6 +19,6 @@ class RobotBlockInteractor extends Interactor<Robot,Block> {
   void handle(Robot robot, Block block) {
         block.handleProtect();
         robot.handleStop();
-        messenger.sendActionMessage(ActionMessage.EVENT_NOTIFICATION_LOST);
+        messenger.sendActionMessage(EventType.NOTIFICATION_PLAYER_LOST);
   }
 }
