@@ -2,11 +2,6 @@
  * Template being
  */
 class Robot extends Being  {
-  static final int COMMAND_PAUSE = 0;
-  static final int COMMAND_UP = 1;
-  static final int COMMAND_LEFT = 2;
-  static final int COMMAND_RIGHT = 3;
-  
   static final int WIDTH = 30;
   static final int HEIGHT = 30;
   static final int SPEED = 1;
@@ -23,48 +18,30 @@ class Robot extends Being  {
   color _c;
   PVector _velocity = UP_VELOCITY;
   PVector zero;
-  float triangleOrientation;
   
-  Polygon triangle;
+  RobotShape robotShape;
+
   RobotPath path;
 
   RobotAction currentAction;
   RobotAction previousAction;
 
   Robot(PVector position, World w, LilluraMessenger theMessenger, RobotPath aPath) {  //FIxME decouping of robotpath
-        super(new Rectangle(position, WIDTH, HEIGHT));
-        messenger = theMessenger;
-        path = aPath;
-        
-        _c = color(DEFAULT_COLOR );
-        zero = new PVector();
-        zero.set(position);
-        //Add your constructor info here
-        println("creating robot");
+      super(new Rectangle(position, WIDTH, HEIGHT));
+      messenger = theMessenger;
+      path = aPath;
+      
+      _c = color(DEFAULT_COLOR );
+      zero = new PVector();
+      zero.set(position);
+      //Add your constructor info here
+      println("creating robot");
 
-        initializeTriangleUp();
-        previousAction = new RobotAction(MovementType.NONE, millis(), position);
+      robotShape = new RobotShape(new Rectangle(position, WIDTH, HEIGHT));
+      
+      previousAction = new RobotAction(MovementType.NONE, millis(), position);
   }
   
-  void initializeTriangleUp() {
-    triangleOrientation = -HALF_PI + TWO_PI;
-    createTriangle(triangleOrientation); 
-  }
-  
-  void createTriangle(float angle) {
-        ArrayList<PVector> points = new ArrayList<PVector>();
-        for (int i=0; i<3; i++, angle+=TWO_PI/3) {
-          PVector vertex1 = PVector.fromAngle(angle);
-          vertex1.mult(WIDTH/2);
-          vertex1.add(new PVector(WIDTH/2, HEIGHT/2));
-          points.add(vertex1);
-        } 
-        triangle =  new Polygon(getCenter(), points);
-  }
-
-
-
-
   public void update() {
     if (isOn) {
       _position.add(_velocity);
@@ -87,23 +64,23 @@ class Robot extends Being  {
         fill(_c);
     }
     noStroke();
-    triangle.draw();
+    robotShape.draw();
   }
   
   private void drawBoxForDebug() {
-     stroke(color(256,0,0));
-    noFill();
-    _shape.draw();
+      stroke(color(256,0,0));
+       noFill();
+      _shape.draw();
   }
     
   private color defaultColor() {
-     return color(int(random(256)), int(random(256)), int(random(256)));
+      return color(int(random(256)), int(random(256)), int(random(256)));
   }
   
   public void handlePause() {
-     isOn = false;
-     sendActionCompleted();
-     currentAction = new RobotAction(MovementType.NONE, millis(), _position);
+      isOn = false;
+      sendActionCompleted();
+      currentAction = new RobotAction(MovementType.NONE, millis(), _position);
   }
   
   public void handleTurnRight() {
@@ -111,8 +88,9 @@ class Robot extends Being  {
       currentAction = new RobotAction(MovementType.RIGHT, millis(), _position);
       isOn = true;
       _velocity.rotate(HALF_PI);
-      triangleOrientation = (triangleOrientation + HALF_PI) % TWO_PI;
-      createTriangle(triangleOrientation); 
+      //triangleOrientation = (triangleOrientation + HALF_PI) % TWO_PI;
+      //createTriangle(triangleOrientation); 
+      robotShape.rotateRight();
   }
   
   public void handleTurnLeft() {
@@ -120,8 +98,9 @@ class Robot extends Being  {
       currentAction = new RobotAction(MovementType.LEFT, millis(), _position);
       isOn = true;
       _velocity.rotate(-HALF_PI);
-      triangleOrientation = (triangleOrientation - HALF_PI) % TWO_PI;
-      createTriangle(triangleOrientation); 
+      //triangleOrientation = (triangleOrientation - HALF_PI) % TWO_PI;
+      //createTriangle(triangleOrientation); 
+      robotShape.rotateLeft();
   }
   
   public void handleGoOn() {
@@ -150,7 +129,8 @@ class Robot extends Being  {
     currentAction = new RobotAction(MovementType.NONE, millis(), _position);
     previousAction = currentAction;
     println("resetting robot");
-    initializeTriangleUp();
+    //initializeTriangleUp();
+    robotShape.reset();
     isOn = false;
     isGameOver = false;
     hasCompleted = false;
@@ -173,20 +153,75 @@ class Robot extends Being  {
     }
   }
 
-    PVector getCenter() {
-      return new Rectangle(_shape.getPosition(), WIDTH, HEIGHT).getCenter();
-    }
-  
     public float  getOrientation() {
-      return triangleOrientation;
+      return robotShape.getOrientation();
     }
     
     public RobotAction  getCurrentAction() {
       return currentAction;
     }
-    
 
 }
+
+//
+// RobotShape : draw the robot
+//
+
+class RobotShape {
+    static final float INITIAL_ORIENTATION = -HALF_PI + TWO_PI; //TODO remove two_pi
+
+    Rectangle boundingBox;
+    float orientation;
+    Polygon triangle;
+    
+    RobotShape(Rectangle aBoundingBox) {
+        boundingBox = aBoundingBox;
+        orientation = INITIAL_ORIENTATION;
+        initialize();
+    }
+    
+    void initialize() {
+        ArrayList<PVector> points = new ArrayList<PVector>();
+        float angle = orientation;
+        float w = boundingBox.getWidth();
+        float h = boundingBox.getHeight();
+        for (int i=0; i<3; i++, angle+=TWO_PI/3) {
+          PVector vertex1 = PVector.fromAngle(angle);
+          vertex1.mult(w/2);
+          vertex1.add(new PVector(w/2, h/2));
+          points.add(vertex1);
+        } 
+        triangle =  new Polygon(getCenter(), points);
+    }
+
+    public void rotateRight() {
+        orientation = (orientation + HALF_PI) % TWO_PI;
+        initialize();
+    }
+    
+    public void rotateLeft() {
+        orientation = (orientation - HALF_PI) % TWO_PI;
+        initialize();
+    }
+
+    public void reset() {
+        orientation = INITIAL_ORIENTATION;
+        initialize();
+    }
+
+    PVector getCenter() {
+      return boundingBox.getCenter();
+    }
+    
+    public float getOrientation() {
+        return orientation;
+    }
+    
+    public void draw() {
+      triangle.draw();
+    }
+}
+
 
 //
 // RobotAction : keep track of the current movement of the robot in order to create a card
