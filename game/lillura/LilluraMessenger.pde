@@ -101,30 +101,35 @@ public class Message {
 }
 
 public class ActionMessage extends Message {
-  static final int ACTION_NONE = 0;
-  static final int ACTION_CODE_NONE = 0;
+  static final int EVENT_NONE = 0;
   
-  static final int ACTION_RESET = 11; //TODO new game / restart
+  static final int EVENT_COMMAND_RESET = 11; //TODO new game / restart
   
-  static final int NOTIFICATION_WIN = 21; 
-  static final int NOTIFICATION_LOST = 22; 
+  static final int EVENT_NOTIFICATION_WIN = 21; 
+  static final int EVENT_NOTIFICATION_LOST = 22; 
   
-  static final int ACTION_COMPLETED = 30;
+  static final int EVENT_ROBOT_ACTION_COMPLETED = 30;
   
-  int action = ACTION_NONE;
-  MovementType movementType;
-  int value;
-  ActionMessage(int anAction)  {
-    action = anAction;
+  int eventType = EVENT_NONE;
+  
+  RobotAction robotAction;
+  
+  ActionMessage(int anEventType)  {
+    eventType = anEventType;
   }
-  ActionMessage(int anAction, MovementType aMovementType, int aValue)  {
-    action = anAction;
-    movementType = aMovementType;
-    value = aValue;
+  ActionMessage(int anEventType, RobotAction aRobotAction)  {
+    eventType = anEventType;
+    robotAction = aRobotAction;
   }
   
   public String toString() {
-    return "[ " + action  + " " + movementType + " ]"; 
+    String message;
+    if (eventType == EVENT_ROBOT_ACTION_COMPLETED) {
+        message = "[ " + eventType  + " " + robotAction.movementType + " " + robotAction.distance() + " ]"; 
+    } else {
+        message = "[ " + eventType  + " ]"; 
+    }
+    return message; 
   }
 }
 

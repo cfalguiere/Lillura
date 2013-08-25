@@ -5,7 +5,7 @@ class HeaderCanvas extends Being implements MessageSubscriber  {
   HashMap<String, Rectangle>  boundingBoxes;
   HeaderMarker marker;
   
-  String message;
+  String gameMessage;
   PVector messagePosition;
 
   HeaderCanvas(Rectangle boundingBox, HashMap<String, Rectangle>  allBoundingBoxes) {
@@ -14,7 +14,7 @@ class HeaderCanvas extends Being implements MessageSubscriber  {
         println("header canvas created");
         
         Rectangle glArea = boundingBoxes.get(GAME_LEVEL_BBOX);
-        message = "Hello";
+        gameMessage = "Hello";
         messagePosition = new PVector( glArea.getAbsMin().x +  glArea.getWidth()/2 - _shape.getBoundingBox().getAbsMin().x, 40);
         //messagePosition = new PVector( _shape.getBoundingBox().getAbsMin().x + _shape.getBoundingBox().getWidth()/2, 40);
   }
@@ -55,25 +55,25 @@ class HeaderCanvas extends Being implements MessageSubscriber  {
     //fill(GREEN);
     textSize(32);
     textAlign(CENTER);
-    text(message, messagePosition.x, messagePosition.y); 
+    text(gameMessage, messagePosition.x, messagePosition.y); 
   }
   
   //
   // behavior implementation 
   //
-    void actionSent(ActionMessage event) {
-      switch (event.action) {
-         case ActionMessage.NOTIFICATION_WIN :
-           message = "You Win !";
+    void actionSent(ActionMessage aMessage) {
+      switch (aMessage.eventType) {
+         case ActionMessage.EVENT_NOTIFICATION_WIN :
+           gameMessage = "You Win !";
            break;
-         case ActionMessage.NOTIFICATION_LOST :
-           message = "Game Over !";
+         case ActionMessage.EVENT_NOTIFICATION_LOST :
+           gameMessage = "Game Over !";
            break;
-         case ActionMessage.ACTION_RESET :
-           message = "New Game";
+         case ActionMessage.EVENT_COMMAND_RESET :
+           gameMessage = "New Game";
            break;
          default :
-           message = "";
+           gameMessage = "";
            break;
       }
     }
