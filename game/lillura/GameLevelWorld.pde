@@ -126,6 +126,10 @@ class GameLevelWorld extends World  implements MessageSubscriber {
 
 }
 
+//
+// GridLayoutManager : helper for the grid creation and random blocks placemebt
+//
+
 class GridLayoutManager {
     static final int GRID_CELL_WIDTH = 50;
     static final int GRID_CELL_HEIGHT = 50;
@@ -158,7 +162,7 @@ class GridLayoutManager {
              float remainingCells = (nrLinesOfBlocks-il-1) + (nrCols-ic-1)*nrLinesOfBlocks;
              float rate = remainingBlocks/remainingCells;
              float dice =  random(1) ;
-             println("ic=" + ic + "/" + nrCols + " il=" + il + "/" + nrLinesOfBlocks + " dice=" + dice + " remainingBlocks=" + remainingBlocks + " rate=" + rate + " remainingCells=" + remainingCells);
+             //println("ic=" + ic + "/" + nrCols + " il=" + il + "/" + nrLinesOfBlocks + " dice=" + dice + " remainingBlocks=" + remainingBlocks + " rate=" + rate + " remainingCells=" + remainingCells);
              boolean hasBlock = dice <  rate;
              if (hasBlock && remainingBlocks>0) {
                  PVector cellCoordinate = new PVector(ic, il + TOP_LINES_OFFSET);
