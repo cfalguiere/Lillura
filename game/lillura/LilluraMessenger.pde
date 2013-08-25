@@ -104,6 +104,7 @@ public class ActionMessage extends Message {
 
   EventType eventType = EventType.NONE;
   RobotAction robotAction;
+  RobotProgram program;
   
   ActionMessage(EventType anEventType)  {
     eventType = anEventType;
@@ -112,6 +113,11 @@ public class ActionMessage extends Message {
   ActionMessage(EventType anEventType, RobotAction aRobotAction)  {
     eventType = anEventType;
     robotAction = aRobotAction;
+  }
+  
+  ActionMessage(EventType anEventType, RobotProgram aProgram)  {
+    eventType = anEventType;
+    program = aProgram;
   }
   
   public String toString() {

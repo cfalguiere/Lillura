@@ -60,8 +60,8 @@ class LilluraWorld extends World {
       MenuButtonRestart restart = new MenuButtonRestart(getMenuButtonBoundingBox(pos++), this, messenger);
       register(restart);
 
-      MenuButtonReplay replay = new MenuButtonReplay(getMenuButtonBoundingBox(pos++), this, messenger);
-      register(replay);
+      MenuButtonPlay play = new MenuButtonPlay(getMenuButtonBoundingBox(pos++), this, messenger);
+      register(play);
 
   }
   

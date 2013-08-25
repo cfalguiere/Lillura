@@ -113,5 +113,15 @@ class CardGroup extends Group<Card> {
         i++;
     }
   }
+  
+  RobotProgram makeProgram() {
+    RobotProgram program = new RobotProgram();
+    for (Card card : getObjects()) {
+      program.addOperation(new RobotOperation(card.movementType, card.distance));
+    }
+    println("program created");
+    return program;
+  }
 }
+
 

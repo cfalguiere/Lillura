@@ -169,7 +169,7 @@ class Robot extends Being implements MessageSubscriber {
   }
 
   
-  public void handleReplay() {
+  public void handleReplay(RobotProgram program) {
      handleReset();
      isReplaying = true;
   }
@@ -310,4 +310,51 @@ class RobotAction {
     return int(abs(startPosition.x -  endPosition.x + startPosition.y -  endPosition.y));
   }
 }
+
+//
+// RobotOperation : an action to be done by the robot
+// 
+
+class RobotOperation {
+  
+  MovementType movementType;
+  int distance;
+  
+  RobotOperation(MovementType aMovementType, int aDistance) {
+    movementType = aMovementType;
+    distance = aDistance;
+  }
+}
+
+//
+// RobotProgram : a list of RobotOperation with operation index
+// 
+
+class RobotProgram {
+  ArrayList<RobotOperation> program;
+  int currentLine = 0;
+  
+  RobotProgram() {
+    program = new ArrayList<RobotOperation>();
+  }
+  
+  void addOperation(RobotOperation anOperation) {
+    program.add(anOperation);
+  }  
+  
+  void run() {
+    currentLine = 0;
+  }
+  
+  
+  boolean hasMoreOperation() {
+    return currentLine < program.size();
+  }
+  
+  RobotOperation readOperation() {
+    return program.get(currentLine++);
+  }
+  
+}
+
 

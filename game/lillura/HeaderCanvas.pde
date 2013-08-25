@@ -75,8 +75,8 @@ class HeaderCanvas extends Being implements MessageSubscriber  {
          case COMMAND_RESTART :
            gameMessage = "Restart";
            break;
-         case COMMAND_REPLAY :
-           gameMessage = "Replaying ...";
+         case COMMAND_PLAY :
+           gameMessage = "Playing robot program ...";
            break;
          default :
            gameMessage = "";

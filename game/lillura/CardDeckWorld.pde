@@ -34,8 +34,8 @@ class CardDeckWorld extends World implements MessageSubscriber  {
          case COMMAND_RESTART :
             resetDeck();
             break;
-         case COMMAND_REPLAY :
-            resetDeck();
+         case COMMAND_PLAY :
+            replayDeck();
             break;
          default :
              break;
@@ -69,5 +69,9 @@ class CardDeckWorld extends World implements MessageSubscriber  {
   }
 
 
+  void replayDeck() {
+    RobotProgram program = cards.makeProgram();
+    messenger.sendMessage(new ActionMessage(EventType.PLAY_PROGRAM, program));
+  }
 }
 

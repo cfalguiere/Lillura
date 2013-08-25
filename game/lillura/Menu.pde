@@ -127,14 +127,14 @@ class MenuButtonRestart extends  MenuButton {
 // MenuButtonReplay : replay button
 // 
 
-class MenuButtonReplay extends  MenuButton {
-  MenuButtonReplay(Rectangle aBoundingBox, World theParentWorld, LilluraMessenger theMessenger) {
-    super("Replay", aBoundingBox, theParentWorld, theMessenger);
+class MenuButtonPlay extends  MenuButton {
+  MenuButtonPlay(Rectangle aBoundingBox, World theParentWorld, LilluraMessenger theMessenger) {
+    super("Play", aBoundingBox, theParentWorld, theMessenger);
   }
   
   void execute() {
-        println("sending replay request");
-        messenger.sendActionMessage(EventType.COMMAND_REPLAY);
+        println("sending play request");
+        messenger.sendActionMessage(EventType.COMMAND_PLAY);
   }
 }
 
