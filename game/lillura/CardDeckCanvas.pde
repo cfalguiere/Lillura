@@ -20,7 +20,7 @@ class CardDeckCanvas extends Being {
         noStroke();
         _shape.draw();
         
-        int selectedCardIndex = cardGroup.getSelectedCardIndex();
+        int selectedCardIndex = cardGroup.getSelectedCardIndex(); //TODO refactoring - dedicated object
         if (selectedCardIndex >= 0) {
           stroke(GREEN);
           strokeWeight(2);
@@ -28,7 +28,44 @@ class CardDeckCanvas extends Being {
           line(HRZ_SPACER, y+3, HRZ_SPACER, y+Card.HEIGHT-3);
           line(HRZ_SPACER+Card.WIDTH+4, y+3, HRZ_SPACER+Card.WIDTH+4, y+Card.HEIGHT-3);
         }
+
   }
 
 }
 
+//
+//  CardDeckMouseMarker : displays the line marker
+//
+
+class CardDeckMouseMarker extends Being {
+    CardGroup cardGroup;
+    boolean isVisible = false;
+
+    CardDeckMouseMarker(Rectangle aBoundingBox, CardGroup theCardGroup) {
+        super(aBoundingBox);
+        cardGroup = theCardGroup;
+        println("card deck mouse marker created");
+    }
+
+    public void update() {
+        if (cardGroup.getUsedBoundingBox().contains(mouseX, mouseY)) {
+            float y = mouseY - _shape.getBoundingBox().getAbsMin().y;
+          stroke(GREEN);
+          strokeWeight(2);
+          //line(1, y, _shape.getBoundingBox().getWidth() -5, y);
+            _position.set(new PVector(_shape.getBoundingBox().getAbsMin().x, mouseY));
+            isVisible = true;
+        } else {
+            isVisible = false;
+        }
+    }
+
+    public void draw() {
+        if (isVisible) {
+          stroke(GREEN);
+          strokeWeight(2);
+          //line(1, y, _shape.getBoundingBox().getWidth() -5, y);
+          _shape.draw();
+        }
+    }
+}

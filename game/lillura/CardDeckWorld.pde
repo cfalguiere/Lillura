@@ -52,6 +52,11 @@ class CardDeckWorld extends World implements MessageSubscriber  {
       
       CardDeckCanvas cardDeck = new CardDeckCanvas(deckBoundingBox, cards); 
       register(cardDeck);
+      
+      PVector position3D = new PVector(deckBoundingBox.getPosition().x, deckBoundingBox.getPosition().y, -1);
+      Rectangle mouseMarker = new Rectangle(position3D, deckBoundingBox.getWidth() -12, 1);
+      CardDeckMouseMarker cardMouseMarker = new CardDeckMouseMarker(mouseMarker, cards);
+      register(cardMouseMarker);
   }
 
   void resetDeck() {
