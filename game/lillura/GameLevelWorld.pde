@@ -51,8 +51,15 @@ class GameLevelWorld extends World  implements MessageSubscriber {
   // behavior implementation 
   //
     void actionSent(ActionMessage message) {
-      if (message.eventType == EventType.COMMAND_RESET) {
-         resetWold();
+      switch(message.eventType) {
+        case COMMAND_RESET:
+         resetLevel();
+        break;
+        case COMMAND_RESTART:
+         restartLevel();
+        break;
+        default:
+         // ignore other actions
       }
     }
     
@@ -60,13 +67,18 @@ class GameLevelWorld extends World  implements MessageSubscriber {
       // don't care
     }
   
-    void resetWold() {
-        println("requesting game to reset");
+    void resetLevel() {
+        println("requesting level to reset");
         robot.handleReset();
         goal.handleReset(getGoalPosition());
         blocks.destroy();
         createBlocks();
         register(robot, blocks, new RobotBlockInteractor(messenger)); 
+    }
+
+    void restartLevel() {
+        println("requesting level to restart");
+        robot.handleReset();
     }
 
 

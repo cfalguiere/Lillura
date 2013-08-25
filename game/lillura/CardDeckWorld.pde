@@ -31,6 +31,7 @@ class CardDeckWorld extends World implements MessageSubscriber  {
             cards.addCard(message.robotAction.movementType, message.robotAction.distance());
             break;
          case COMMAND_RESET :
+         case COMMAND_RESTART :
             resetDeck();
             break;
          default :

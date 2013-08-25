@@ -52,9 +52,18 @@ class LilluraWorld extends World {
       MenuCanvas menuCanvas = new MenuCanvas(position, w, h);
       register(menuCanvas);
       
-      Rectangle boundingBox = new Rectangle(position, h, h);
+      PVector positionReset = new PVector();
+      positionReset.set(leftPanelBoundingBox.getAbsMin());
+      Rectangle boundingBox = new Rectangle(positionReset, h, h);
       MenuButtonReset reset = new MenuButtonReset(boundingBox, this, messenger);
       register(reset);
+      
+      PVector positionRestart = new PVector();
+      positionRestart.set(positionReset);
+      positionRestart.add(new PVector(h, 0));
+      Rectangle boundingBoxRestart = new Rectangle(positionRestart, h, h);
+      MenuButtonRestart restart = new MenuButtonRestart(boundingBoxRestart, this, messenger);
+      register(restart);
   }
   
   void createHand() {

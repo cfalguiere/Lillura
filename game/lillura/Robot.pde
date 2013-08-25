@@ -270,6 +270,10 @@ class Robot extends Being implements MessageSubscriber {
 
 }
 
+//
+// RobotAction : keep track of the current movement of the robot in order to create a card
+// 
+
 class RobotAction {
   static final int STABILIZER = 100; // in ms
   
