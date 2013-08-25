@@ -1,7 +1,7 @@
 /**
  * Template being
  */
-class Robot extends Being implements MessageSubscriber {
+class Robot extends Being  {
   static final int COMMAND_PAUSE = 0;
   static final int COMMAND_UP = 1;
   static final int COMMAND_LEFT = 2;
@@ -41,12 +41,7 @@ class Robot extends Being implements MessageSubscriber {
         zero.set(position);
         //Add your constructor info here
         println("creating robot");
-        
-        w.subscribe(this, POCodes.Key.UP);
-        w.subscribe(this, POCodes.Key.LEFT);
-        w.subscribe(this, POCodes.Key.RIGHT);
-        w.subscribe(this, POCodes.Key.SPACE);
-       
+
         initializeTriangleUp();
         previousAction = new RobotAction(MovementType.NONE, millis(), position);
   }
@@ -70,10 +65,6 @@ class Robot extends Being implements MessageSubscriber {
 
 
 
-  PVector getCenter() {
-    return new Rectangle(_shape.getPosition(), WIDTH, HEIGHT).getCenter();
-  }
-  
   public void update() {
     if (isOn) {
       _position.add(_velocity);
@@ -111,7 +102,6 @@ class Robot extends Being implements MessageSubscriber {
   
   public void handlePause() {
      isOn = false;
-     println("PAUSE");
      sendActionCompleted();
      currentAction = new RobotAction(MovementType.NONE, millis(), _position);
   }
@@ -183,103 +173,18 @@ class Robot extends Being implements MessageSubscriber {
     }
   }
 
-  public void receive(KeyMessage m) { //FIXME generates a command, and update do the switch
-    if (isReplaying) return;
+    PVector getCenter() {
+      return new Rectangle(_shape.getPosition(), WIDTH, HEIGHT).getCenter();
+    }
+  
+    public float  getOrientation() {
+      return triangleOrientation;
+    }
     
-    int code = m.getKeyCode();
-    if (m.isPressed()) {
-      switch (code) {
-        case POCodes.Key.SPACE:
-          handlePause();
-          break;
-        case POCodes.Key.LEFT:
-          if (currentAction.isDistinct(MovementType.LEFT, millis())) {
-              handleTurnLeft();
-          }
-          break;
-        case POCodes.Key.RIGHT:
-          if (currentAction.isDistinct(MovementType.RIGHT, millis())) {
-            handleTurnRight();
-          }
-          break;
-        case POCodes.Key.UP:
-          handleGoOn();
-          break;
-        default:
-          // go ahead
-          break;
-      }
+    public RobotAction  getCurrentAction() {
+      return currentAction;
     }
-  }
-  
-  public void receive(MouseMessage m) {
-    if (isReplaying) return;
-
-    if (m.getAction() == POCodes.Click.PRESSED) {
-      if (_shape.getBoundingBox().contains(mouseX, mouseY)) {
-        handlePause();
-      } else {
-        MovementType mt = convertToMovement();
-        switch (mt) {
-          case LEFT:
-             handleTurnLeft();
-             break;
-          case RIGHT:
-            handleTurnRight();
-            break;
-          case FORWARD:
-            handleGoOn();
-            break;
-        }
-      }
-    }
-  }
-  
-  MovementType convertToMovement() {
-    float mouseAngle = normAngle(atan2(mouseY-_position.y, mouseX-_position.x));
-    //println("mouseAngle " + mouseAngle);    
-    triangleOrientation = normAngle(triangleOrientation);
-    //println("triangleOrientation " + triangleOrientation);    
-    float delta = (triangleOrientation - mouseAngle);
-    //println("delta " + delta + " Q "  + HALF_PI  + "  " + PI + " "  + 3*PI/2);    
-    MovementType mt = MovementType.NONE;
-    if (abs(delta) < HALF_PI/2) {
-      // going up 3PI/2 click ahead 3PI/2 delta 0
-      mt = MovementType.FORWARD;
-    } else {
-      if (delta<0) delta+=TWO_PI;
-      // going up 3PI/2 click back PI/2 delta  PI
-      if (abs(delta-3*PI/2) < HALF_PI) {
-        // going up 3PI/2 click right 0 delta 3PI/2 == -PI/2
-        // going right 0 click right PI/2 delta  -PI/2 
-        // going left PI click right 3PI/2 delta -PI/2
-        mt = MovementType.RIGHT;
-      } else if (abs(delta-HALF_PI) < HALF_PI) {
-        // going up 3PI/2 click left PI delta  PI/2
-        // going right 0 click left 3PI/2  delta -3PI/2 = PI/2
-        // going left PI click left PI/2  delta PI/2
-        mt = MovementType.LEFT;
-      } 
-    }  
-    return mt;
-  }
-  
-  float normAngle(float aRad) {
-    float rad =  aRad;
-    if (rad < 0) rad += TWO_PI;
-    rad %= TWO_PI;
-    return rad;
-  }
-  
-  void perCChanged(PerCMessage handSensor) {
-    if (isReplaying) return;
-
-    isOn = handSensor.isHandOpen() && !handSensor.isTooFar();
-  }
-
-  void actionSent(ActionMessage event) {
-    // don't care
-  }
+    
 
 }
 

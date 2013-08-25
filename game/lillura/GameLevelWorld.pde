@@ -15,6 +15,10 @@ class GameLevelWorld extends World  implements MessageSubscriber {
   Robot robot;
   Goal goal;
   
+  RobotMouseMovementController robotMouseMovementController;
+  RobotKeyMovementController robotKeyMovementController;
+  RobotPerceptualMovementController robotPerceptualMovementController;
+  
   
   GameLevelWorld(int portIn, int portOut, LilluraWorld aMainWorld, Rectangle aWorldBoundingBox, LilluraMessenger theMessenger) {
       super(portIn, portOut);
@@ -31,9 +35,6 @@ class GameLevelWorld extends World  implements MessageSubscriber {
       createBlocks();
       
       createRobot();
-      if (USE_PCC) {
-        messenger.subscribe(robot);
-      }
       
       createGoal();
       
@@ -47,6 +48,15 @@ class GameLevelWorld extends World  implements MessageSubscriber {
       println("GameLevel world set up");
   }
 
+  //
+  // World interface
+  //
+  
+  void preUpdate() {
+      robotMouseMovementController.preUpdate();
+  }
+  
+  
   //
   // behavior implementation 
   //
@@ -130,8 +140,18 @@ class GameLevelWorld extends World  implements MessageSubscriber {
       robot = new Robot(position, this, messenger,path);
       register(robot);
       register(path);
-      messenger.subscribe(robot);
-      subscribe(robot, POCodes.Button.LEFT, worldBoundingBox);
+      
+      robotMouseMovementController =  new RobotMouseMovementController(robot, this, messenger);
+      subscribe(robotMouseMovementController, POCodes.Button.LEFT, worldBoundingBox);
+      
+      robotKeyMovementController =  new RobotKeyMovementController(robot, this, messenger);
+      subscribe(robotKeyMovementController, POCodes.Key.UP);
+      subscribe(robotKeyMovementController, POCodes.Key.LEFT);
+      subscribe(robotKeyMovementController, POCodes.Key.RIGHT);
+      subscribe(robotKeyMovementController, POCodes.Key.SPACE);
+      
+      robotPerceptualMovementController =  new RobotPerceptualMovementController(robot, this, messenger);
+      messenger.subscribe(robotPerceptualMovementController);
   }
   
   void createGoal() { 
