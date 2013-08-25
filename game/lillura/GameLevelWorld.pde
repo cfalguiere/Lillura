@@ -52,7 +52,7 @@ class GameLevelWorld extends World  implements MessageSubscriber {
   //
     void actionSent(ActionMessage message) {
       switch(message.eventType) {
-        case COMMAND_RESET:
+        case COMMAND_NEWGAME:
          resetLevel();
         break;
         case COMMAND_RESTART:

@@ -94,17 +94,17 @@ class MenuButton extends Being {
 }
 
 //
-// MenuButtonReset : reset button
+// MenuButtonNewGame : reset button
 // 
 
-class MenuButtonReset extends  MenuButton {
-  MenuButtonReset(Rectangle aBoundingBox, World theParentWorld, LilluraMessenger theMessenger) {
-    super("Reset", aBoundingBox, theParentWorld, theMessenger);
+class MenuButtonNewGame extends  MenuButton {
+  MenuButtonNewGame(Rectangle aBoundingBox, World theParentWorld, LilluraMessenger theMessenger) {
+    super("New", aBoundingBox, theParentWorld, theMessenger);
   }
   
   void execute() {
-        println("sending reset request");
-        messenger.sendActionMessage(EventType.COMMAND_RESET);
+        println("sending NewGame request");
+        messenger.sendActionMessage(EventType.COMMAND_NEWGAME);
   }
 }
 

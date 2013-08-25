@@ -52,14 +52,14 @@ class LilluraWorld extends World {
       MenuCanvas menuCanvas = new MenuCanvas(position, w, h);
       register(menuCanvas);
       
-      PVector positionReset = new PVector();
-      positionReset.set(leftPanelBoundingBox.getAbsMin());
-      Rectangle boundingBox = new Rectangle(positionReset, h, h);
-      MenuButtonReset reset = new MenuButtonReset(boundingBox, this, messenger);
-      register(reset);
+      PVector positionNewGame = new PVector();
+      positionNewGame.set(leftPanelBoundingBox.getAbsMin());
+      Rectangle boundingBoxNewGame = new Rectangle(positionNewGame, h, h);
+      MenuButtonNewGame newGame = new MenuButtonNewGame(boundingBoxNewGame, this, messenger);
+      register(newGame);
       
       PVector positionRestart = new PVector();
-      positionRestart.set(positionReset);
+      positionRestart.set(positionNewGame);
       positionRestart.add(new PVector(h, 0));
       Rectangle boundingBoxRestart = new Rectangle(positionRestart, h, h);
       MenuButtonRestart restart = new MenuButtonRestart(boundingBoxRestart, this, messenger);

@@ -1,6 +1,6 @@
 public enum EventType {
   NONE,
-  COMMAND_RESET, //TODO new game / restart
+  COMMAND_NEWGAME, //TODO new game / restart
   COMMAND_RESTART, 
   NOTIFICATION_PLAYER_WON,
   NOTIFICATION_PLAYER_LOST,
