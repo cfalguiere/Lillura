@@ -1,7 +1,27 @@
 //
+// MenuCanvas : menu background
+// 
+class MenuCanvas extends Being {
+  
+  MenuCanvas(PVector position, int w, int h) {
+        super(new Rectangle(position, w, h));
+        println("creating menu canvas");
+  }
+  
+  public void update() {
+    //_stroke = false;
+  }
+
+  public void draw() {
+      fill(MENU_BG);
+      noStroke();
+      _shape.draw();
+  }
+}
+
+//
 // MenuButton : common look & feel and behavior of buttons
 // 
-
 class MenuButton extends Being {
   
   String buttonLabel;
@@ -102,3 +122,4 @@ class MenuButtonRestart extends  MenuButton {
         messenger.sendActionMessage(EventType.COMMAND_RESTART);
   }
 }
+
