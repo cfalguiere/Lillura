@@ -186,6 +186,78 @@ class RobotKeyMovementController extends Controller {
 
 }
 
+//
+// PerceptualEmulator
+//
+
+class PerceptualEventEmulator {
+
+    LilluraMessenger messenger;
+  
+    PerceptualEventEmulator(LilluraMessenger theMessenger) {
+        messenger = theMessenger;
+    }
+
+    /**
+     * emulates the perceptual hand movement with keyboard
+     * caller must register to the right button
+     */    
+    public void emulatePerceptualWithMouse(MouseMessage m) {
+        if (m.getAction() == POCodes.Click.PRESSED) {
+            boolean top = (mouseY<height*0.2);
+            boolean bottom = (mouseY>height*0.8);
+            boolean left = (mouseX<width*0.33);
+            boolean right = (mouseX>width*0.66);
+        
+            EventType et = EventType.PERCEPTUAL_HAND_MOVED_CENTER;
+            
+            if (top) {
+                 if (left) {
+                    et = EventType.PERCEPTUAL_HAND_MOVED_TOP_LEFT;
+                 } else if (right) {
+                    et = EventType.PERCEPTUAL_HAND_MOVED_TOP_RIGHT;
+                 } else {
+                    et = EventType.PERCEPTUAL_HAND_MOVED_TOP_CENTER;
+                 }
+            } else if (bottom) { 
+                 if (left) {
+                    et = EventType.PERCEPTUAL_HAND_MOVED_BOTTOM_LEFT;
+                 } 
+            } else {
+                if (left) {
+                    et = EventType.PERCEPTUAL_HAND_MOVED_LEFT;
+                } else if (right) {
+                    et = EventType.PERCEPTUAL_HAND_MOVED_CENTER;
+                } else {
+                    et = EventType.PERCEPTUAL_HAND_MOVED_RIGHT;
+                }
+            }
+            
+            messenger.sendMessage(new ActionMessage(et));
+        }
+    }
+
+    /**
+     * emulates the perceptual hand movement with keyboard
+     * caller must register to Key O and C 
+     */    
+     public void emulatePerceptualWithKeyboard(KeyMessage m) { 
+        int code = m.getKeyCode();
+        if (m.isPressed()) {
+            switch (code) {
+                case POCodes.Key.C:
+                    messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_HAND_CLOSE));
+                    break;
+                case POCodes.Key.O:
+                    messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_HAND_OPEN));
+                    break;
+              default:
+                  // ignore other events
+            }
+        }
+    }   
+  
+}
 
 //
 // RobotPerceptualMovementController : listen to perceptual events and control the robot movement
@@ -194,10 +266,12 @@ class RobotKeyMovementController extends Controller {
 class RobotPerceptualMovementController extends Controller {
     Robot robot;
     float lastMouseX;
+    PerceptualEventEmulator emulator;
     
     RobotPerceptualMovementController(Robot aRobot, World aParentWorld, LilluraMessenger theMessenger) {
         super(aParentWorld, theMessenger);
         robot = aRobot;
+        emulator = new PerceptualEventEmulator(theMessenger);
     }
   
     void perCChanged(PerCMessage handSensor) {
@@ -241,65 +315,14 @@ class RobotPerceptualMovementController extends Controller {
  
     // emulation of position with right button
     public void receive(MouseMessage m) {
-       if (! isActive) return;
-
-        //if (isReplaying) return; //TODO handle replay
-        
-        if (m.getAction() == POCodes.Click.PRESSED) {
-            boolean top = (mouseY<height*0.2);
-            boolean bottom = (mouseY>height*0.8);
-            boolean left = (mouseX<width*0.33);
-            boolean right = (mouseX>width*0.66);
-        
-            EventType et = EventType.PERCEPTUAL_HAND_MOVED_CENTER;
-            
-            if (top) {
-                 if (left) {
-                    et = EventType.PERCEPTUAL_HAND_MOVED_TOP_LEFT;
-                 } else if (right) {
-                    et = EventType.PERCEPTUAL_HAND_MOVED_TOP_RIGHT;
-                 } else {
-                    et = EventType.PERCEPTUAL_HAND_MOVED_TOP_CENTER;
-                 }
-            } else if (bottom) { 
-                 if (left) {
-                    et = EventType.PERCEPTUAL_HAND_MOVED_BOTTOM_LEFT;
-                 } 
-            } else {
-                if (left) {
-                    et = EventType.PERCEPTUAL_HAND_MOVED_LEFT;
-                } else if (right) {
-                    et = EventType.PERCEPTUAL_HAND_MOVED_CENTER;
-                } else {
-                    et = EventType.PERCEPTUAL_HAND_MOVED_RIGHT;
-                }
-            }
-            
-            messenger.sendMessage(new ActionMessage(et));
-        }
+        if (! isActive) return;
+        emulator.emulatePerceptualWithMouse(m);
     }
 
     // emulation of close / open with keyboard C and O
     public void receive(KeyMessage m) { //FIXME generates a command, and update do the switch
-       if (! isActive) return;
-       
-       println("here");
-
-        //if (isReplaying) return; //TODO replay
-        
-        int code = m.getKeyCode();
-        if (m.isPressed()) {
-            switch (code) {
-                case POCodes.Key.C:
-                    messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_HAND_CLOSE));
-                    break;
-                case POCodes.Key.O:
-                    messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_HAND_OPEN));
-                    break;
-              default:
-                  // ignore other events
-            }
-        }
+        if (! isActive) return;
+        emulator.emulatePerceptualWithKeyboard(m);
     }   
 }
 
@@ -375,8 +398,11 @@ class CardDeckMouseController extends CardDeckController {
 
 class CardDeckPerceptualController extends CardDeckController {
     
+    PerceptualEventEmulator emulator;
+    
     CardDeckPerceptualController(CardDeckCanvas aCardDeckCanvas, CardGroup aCardGroup, World aParentWorld, LilluraMessenger theMessenger) {
         super(aCardDeckCanvas, aCardGroup, aParentWorld, theMessenger);
+        emulator = new PerceptualEventEmulator(theMessenger);
     }
 
     public void preUpdate() {
@@ -405,21 +431,8 @@ class CardDeckPerceptualController extends CardDeckController {
     
     // emulation of close / open with keyboard C and O
     public void receive(KeyMessage m) { //FIXME generates a command, and update do the switch
-      //if (isReplaying) return; //TODO replay
-      
-      int code = m.getKeyCode();
-      if (m.isPressed()) {
-          switch (code) {
-              case POCodes.Key.C:
-                  messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_HAND_CLOSE));
-                  break;
-              case POCodes.Key.O:
-                  messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_HAND_OPEN));
-                  break;
-            default:
-                // ignore other events
-          }
-      }
+        if (! isActive) return;
+        emulator.emulatePerceptualWithKeyboard(m);
     }   
 
 }
