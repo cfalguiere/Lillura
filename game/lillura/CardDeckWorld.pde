@@ -5,6 +5,8 @@ class CardDeckWorld extends World implements MessageSubscriber  {
     LilluraMessenger messenger = null;  
     CardGroup cards;
   
+    CardDeckMouseMarker cardMouseMarker;
+  
     CardDeckMouseController cardDeckMouseController;
     CardDeckPerceptualController cardDeckPerceptualController;
     
@@ -43,14 +45,16 @@ class CardDeckWorld extends World implements MessageSubscriber  {
             case COMMAND_PLAY :
                 replayDeck();
                 break;
-            case PERCEPTUAL_HAND_MOVED_BOTTOM_RIGHT:
-            case PERCEPTUAL_HAND_MOVED_BOTTOM_CENTER:
+            case PERCEPTUAL_HAND_MOVED_TOP_RIGHT:
                 cardDeckMouseController.enable();
                 cardDeckPerceptualController.disable();
+                cardMouseMarker.setPerceptualMode(true);
                 break;
-            case PERCEPTUAL_HAND_MOVED_BOTTOM_LEFT:
+            case PERCEPTUAL_HAND_MOVED_TOP_CENTER:
+            case PERCEPTUAL_HAND_MOVED_TOP_LEFT:
                 cardDeckMouseController.disable();
                 cardDeckPerceptualController.enable();
+                cardMouseMarker.setPerceptualMode(false);
                 break;
             default :
                 break;
@@ -74,7 +78,8 @@ class CardDeckWorld extends World implements MessageSubscriber  {
       
       PVector position3D = new PVector(deckBoundingBox.getPosition().x, deckBoundingBox.getPosition().y, -1);
       Rectangle mouseMarker = new Rectangle(position3D, deckBoundingBox.getWidth() -12, 1);
-      CardDeckMouseMarker cardMouseMarker = new CardDeckMouseMarker(mouseMarker, cards);
+      
+      cardMouseMarker = new CardDeckMouseMarker(mouseMarker, cards);
       register(cardMouseMarker);
       
       cardDeckMouseController =  new CardDeckMouseController(cardDeck, cards, this, messenger);

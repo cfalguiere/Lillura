@@ -40,6 +40,8 @@ class CardDeckCanvas extends Being {
 class CardDeckMouseMarker extends Being {
     CardGroup cardGroup;
     boolean isVisible = false;
+    
+    boolean isPerceptualMode = false;
 
     CardDeckMouseMarker(Rectangle aBoundingBox, CardGroup theCardGroup) {
         super(aBoundingBox);
@@ -49,15 +51,21 @@ class CardDeckMouseMarker extends Being {
 
     public void update() {
         if (cardGroup.getUsedBoundingBox().contains(mouseX, mouseY)) {
-            float y = mouseY - _shape.getBoundingBox().getAbsMin().y;
-          stroke(GREEN);
-          strokeWeight(2);
-          //line(1, y, _shape.getBoundingBox().getWidth() -5, y);
+            float y = 0;
+            /*if (isPerceptualMode) {
+                y = ( mouseY * _shape.getBoundingBox().getHeight()) / height;
+            } else {*/
+                y = mouseY - _shape.getBoundingBox().getAbsMin().y;
+            //}
             _position.set(new PVector(_shape.getBoundingBox().getAbsMin().x, mouseY));
             isVisible = true;
         } else {
             isVisible = false;
         }
+    }
+    
+    void setPerceptualMode(boolean b) {
+      isPerceptualMode = b;
     }
 
     public void draw() {
