@@ -71,12 +71,14 @@ class GameLevelWorld extends World  implements MessageSubscriber {
             case PLAY_PROGRAM:
                 replayLevel(message.program);
                 break;
-            case PERCEPTUAL_HAND_MOVED_BOTTOM_RIGHT:
+            case PERCEPTUAL_HAND_MOVED_TOP_RIGHT:
                 robotPerceptualMovementController.disable();
+                robotKeyMovementController.disable();
                 break;
-            case PERCEPTUAL_HAND_MOVED_BOTTOM_LEFT:
-            case PERCEPTUAL_HAND_MOVED_BOTTOM_CENTER:
+            case PERCEPTUAL_HAND_MOVED_TOP_LEFT:
+            case PERCEPTUAL_HAND_MOVED_TOP_CENTER:
                 robotPerceptualMovementController.enable();
+                robotKeyMovementController.enable();
                 break;
             default:
                  // ignore other events
@@ -149,7 +151,7 @@ class GameLevelWorld extends World  implements MessageSubscriber {
       
       robotMouseMovementController =  new RobotMouseMovementController(robot, this, messenger);
       subscribe(robotMouseMovementController, POCodes.Button.LEFT, worldBoundingBox);
-      
+     
       robotKeyMovementController =  new RobotKeyMovementController(robot, this, messenger);
       subscribe(robotKeyMovementController, POCodes.Key.UP);
       subscribe(robotKeyMovementController, POCodes.Key.LEFT);
@@ -158,7 +160,7 @@ class GameLevelWorld extends World  implements MessageSubscriber {
       
       robotPerceptualMovementController =  new RobotPerceptualMovementController(robot, this, messenger);
       messenger.subscribe(robotPerceptualMovementController);
-      subscribe(robotPerceptualMovementController, POCodes.Button.RIGHT /*, worldBoundingBox*/);
+      subscribe(robotPerceptualMovementController, POCodes.Button.RIGHT);
       subscribe(robotPerceptualMovementController, POCodes.Key.C);
       subscribe(robotPerceptualMovementController, POCodes.Key.O);
   }

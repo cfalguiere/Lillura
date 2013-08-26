@@ -1,22 +1,22 @@
 class CardDeckWorld extends World implements MessageSubscriber  {
   
-  Rectangle deckBoundingBox;
+    Rectangle deckBoundingBox;
+    
+    LilluraMessenger messenger = null;  
+    CardGroup cards;
   
-  LilluraMessenger messenger = null;  
-  CardGroup cards;
-
-  CardDeckMouseController cardDeckMouseController;
- 
-  //CardDeckPerceptualController cardDeckPerceptualController;
-  
-  CardDeckWorld(int portIn, int portOut, Rectangle aBoundingBox, LilluraMessenger theMessenger) {
-      super(portIn, portOut);
-      deckBoundingBox = aBoundingBox;
-      messenger = theMessenger;
-  }
+    CardDeckMouseController cardDeckMouseController;
+    CardDeckPerceptualController cardDeckPerceptualController;
+    
+    CardDeckWorld(int portIn, int portOut, Rectangle aBoundingBox, LilluraMessenger theMessenger) {
+        super(portIn, portOut);
+        deckBoundingBox = aBoundingBox;
+        messenger = theMessenger;
+    }
 
     void preUpdate() {
         cardDeckMouseController.preUpdate();
+        cardDeckPerceptualController.preUpdate();
     }
   
   void setup() {
@@ -45,10 +45,12 @@ class CardDeckWorld extends World implements MessageSubscriber  {
                 break;
             case PERCEPTUAL_HAND_MOVED_BOTTOM_RIGHT:
             case PERCEPTUAL_HAND_MOVED_BOTTOM_CENTER:
-                //cardDeckPerceptualMovementController.disable();
+                cardDeckMouseController.enable();
+                cardDeckPerceptualController.disable();
                 break;
             case PERCEPTUAL_HAND_MOVED_BOTTOM_LEFT:
-                //cardDeckPerceptualMovementController.enable();
+                cardDeckMouseController.disable();
+                cardDeckPerceptualController.enable();
                 break;
             default :
                 break;
@@ -77,6 +79,11 @@ class CardDeckWorld extends World implements MessageSubscriber  {
       
       cardDeckMouseController =  new CardDeckMouseController(cardDeck, cards, this, messenger);
       subscribe(cardDeckMouseController, POCodes.Button.LEFT, deckBoundingBox);
+      
+      cardDeckPerceptualController =  new CardDeckPerceptualController(cardDeck, cards, this, messenger);
+      messenger.subscribe(cardDeckPerceptualController);
+      subscribe(cardDeckPerceptualController, POCodes.Key.C);
+      subscribe(cardDeckPerceptualController, POCodes.Key.O);
   }
 
   void resetDeck() {

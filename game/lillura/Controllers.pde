@@ -31,10 +31,12 @@ class Controller extends HObject implements MessageSubscriber {
  
     void enable() {
         isActive = true;
+        println("Controller " + getName() + " is enabled");
     }
  
     void disable() {
         isActive = false;
+        println("Controller " + getName() + " is disabled");
     }
 }
 
@@ -150,6 +152,8 @@ class RobotKeyMovementController extends Controller {
     }
     
     public void receive(KeyMessage m) { //FIXME generates a command, and update do the switch
+      if (! isActive) return;
+
       //if (isReplaying) return; //TODO replay
       
       RobotAction currentAction = robot.getCurrentAction();
@@ -237,6 +241,8 @@ class RobotPerceptualMovementController extends Controller {
  
     // emulation of position with right button
     public void receive(MouseMessage m) {
+       if (! isActive) return;
+
         //if (isReplaying) return; //TODO handle replay
         
         if (m.getAction() == POCodes.Click.PRESSED) {
@@ -252,7 +258,9 @@ class RobotPerceptualMovementController extends Controller {
                     et = EventType.PERCEPTUAL_HAND_MOVED_TOP_LEFT;
                  } else if (right) {
                     et = EventType.PERCEPTUAL_HAND_MOVED_TOP_RIGHT;
-                 }  
+                 } else {
+                    et = EventType.PERCEPTUAL_HAND_MOVED_TOP_CENTER;
+                 }
             } else if (bottom) { 
                  if (left) {
                     et = EventType.PERCEPTUAL_HAND_MOVED_BOTTOM_LEFT;
@@ -273,21 +281,25 @@ class RobotPerceptualMovementController extends Controller {
 
     // emulation of close / open with keyboard C and O
     public void receive(KeyMessage m) { //FIXME generates a command, and update do the switch
-      //if (isReplaying) return; //TODO replay
-      
-      int code = m.getKeyCode();
-      if (m.isPressed()) {
-          switch (code) {
-              case POCodes.Key.C:
-                  messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_HAND_CLOSE));
-                  break;
-              case POCodes.Key.O:
-                  messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_HAND_OPEN));
-                  break;
-            default:
-                // ignore other events
-          }
-      }
+       if (! isActive) return;
+       
+       println("here");
+
+        //if (isReplaying) return; //TODO replay
+        
+        int code = m.getKeyCode();
+        if (m.isPressed()) {
+            switch (code) {
+                case POCodes.Key.C:
+                    messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_HAND_CLOSE));
+                    break;
+                case POCodes.Key.O:
+                    messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_HAND_OPEN));
+                    break;
+              default:
+                  // ignore other events
+            }
+        }
     }   
 }
 
@@ -305,20 +317,27 @@ class CardDeckController extends Controller {
     }
     
     void selectCurrentCard() {
-        actionCardIndex = int(hoverPosition);
-        Card card = cards.getCard(actionCardIndex);
-        println("select card " + actionCardIndex + " "  + card);
-        card.select();
+        if (hoverPosition >= 0) {
+            println("hover position " + hoverPosition);
+            actionCardIndex = int(hoverPosition);
+            println("selected card at " + actionCardIndex);
+            Card card = cards.getCard(actionCardIndex);
+            println("selected card is "  + card);
+            card.select();
+        }
     }
     
     void deselectCurrentCard() {
-        Card card = cards.getCard(actionCardIndex);
-        float index = cards.getCardIndexForMouse(mouseY);
-        int newPos = (index == int(index)) ? floor(index) : ceil(index);
-        cards.moveCardTo(card, newPos);
-        println("deselect card " + actionCardIndex + " "  + card);
-        card.deselect();
-        actionCardIndex = -1;
+        if (actionCardIndex >= 0) {
+            Card card = cards.getCard(actionCardIndex);
+            float index = cards.getCardIndexForMouse(mouseY);
+            println("releasing card at index " + index);
+            int newPos = (index == int(index)) ? floor(index) : ceil(index);
+            println("releasing card at pos " + newPos);
+            cards.moveCardTo(card, newPos);
+            card.deselect();
+            actionCardIndex = -1;
+        }
     }
 }
 
@@ -329,6 +348,8 @@ class CardDeckMouseController extends CardDeckController {
     }
 
     public void preUpdate() {
+        if (! isActive) return;
+
         if (cardDeckCanvas.getBoundingBox().contains(mouseX, mouseY)) {
             hoverPosition = cards.getCardIndexForMouse(mouseY);
         } else {
@@ -338,6 +359,8 @@ class CardDeckMouseController extends CardDeckController {
     }
     
     public void receive(MouseMessage m) {
+       if (! isActive) return;
+
       if (hoverPosition < 0) return;
       
       if (m.getAction() == POCodes.Click.PRESSED) {
@@ -357,21 +380,46 @@ class CardDeckPerceptualController extends CardDeckController {
     }
 
     public void preUpdate() {
-        if (cardDeckCanvas.getBoundingBox().contains(mouseX, mouseY)) {
-            hoverPosition = cards.getCardIndexForMouse(mouseY);
-        } else {
-            hoverPosition = -1;
-        }   
+        if (! isActive) {
+           hoverPosition = -1;
+          return;
+        }
+
+        hoverPosition = cards.getCardIndexForMouse(mouseY);
+    }
+
+    void actionSent(ActionMessage message) {
+        if (! isActive) return;
+
+        switch(message.eventType) {
+            case PERCEPTUAL_HAND_OPEN:
+                deselectCurrentCard();
+                break;
+            case PERCEPTUAL_HAND_CLOSE:
+                selectCurrentCard();
+                break;
+            default:
+                // ignore other events
+        }
     }
     
-    public void receive(MouseMessage m) {
-      if (hoverPosition < 0) return;
+    // emulation of close / open with keyboard C and O
+    public void receive(KeyMessage m) { //FIXME generates a command, and update do the switch
+      //if (isReplaying) return; //TODO replay
       
-      if (m.getAction() == POCodes.Click.PRESSED) {
-           selectCurrentCard();
-      }  
-      if (m.getAction() == POCodes.Click.RELEASED) {
-            deselectCurrentCard();
-      }  
-    }
+      int code = m.getKeyCode();
+      if (m.isPressed()) {
+          switch (code) {
+              case POCodes.Key.C:
+                  messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_HAND_CLOSE));
+                  break;
+              case POCodes.Key.O:
+                  messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_HAND_OPEN));
+                  break;
+            default:
+                // ignore other events
+          }
+      }
+    }   
+
 }

@@ -17,14 +17,14 @@ class CardGroup extends Group<Card> {
     }
 
     public float getCardIndexForMouse(float y) {
-        int index = -1;
+        float index = -1;
         float relativeMouseY = mouseY - boundingBox.getAbsMin().y;
         int pos = floor(relativeMouseY / offset.y);
         float remainder = relativeMouseY - (pos*offset.y);
         //println("relativeMouseY " + relativeMouseY + " pos " + pos + " remainder " + remainder);
         if (pos < getObjects().size()) {
             index = pos;
-            if (remainder>Card.HEIGHT) pos += 0.5;
+            if (remainder>Card.HEIGHT) index += 0.5;
         } 
         return index;
     }
