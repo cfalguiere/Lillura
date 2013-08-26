@@ -157,7 +157,7 @@ class Robot extends Being  {
 //
 
 class RobotShape {
-    static final float INITIAL_ORIENTATION = -HALF_PI + TWO_PI; //TODO remove two_pi
+    static final float INITIAL_ORIENTATION = -HALF_PI;
     static final int DEFAULT_COLOR = 127; 
 
     Rectangle boundingBox;
@@ -222,9 +222,11 @@ class RobotShape {
     }
     
     public void draw() {
+      pushMatrix();
       fill(c);
       noStroke();
       triangle.draw();
+      popMatrix();
     }
 }
 
