@@ -152,7 +152,7 @@ class Robot extends Being  {
     }
     
     String toString() {
-        return "Robot:[ " + robotState + " " + robotState + " " + _position + " ]";
+        return "Robot:[ " + robotState + " " + robotDirection + " position:" + _position + " ]";
     }
 
 }
@@ -223,7 +223,7 @@ class RobotDirection {
     }
     
     String toString() {
-      return "[ RobotDirection " + orientation + " " + velocity + " ]"; 
+      return "RobotDirection:[ " + orientation + " velocity:" + velocity + " ]"; 
     }
 }
 
