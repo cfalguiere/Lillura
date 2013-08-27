@@ -162,7 +162,8 @@ class GameLevelWorld extends World  implements MessageSubscriber {
   
 
   void createRobot() {     
-      PVector position = grid.getPositionBottomCentered(grid.computeRobotCoordinate(), Robot.WIDTH, Robot.HEIGHT);
+      PVector coordinates = grid.computeRobotCoordinate();
+      PVector position = grid.getPositionBottomCentered(coordinates, Robot.WIDTH, Robot.HEIGHT);
       robot = new Robot(position, this, messenger);
       register(robot);
       
@@ -177,11 +178,17 @@ class GameLevelWorld extends World  implements MessageSubscriber {
       
       robotPerceptualMovementController =  new RobotPerceptualMovementController(robot, this, messenger);
       messenger.subscribe(robotPerceptualMovementController);
+      
+      terrain.setDeparture(grid.getPosition(coordinates));
+
   }
   
   void createGoal() { 
-      goal = new Goal( getGoalPosition(), worldBoundingBox);
+      PVector position = getGoalPosition();
+      goal = new Goal(position, worldBoundingBox);
       register(goal);
+      
+      terrain.setArrival(position);
   }
   
   PVector getGoalPosition() {
