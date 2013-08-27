@@ -39,6 +39,8 @@ class Robot extends Being  {
         _velocity.set(robotDirection.velocity);
         _position.add(_velocity);
         //println("robot after update " + this);
+    } else {
+        _velocity.set(new PVector(0,0));
     }
     
     robotShape.update();
