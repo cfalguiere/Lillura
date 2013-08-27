@@ -39,7 +39,8 @@ class Robot extends Being  {
   public void update() {
     if (isOn || isReplaying) {
         //println("robot before update " + this);
-        _position.add(robotDirection.velocity);
+        _velocity.set(robotDirection.velocity);
+        _position.add(_velocity);
         //println("robot after update " + this);
     }
     
@@ -50,14 +51,15 @@ class Robot extends Being  {
     
     if (isGameOver) {
         robotShape.setColorToBroken();
-        robotShape.update();
-    } else  if (hasCompleted) {
+    } else if (hasCompleted) {
         robotShape.setColorToCompleted();
-        robotShape.update();
+    } else if (isReplaying) {
+        robotShape.setColorToReplaying();
     } else {
         robotShape.setColorToDefault();
-        robotShape.update();
     }
+    
+    robotShape.update();
 
   }
 
@@ -157,13 +159,16 @@ class Robot extends Being  {
     public void replay(MovementType mvt) {
       switch (mvt) {
        case FORWARD:
-          robotDirection.forward();
           break;
         case TURN_LEFT:
+          println("in replay before turn left " + robotDirection);
           robotDirection.turnLeft();
+          println("in replay after turn left  " + robotDirection);
           break;
         case TURN_RIGHT:
+          println("in replay before turn right  " + robotDirection);
           robotDirection.turnRight();
+          println("in replay after turn right " + robotDirection);
           break;
         default:
           //ignore
@@ -202,13 +207,17 @@ class RobotDirection {
     }
     
     void turnLeft() {
-        orientation = (orientation - HALF_PI + TWO_PI) % TWO_PI;
+        orientation -= HALF_PI;
         velocity.rotate(-HALF_PI);
     }
     
     void turnRight() {
-        orientation = (orientation + HALF_PI + TWO_PI) % TWO_PI;
+        orientation += HALF_PI;
         velocity.rotate(HALF_PI);
+    }
+    
+    String toString() {
+      return "[ RobotDirection " + orientation + " " + velocity + " ]"; 
     }
 }
 
@@ -253,6 +262,10 @@ class RobotShape {
 
     public void setColorToBroken() {
       c = color(256,0,0);
+    }
+    
+    public void setColorToReplaying() {
+      c = color(92,128,256);
     }
     
     public void setColorToCompleted() {
@@ -382,8 +395,12 @@ class RobotProgramPlayer {
     }
   
     boolean preUpdate() {
-        if (remainingDistance == 0) pickNextOperation();
-        if (!isCompleted) runStep();
+        if (remainingDistance == 0) {
+            pickNextOperation();
+        } else if (!isCompleted) {
+            runNextStep();
+        }
+        
         return !isCompleted;
     }
     
@@ -398,13 +415,19 @@ class RobotProgramPlayer {
         } else {
             currentOperation = program.getOperation(currentLine);
             remainingDistance = currentOperation.distance;
+            runFirstStep();
             println(this);
         }
         currentLine++;
      }
     
-    void runStep() {
+    void runFirstStep() {
         robot.replay(currentOperation.movementType);
+        remainingDistance--;
+    }
+    
+    void runNextStep() {
+        robot.replay(MovementType.FORWARD);
         remainingDistance--;
     }
     
