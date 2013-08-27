@@ -19,15 +19,12 @@ class Robot extends Being  {
   
   RobotShape robotShape;
 
-  RobotPath path;
-
   RobotAction currentAction;
   RobotAction previousAction;
 
-  Robot(PVector position, World w, LilluraMessenger theMessenger, RobotPath aPath) {  //FIxME decouping of robotpath
+  Robot(PVector position, World w, LilluraMessenger theMessenger) {  
       super(new Rectangle(position, WIDTH, HEIGHT));
       messenger = theMessenger;
-      path = aPath;
       
       zero = new PVector();
       zero.set(position);
@@ -43,7 +40,6 @@ class Robot extends Being  {
     if (isOn || isReplaying) {
         //println("robot before update " + this);
         _position.add(_velocity);
-        //path.addPoint(_position);
         //println("robot after update " + this);
     }
     

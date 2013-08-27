@@ -163,11 +163,9 @@ class GameLevelWorld extends World  implements MessageSubscriber {
   
 
   void createRobot() {     
-      RobotPath path =  new RobotPath(worldBoundingBox);
       PVector position = grid.getPositionBottomCentered(grid.computeRobotCoordinate(), Robot.WIDTH, Robot.HEIGHT);
-      robot = new Robot(position, this, messenger,path);
+      robot = new Robot(position, this, messenger);
       register(robot);
-      register(path);
       
       robotMouseMovementController =  new RobotMouseMovementController(robot, this, messenger);
       subscribe(robotMouseMovementController, POCodes.Button.LEFT, worldBoundingBox);
