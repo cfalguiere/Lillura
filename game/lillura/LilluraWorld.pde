@@ -23,6 +23,15 @@ class LilluraWorld extends World {
 
   void setup() {
       //IMPORTANT: put all other setup hereterBeing(TemplateBeing);
+
+      PerceptualEventEmulatorController perceptualEmulator =  new PerceptualEventEmulatorController(this, messenger);
+      subscribe(perceptualEmulator, POCodes.Button.RIGHT);
+      subscribe(perceptualEmulator, POCodes.Key.C);
+      subscribe(perceptualEmulator, POCodes.Key.O);
+
+      ViewFocusPerceptualController viewFocusController =  new ViewFocusPerceptualController(3, this, messenger);
+      viewFocusController.setActivePos(1);
+      messenger.subscribe(viewFocusController);
       
       createHeader();
       

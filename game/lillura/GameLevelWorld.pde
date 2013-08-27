@@ -19,6 +19,8 @@ class GameLevelWorld extends World  implements MessageSubscriber {
   RobotKeyMovementController robotKeyMovementController;
   RobotPerceptualMovementController robotPerceptualMovementController;
   
+  boolean hasPerceptualFocus = true;
+  
   
   GameLevelWorld(int portIn, int portOut, LilluraWorld aMainWorld, Rectangle aWorldBoundingBox, LilluraMessenger theMessenger) {
       super(portIn, portOut);
@@ -71,14 +73,19 @@ class GameLevelWorld extends World  implements MessageSubscriber {
             case PLAY_PROGRAM:
                 replayLevel(message.program);
                 break;
-            case PERCEPTUAL_HAND_MOVED_TOP_RIGHT:
-                robotPerceptualMovementController.disable();
-                robotKeyMovementController.disable();
-                break;
             case PERCEPTUAL_HAND_MOVED_TOP_LEFT:
+            case PERCEPTUAL_HAND_MOVED_TOP_RIGHT:
+            case SWITCH_TO_VIEW_0:
+            case SWITCH_TO_VIEW_2:
+                 robotPerceptualMovementController.disable();
+                robotKeyMovementController.disable();
+                hasPerceptualFocus = false;
+                break;
             case PERCEPTUAL_HAND_MOVED_TOP_CENTER:
+            case SWITCH_TO_VIEW_1:
                 robotPerceptualMovementController.enable();
                 robotKeyMovementController.enable();
+                hasPerceptualFocus = false;
                 break;
             default:
                  // ignore other events
@@ -160,9 +167,6 @@ class GameLevelWorld extends World  implements MessageSubscriber {
       
       robotPerceptualMovementController =  new RobotPerceptualMovementController(robot, this, messenger);
       messenger.subscribe(robotPerceptualMovementController);
-      subscribe(robotPerceptualMovementController, POCodes.Button.RIGHT);
-      subscribe(robotPerceptualMovementController, POCodes.Key.C);
-      subscribe(robotPerceptualMovementController, POCodes.Key.O);
   }
   
   void createGoal() { 

@@ -37,13 +37,15 @@ public class LilluraMessenger {
   } 
 
   protected void fireMessages() {
-    while(!actionMessageQueue.isEmpty()) {
-      ActionMessage m = actionMessageQueue.poll();
-      println("firing message " + m);
-      for(MessageSubscriber subscriber : messageSubscribers) {
-        subscriber.actionSent(m);
+      while(!actionMessageQueue.isEmpty()) {
+          ActionMessage m = actionMessageQueue.poll();
+          println("firing message " + m);
+          synchronized(messageSubscribers) {
+              for(MessageSubscriber subscriber : messageSubscribers) {
+                  subscriber.actionSent(m);
+              }
+          }
       }
-    }
   }
 
   protected void firePerCChanged() {

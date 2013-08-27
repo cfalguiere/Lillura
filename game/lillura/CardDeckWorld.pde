@@ -46,12 +46,15 @@ class CardDeckWorld extends World implements MessageSubscriber  {
                 replayDeck();
                 break;
             case PERCEPTUAL_HAND_MOVED_TOP_RIGHT:
+            case SWITCH_TO_VIEW_2:
                 cardDeckMouseController.enable();
                 cardDeckPerceptualController.disable();
                 cardMouseMarker.setPerceptualMode(true);
                 break;
             case PERCEPTUAL_HAND_MOVED_TOP_CENTER:
             case PERCEPTUAL_HAND_MOVED_TOP_LEFT:
+            case SWITCH_TO_VIEW_0:
+            case SWITCH_TO_VIEW_1:
                 cardDeckMouseController.disable();
                 cardDeckPerceptualController.enable();
                 cardMouseMarker.setPerceptualMode(false);
@@ -87,8 +90,6 @@ class CardDeckWorld extends World implements MessageSubscriber  {
       
       cardDeckPerceptualController =  new CardDeckPerceptualController(cardDeck, cards, this, messenger);
       messenger.subscribe(cardDeckPerceptualController);
-      subscribe(cardDeckPerceptualController, POCodes.Key.C);
-      subscribe(cardDeckPerceptualController, POCodes.Key.O);
   }
 
   void resetDeck() {

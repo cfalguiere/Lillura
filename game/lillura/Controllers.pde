@@ -31,12 +31,12 @@ class Controller extends HObject implements MessageSubscriber {
  
     void enable() {
         isActive = true;
-        println("Controller " + getName() + " is enabled");
+        println("Controller " + getClass().getName() + " is enabled");
     }
  
     void disable() {
         isActive = false;
-        println("Controller " + getName() + " is disabled");
+        println("Controller " + getClass().getName() + " is disabled");
     }
 }
 
@@ -187,61 +187,75 @@ class RobotKeyMovementController extends Controller {
 }
 
 //
-// PerceptualEmulator
+// PerceptualEventEmulatorController : emulate perceptual event with mouse and keyboard - ofr test purpose
 //
 
-class PerceptualEventEmulator {
+class PerceptualEventEmulatorController extends Controller { 
 
-    LilluraMessenger messenger;
-  
-    PerceptualEventEmulator(LilluraMessenger theMessenger) {
-        messenger = theMessenger;
+    PVector lastMousePosition;
+
+    PerceptualEventEmulatorController(World aParentWorld, LilluraMessenger theMessenger) {
+        super(aParentWorld, theMessenger);
+        println("Perceptual event emulator is ON");
     }
-
+  
     /**
      * emulates the perceptual hand movement with keyboard
-     * caller must register to the right button
      */    
-    public void emulatePerceptualWithMouse(MouseMessage m) {
-        if (m.getAction() == POCodes.Click.PRESSED) {
-            boolean top = (mouseY<height*0.2);
-            boolean bottom = (mouseY>height*0.8);
-            boolean left = (mouseX<width*0.33);
-            boolean right = (mouseX>width*0.66);
-        
-            EventType et = EventType.PERCEPTUAL_HAND_MOVED_CENTER;
-            
-            if (top) {
-                 if (left) {
-                    et = EventType.PERCEPTUAL_HAND_MOVED_TOP_LEFT;
-                 } else if (right) {
-                    et = EventType.PERCEPTUAL_HAND_MOVED_TOP_RIGHT;
-                 } else {
-                    et = EventType.PERCEPTUAL_HAND_MOVED_TOP_CENTER;
-                 }
-            } else if (bottom) { 
-                 if (left) {
-                    et = EventType.PERCEPTUAL_HAND_MOVED_BOTTOM_LEFT;
-                 } 
-            } else {
-                if (left) {
-                    et = EventType.PERCEPTUAL_HAND_MOVED_LEFT;
-                } else if (right) {
-                    et = EventType.PERCEPTUAL_HAND_MOVED_CENTER;
-                } else {
-                    et = EventType.PERCEPTUAL_HAND_MOVED_RIGHT;
-                }
-            }
-            
-            messenger.sendMessage(new ActionMessage(et));
+    public void receive(MouseMessage m) {
+        if (m.getButton() != POCodes.Button.RIGHT) {
+            return;
+        }
+      
+        switch (m.getAction()) {
+            case PRESSED:
+                lastMousePosition = m.getPosition();
+                break;
+            case RELEASED:
+                whenRightButtonReleased(m);
+                break;
+            default:
+               // ignore others  
         }
     }
+    
+    void whenRightButtonReleased(MouseMessage m) {
+          PVector currentMousePosition = m.getPosition();
+          EventType et = null;
+          
+          float distance = currentMousePosition.dist(lastMousePosition);
+          println("distance " + distance);
+          if ( distance > width*0.1) {
+              et = (lastMousePosition.x > currentMousePosition.x) ? EventType.PERCEPTUAL_SWIPE_LEFT : EventType.PERCEPTUAL_SWIPE_RIGHT;
+          } else {
+              et = getScreenArea();
+          }
+          messenger.sendMessage(new ActionMessage(et));
+     }
+    
+    EventType getScreenArea() {
+          StringBuilder eventTypeName = new StringBuilder("PERCEPTUAL_HAND_MOVED_");
+          if (mouseY<height*0.2) {
+              eventTypeName.append("TOP_");
+          } else if (mouseY>height*0.8) { 
+              eventTypeName.append("BOTTOM_");
+          } 
+          
+          if (mouseX<width*0.33) {
+              eventTypeName.append("LEFT");
+          } else if (mouseX>width*0.66) {
+              eventTypeName.append("RIGHT");
+          } else {
+              eventTypeName.append("CENTER");
+          }
+           
+          return EventType.valueOf(eventTypeName.toString()); 
+     } 
 
     /**
      * emulates the perceptual hand movement with keyboard
-     * caller must register to Key O and C 
      */    
-     public void emulatePerceptualWithKeyboard(KeyMessage m) { 
+    public void receive(KeyMessage m) { //FIXME generates a command, and update do the switch
         int code = m.getKeyCode();
         if (m.isPressed()) {
             switch (code) {
@@ -266,12 +280,10 @@ class PerceptualEventEmulator {
 class RobotPerceptualMovementController extends Controller {
     Robot robot;
     float lastMouseX;
-    PerceptualEventEmulator emulator;
     
     RobotPerceptualMovementController(Robot aRobot, World aParentWorld, LilluraMessenger theMessenger) {
         super(aParentWorld, theMessenger);
         robot = aRobot;
-        emulator = new PerceptualEventEmulator(theMessenger);
     }
   
     void perCChanged(PerCMessage handSensor) {
@@ -312,19 +324,13 @@ class RobotPerceptualMovementController extends Controller {
                 // ignore other events
         }
     }
- 
-    // emulation of position with right button
-    public void receive(MouseMessage m) {
-        if (! isActive) return;
-        emulator.emulatePerceptualWithMouse(m);
-    }
-
-    // emulation of close / open with keyboard C and O
-    public void receive(KeyMessage m) { //FIXME generates a command, and update do the switch
-        if (! isActive) return;
-        emulator.emulatePerceptualWithKeyboard(m);
-    }   
 }
+
+//
+// CardDeckController : base class for all CardDeck controller. is responsibie for executing the cardDeck actions 
+//TODO select and unselect are CardDeck operations
+//TODO move some card deck operations to gui List classes  
+//
 
 class CardDeckController extends Controller {
     CardGroup cards;
@@ -364,6 +370,10 @@ class CardDeckController extends Controller {
     }
 }
 
+//
+// CardDeckMouseController : cardDeck controller with mouse
+//
+
 class CardDeckMouseController extends CardDeckController {
     
     CardDeckMouseController(CardDeckCanvas aCardDeckCanvas, CardGroup aCardGroup, World aParentWorld, LilluraMessenger theMessenger) {
@@ -396,13 +406,14 @@ class CardDeckMouseController extends CardDeckController {
 
 }
 
+//
+// CardDeckPerceptualController : cardDeck controller with peceptual camera
+//
+
 class CardDeckPerceptualController extends CardDeckController {
-    
-    PerceptualEventEmulator emulator;
     
     CardDeckPerceptualController(CardDeckCanvas aCardDeckCanvas, CardGroup aCardGroup, World aParentWorld, LilluraMessenger theMessenger) {
         super(aCardDeckCanvas, aCardGroup, aParentWorld, theMessenger);
-        emulator = new PerceptualEventEmulator(theMessenger);
     }
 
     public void preUpdate() {
@@ -428,11 +439,72 @@ class CardDeckPerceptualController extends CardDeckController {
                 // ignore other events
         }
     }
-    
-    // emulation of close / open with keyboard C and O
-    public void receive(KeyMessage m) { //FIXME generates a command, and update do the switch
-        if (! isActive) return;
-        emulator.emulatePerceptualWithKeyboard(m);
-    }   
 
 }
+
+//
+// ViewFocusPerceptualController : manage which view has the focus
+//
+
+class ViewFocusPerceptualController extends Controller {
+    
+    int activePos;
+    int nbPos;
+    
+    ViewFocusPerceptualController(int aNbPos, World aParentWorld, LilluraMessenger theMessenger) {
+        super(aParentWorld, theMessenger);
+        nbPos = aNbPos;
+    }
+
+    /**
+    * pos is zero based
+    */
+    void setActivePos(int aPos) {
+        activePos = aPos;
+    }
+    
+    void actionSent(ActionMessage message) {
+        if (! isActive) return;
+
+        switch(message.eventType) {
+            case PERCEPTUAL_HAND_MOVED_TOP_LEFT:
+                 setActivePos(1);
+                 break;
+            case PERCEPTUAL_HAND_MOVED_TOP_CENTER:
+                 setActivePos(2);
+                 break;
+            case PERCEPTUAL_HAND_MOVED_TOP_RIGHT:
+                 setActivePos(3);
+                 break;
+            case PERCEPTUAL_SWIPE_LEFT:
+                incrementActivePos();
+                EventType et1 = EventType.valueOf("SWITCH_TO_VIEW_" + activePos); 
+                messenger.sendMessage(new ActionMessage(et1));
+                break;
+            case PERCEPTUAL_SWIPE_RIGHT:
+                decrementActivePos();
+                EventType et2 = EventType.valueOf("SWITCH_TO_VIEW_" + activePos); 
+                messenger.sendMessage(new ActionMessage(et2));
+                break;
+            default:
+                // ignore other events
+        }
+    }
+    
+    void incrementActivePos() {
+      int newPos = (activePos + 1) % nbPos;
+      println("inc activePos " + activePos + " newPos " + newPos);
+      activePos = newPos;
+    }
+
+    
+    void decrementActivePos() {
+      int newPos = (activePos - 1 + nbPos) % nbPos;
+      println("dec activePos " + activePos + " newPos " + newPos);
+      activePos = newPos;
+    }
+
+}
+
+
+//TODO add focus controller 
