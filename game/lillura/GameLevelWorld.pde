@@ -112,7 +112,9 @@ class GameLevelWorld extends World  implements MessageSubscriber {
     void resetLevel() {
         println("requesting level to reset");
         robot.handleReset();
-        goal.handleReset(getGoalPosition());
+        PVector goalPosition =  getGoalPosition();
+        goal.handleReset(goalPosition);
+        terrain.setArrival(goalPosition);
         blocks.destroy();
         createBlocks();
         register(robot, blocks, new RobotBlockInteractor(messenger)); 
@@ -164,6 +166,7 @@ class GameLevelWorld extends World  implements MessageSubscriber {
   void createRobot() {     
       PVector coordinates = grid.computeRobotCoordinate();
       PVector position = grid.getPositionBottomCentered(coordinates, Robot.WIDTH, Robot.HEIGHT);
+      position.add(new PVector(0, GridLayoutManager.GRID_HEIGHT_OFFSET*1/6));
       robot = new Robot(position, this, messenger);
       register(robot);
       
@@ -192,7 +195,9 @@ class GameLevelWorld extends World  implements MessageSubscriber {
   }
   
   PVector getGoalPosition() {
-      return grid.getPosition( grid.computeGoalCoordinate() );
+      PVector position =  grid.getPosition( grid.computeGoalCoordinate() );
+      position.sub(new PVector(0, GridLayoutManager.GRID_HEIGHT_OFFSET));
+      return position;
   }
 
 
