@@ -4,8 +4,6 @@
 class Robot extends Being  {
   static final int WIDTH = 30;
   static final int HEIGHT = 30;
-  static final int SPEED = 1;
-  final PVector UP_VELOCITY  = PVector.fromAngle(-HALF_PI); // (0,-1)
 
   LilluraMessenger messenger;
 
@@ -14,9 +12,9 @@ class Robot extends Being  {
   boolean hasCompleted = false;
   boolean isReset = false;
   boolean isReplaying = false; //TODO state machine
-  PVector _velocity = UP_VELOCITY;
   PVector zero;
   
+  RobotDirection robotDirection;
   RobotShape robotShape;
 
   RobotAction currentAction;
@@ -25,13 +23,15 @@ class Robot extends Being  {
   Robot(PVector position, World w, LilluraMessenger theMessenger) {  
       super(new Rectangle(position, WIDTH, HEIGHT));
       messenger = theMessenger;
+
+      //Add your constructor info here
+      println("creating robot");
       
       zero = new PVector();
       zero.set(position);
-      //Add your constructor info here
-      println("creating robot");
 
-      robotShape = new RobotShape(new Rectangle(position, WIDTH, HEIGHT));
+      robotDirection = new RobotDirection();
+      robotShape = new RobotShape(new Rectangle(position, WIDTH, HEIGHT), robotDirection);
       
       previousAction = new RobotAction(MovementType.NONE, millis(), position);
   }
@@ -39,7 +39,7 @@ class Robot extends Being  {
   public void update() {
     if (isOn || isReplaying) {
         //println("robot before update " + this);
-        _position.add(_velocity);
+        _position.add(robotDirection.velocity);
         //println("robot after update " + this);
     }
     
@@ -50,10 +50,13 @@ class Robot extends Being  {
     
     if (isGameOver) {
         robotShape.setColorToBroken();
+        robotShape.update();
     } else  if (hasCompleted) {
         robotShape.setColorToCompleted();
+        robotShape.update();
     } else {
         robotShape.setColorToDefault();
+        robotShape.update();
     }
 
   }
@@ -79,16 +82,14 @@ class Robot extends Being  {
       sendActionCompleted();
       currentAction = new RobotAction(MovementType.TURN_RIGHT, millis(), _position);
       isOn = true;
-      _velocity.rotate(HALF_PI);
-      robotShape.rotateRight();
+      robotDirection.turnRight();
   }
   
   public void handleTurnLeft() {
       sendActionCompleted();
       currentAction = new RobotAction(MovementType.TURN_LEFT, millis(), _position);
       isOn = true;
-      _velocity.rotate(-HALF_PI);
-      robotShape.rotateLeft();
+      robotDirection.turnLeft();
   }
   
   public void handleGoOn() {
@@ -116,7 +117,7 @@ class Robot extends Being  {
   public void handleReset() {
     currentAction = new RobotAction(MovementType.NONE, millis(), _position);
     previousAction = currentAction;
-    _velocity = UP_VELOCITY;
+    robotDirection.reset();
     robotShape.reset();
     isOn = false;
     isGameOver = false;
@@ -146,7 +147,7 @@ class Robot extends Being  {
     }
 
     public float  getOrientation() {
-      return robotShape.getOrientation();
+      return robotDirection.orientation;
     }
     
     public RobotAction  getCurrentAction() {
@@ -156,13 +157,13 @@ class Robot extends Being  {
     public void replay(MovementType mvt) {
       switch (mvt) {
        case FORWARD:
-          _velocity = UP_VELOCITY;
+          robotDirection.forward();
           break;
         case TURN_LEFT:
-          _velocity.rotate(-HALF_PI);
+          robotDirection.turnLeft();
           break;
         case TURN_RIGHT:
-          _velocity.rotate(HALF_PI);
+          robotDirection.turnRight();
           break;
         default:
           //ignore
@@ -176,28 +177,69 @@ class Robot extends Being  {
 }
 
 //
+// RobotDirection
+//
+
+class RobotDirection {
+    static final int SPEED = 1;
+    static final float DEFAULT_ORIENTATION = -HALF_PI; 
+    final PVector UP_VELOCITY  = PVector.fromAngle(DEFAULT_ORIENTATION); // (0,-1)
+
+    float orientation;
+    PVector velocity;
+    
+    RobotDirection() {
+        reset();
+    }
+    
+    void reset() {
+        forward();   
+    }
+    
+    void forward() {
+        orientation = DEFAULT_ORIENTATION;
+        velocity = UP_VELOCITY;     
+    }
+    
+    void turnLeft() {
+        orientation = (orientation - HALF_PI + TWO_PI) % TWO_PI;
+        velocity.rotate(-HALF_PI);
+    }
+    
+    void turnRight() {
+        orientation = (orientation + HALF_PI + TWO_PI) % TWO_PI;
+        velocity.rotate(HALF_PI);
+    }
+}
+
+//
 // RobotShape : draw the robot
 //
 
 class RobotShape {
-    static final float INITIAL_ORIENTATION = -HALF_PI;
     static final int DEFAULT_COLOR = 127; 
 
     Rectangle boundingBox;
-    float orientation;
+    RobotDirection robotDirection;
+    float currentDirection;
     Polygon triangle;
     color c;
     
-    RobotShape(Rectangle aBoundingBox) {
+    RobotShape(Rectangle aBoundingBox, RobotDirection aRobotDirection) {
         boundingBox = aBoundingBox;
-        orientation = INITIAL_ORIENTATION;
+        robotDirection = aRobotDirection;
+        reset();
+    }
+
+    void reset() {
         initialize();
         setColorToDefault();
     }
     
     void initialize() {
+        currentDirection = robotDirection.orientation;
         ArrayList<PVector> points = new ArrayList<PVector>();
-        float angle = orientation;
+        float angle = currentDirection;
         float w = boundingBox.getWidth();
         float h = boundingBox.getHeight();
         for (int i=0; i<3; i++, angle+=TWO_PI/3) {
@@ -207,21 +249,6 @@ class RobotShape {
           points.add(vertex1);
         } 
         triangle =  new Polygon(getCenter(), points);
-    }
-
-    public void rotateRight() {
-        orientation = (orientation + HALF_PI) % TWO_PI;
-        initialize();
-    }
-    
-    public void rotateLeft() {
-        orientation = (orientation - HALF_PI) % TWO_PI;
-        initialize();
-    }
-
-    public void reset() {
-        orientation = INITIAL_ORIENTATION;
-        initialize();
     }
 
     public void setColorToBroken() {
@@ -240,8 +267,8 @@ class RobotShape {
       return boundingBox.getCenter();
     }
     
-    public float getOrientation() {
-        return orientation;
+    public void update() {
+      if (currentDirection != robotDirection.orientation) initialize();
     }
     
     public void draw() {
@@ -252,7 +279,6 @@ class RobotShape {
       popMatrix();
     }
 }
-
 
 //
 // RobotAction : keep track of the current movement of the robot in order to create a card
