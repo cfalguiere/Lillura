@@ -2,9 +2,9 @@
 acquire data from the camera and dispatch to subscribers
 */
 public class LilluraMessenger {
-  /*
+  
   PerCSensor perCSensor;
-  */
+  
   // subscriber
   //private final ArrayList<MessageSubscriber> messageSubscribers;
   private final ConcurrentLinkedQueue<MessageSubscriber> messageSubscribers;
@@ -17,9 +17,12 @@ public class LilluraMessenger {
     messageSubscribers = new ConcurrentLinkedQueue<MessageSubscriber>();
     actionMessageQueue = new LinkedList<ActionMessage>();
     perCMessageQueue = new LinkedList<PerCMessage>();
-    /*
-    perCSensor = new PerCSensor(this);
-    */
+    
+    try {  //FIXME move elsewhere
+        perCSensor = new PerCSensor(this);
+    } catch(Exception e) {
+        println("Could not initialize Perceptual " + e);
+    }
     println("Messenger created");
   }
   
@@ -133,28 +136,6 @@ public class ActionMessage extends Message {
         message = "[ " + eventType.name()  + " ]"; 
     }
     return message; 
-  }
-}
-
-//Mock
-public class PerCMessage extends Message {
-  public float x;
-  public float y;
-  public float depth;
-  public float openness;
-  public float opennessState;
-  public int gesture;
-  
-  public boolean isHandOpen() {
-    return true;
-  }
-  
-  public boolean isHandClose() {
-    return false;
-  }
-  
-  public boolean isTooFar() {
-    return false;
   }
 }
 

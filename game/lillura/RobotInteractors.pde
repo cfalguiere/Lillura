@@ -13,7 +13,7 @@ class RobotBlockInteractor extends Interactor<Robot,Block> {
   }
 
   boolean detect(Robot robot, Block block) {
-    return block.getShape().collide(robot.getShape()) &&  robot.isOn;
+    return robot.robotState.canMove() && block.getShape().collide(robot.getShape());
   }
 
   void handle(Robot robot, Block block) {
@@ -37,11 +37,11 @@ class RobotGoalInteractor extends Interactor<Robot, Goal> {
   }
 
   boolean detect(Robot robot, Goal goal) {
-    return goal.getShape().collide(robot.getShape()) &&  robot.isOn;
+    return robot.robotState.canMove() && ( goal.collide(robot) || goal.contains(robot) );
   }
 
   void handle(Robot robot, Goal goal) {
-    if ( goal.getShape().getBoundingBox().contains(robot.getShape().getBoundingBox()) ) {
+    if ( goal.contains(robot) ) {
         goal.handleWin();
         robot.handleCompleted();
         messenger.sendActionMessage(EventType.NOTIFICATION_PLAYER_WON);
@@ -70,7 +70,7 @@ class RobotTerrainInteractor extends Interactor<Robot, Terrain> {
 
   boolean detect(Robot robot, Terrain terrain) {
     return ! terrain.getShape().getBoundingBox().contains(robot.getShape().getBoundingBox())
-            &&  robot.isOn;
+            &&  robot.robotState.canMove();
   }
 
   void handle(Robot robot, Terrain terrain) {

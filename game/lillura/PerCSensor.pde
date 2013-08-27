@@ -1,7 +1,7 @@
 /*
 This class responisbilities are to interface the camera, collect information and store the state of the interaction
 */
-/*
+
 class PerCSensor {
   
   float[] mHandPos = new float[4];
@@ -82,5 +82,28 @@ public class PerCMessage extends Message {
     return depth > 0.4;
   }
 }
-*/
+
+//Mock
+/*
+public class PerCMessage extends Message {
+  public float x;
+  public float y;
+  public float depth;
+  public float openness;
+  public float opennessState;
+  public int gesture;
+  
+  public boolean isHandOpen() {
+    return true;
+  }
+  
+  public boolean isHandClose() {
+    return false;
+  }
+  
+  public boolean isTooFar() {
+    return false;
+  }
+}*/
+
 

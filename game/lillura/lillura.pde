@@ -17,9 +17,8 @@ import hermes.animation.*;
 import hermes.physics.*;
 import hermes.postoffice.*;
 
-/*
+
 import intel.pcsdk.*;
-*/
 
 ///////////////////////////////////////////////////
 // CONSTANTS

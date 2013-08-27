@@ -7,12 +7,9 @@ class Robot extends Being  {
 
   LilluraMessenger messenger;
 
-  boolean isOn = false;
-  boolean isGameOver = false;
-  boolean hasCompleted = false;
-  boolean isReplaying = false; //TODO state machine
   PVector zero;
   
+  RobotState robotState;
   RobotDirection robotDirection;
   RobotShape robotShape;
 
@@ -29,28 +26,19 @@ class Robot extends Being  {
       zero = new PVector();
       zero.set(position);
 
+      robotState = new RobotState();
       robotDirection = new RobotDirection();
-      robotShape = new RobotShape(new Rectangle(position, WIDTH, HEIGHT), robotDirection);
+      robotShape = new RobotShape(new Rectangle(position, WIDTH, HEIGHT), robotDirection, robotState);
       
       previousAction = new RobotAction(MovementType.NONE, millis(), position);
   }
   
   public void update() {
-    if (isOn || isReplaying) {
+    if (robotState.canMove()) {
         //println("robot before update " + this);
         _velocity.set(robotDirection.velocity);
         _position.add(_velocity);
         //println("robot after update " + this);
-    }
-    
-    if (isGameOver) {
-        robotShape.setColorToBroken();
-    } else if (hasCompleted) {
-        robotShape.setColorToCompleted();
-    } else if (isReplaying) {
-        robotShape.setColorToReplaying();
-    } else {
-        robotShape.setColorToDefault();
     }
     
     robotShape.update();
@@ -69,7 +57,7 @@ class Robot extends Being  {
   }
   
   public void handlePause() {
-      isOn = false;
+      robotState.state = RobotState.WAITING;
       sendActionCompleted();
       currentAction = new RobotAction(MovementType.NONE, millis(), _position);
   }
@@ -77,14 +65,14 @@ class Robot extends Being  {
   public void handleTurnRight() {
       sendActionCompleted();
       currentAction = new RobotAction(MovementType.TURN_RIGHT, millis(), _position);
-      isOn = true;
+      robotState.state = RobotState.STEERABLE;
       robotDirection.turnRight();
   }
   
   public void handleTurnLeft() {
       sendActionCompleted();
       currentAction = new RobotAction(MovementType.TURN_LEFT, millis(), _position);
-      isOn = true;
+      robotState.state = RobotState.STEERABLE;
       robotDirection.turnLeft();
   }
   
@@ -93,43 +81,37 @@ class Robot extends Being  {
         currentAction = new RobotAction(MovementType.FORWARD, millis(), _position);
         //println("CREATE currentAction " + currentAction.movementType.name() + " "+ currentAction.startPosition);
       }
-      isOn = true;
+      robotState.state = RobotState.STEERABLE;
   }
   
   public void handleStop() {
-      //if (!isGameOver) 
-      // sendActionCompleted();
-      isGameOver = true;
-      isOn = false;
+      robotState.state = RobotState.CRASHED;
   }
   
   public void handleCompleted() {
-      if (!hasCompleted) 
-       sendActionCompleted();
-      hasCompleted = true;
-      isOn = false;
+      if (robotState.state != RobotState.PARKED) {
+         sendActionCompleted();
+         robotState.state = RobotState.PARKED;
+      }
   }
   
-  public void handleReset() {
-    currentAction = new RobotAction(MovementType.NONE, millis(), _position);
-    previousAction = currentAction;
-    _position.set(zero);
-    robotDirection.reset();
-    robotShape.reset();
-    isOn = false;
-    isGameOver = false;
-    hasCompleted = false;
-    isReplaying = false;
-  }
+    public void handleReset() {
+        currentAction = new RobotAction(MovementType.NONE, millis(), _position);
+        previousAction = currentAction;
+        _position.set(zero);
+        robotState.reset();
+        robotDirection.reset();
+        robotShape.reset();
+    }
 
   
     public void handleReplay() {
        handleReset();
-       isReplaying = true;
+       robotState.state = RobotState.REPLAYING;
     }
    
     public void handleStopReplay() {
-       isReplaying = false;
+       robotState.state = RobotState.WAITING;
     }
    
    
@@ -170,9 +152,39 @@ class Robot extends Being  {
     }
     
     String toString() {
-        return "[Robot " + (isOn?"ON":"OFF") + " position " + _position + " ]";
+        return "Robot:[ " + robotState + " " + robotState + " " + _position + " ]";
     }
 
+}
+
+//
+// RobotState
+//
+
+public class  RobotState {
+    static final int WAITING = 0;
+    static final int STEERABLE = 1;
+    static final int REPLAYING = 2;
+    static final int CRASHED = 3;
+    static final int PARKED = 4;
+    final String[] labels = {"WAITING", "STEERABLE", "REPLAYING", "CRASHED", "PARKED"};
+    int state;
+    
+    RobotState() {
+        reset();
+    }
+    
+    void reset() {
+        state = WAITING;
+    }
+    
+    boolean canMove() {
+        return state == STEERABLE || state == REPLAYING;
+    }
+    
+    String toString() {
+      return labels[state];
+    }
 }
 
 //
@@ -224,13 +236,15 @@ class RobotShape {
 
     Rectangle boundingBox;
     RobotDirection robotDirection;
+    RobotState robotState;
     float currentDirection;
     Polygon triangle;
     color c;
     
-    RobotShape(Rectangle aBoundingBox, RobotDirection aRobotDirection) {
+    RobotShape(Rectangle aBoundingBox, RobotDirection aRobotDirection, RobotState aRobotState) {
         boundingBox = aBoundingBox;
         robotDirection = aRobotDirection;
+        robotState = aRobotState;
         reset();
     }
 
@@ -276,6 +290,21 @@ class RobotShape {
     
     public void update() {
       if (currentDirection != robotDirection.orientation) initialize();
+      
+      switch (robotState.state) {
+          case RobotState.CRASHED:
+              setColorToBroken();
+              break;
+          case RobotState.PARKED:
+              setColorToCompleted();
+              break;
+          case RobotState.REPLAYING:
+              setColorToReplaying();
+              break;
+          default:
+              setColorToDefault();
+      } 
+
     }
     
     public void draw() {
