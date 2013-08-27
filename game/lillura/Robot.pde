@@ -10,7 +10,6 @@ class Robot extends Being  {
   boolean isOn = false;
   boolean isGameOver = false;
   boolean hasCompleted = false;
-  boolean isReset = false;
   boolean isReplaying = false; //TODO state machine
   PVector zero;
   
@@ -42,11 +41,6 @@ class Robot extends Being  {
         _velocity.set(robotDirection.velocity);
         _position.add(_velocity);
         //println("robot after update " + this);
-    }
-    
-    if (isReset) {
-      _position.set(zero);
-      isReset = false;
     }
     
     if (isGameOver) {
@@ -119,17 +113,17 @@ class Robot extends Being  {
   public void handleReset() {
     currentAction = new RobotAction(MovementType.NONE, millis(), _position);
     previousAction = currentAction;
+    _position.set(zero);
     robotDirection.reset();
     robotShape.reset();
     isOn = false;
     isGameOver = false;
     hasCompleted = false;
-    isReset = true;
     isReplaying = false;
   }
 
   
-    public void handleReplay(RobotProgram program) {
+    public void handleReplay() {
        handleReset();
        isReplaying = true;
     }
