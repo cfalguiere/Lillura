@@ -15,10 +15,13 @@ class Robot extends Being  {
 
   RobotAction currentAction;
   RobotAction previousAction;
+  RobotPath robotPath;
+  int nbSteps;
 
-  Robot(PVector position, World w, LilluraMessenger theMessenger) {  
+  Robot(PVector position, World w, LilluraMessenger theMessenger, RobotPath aRobotPath) {  
       super(new Rectangle(position, WIDTH, HEIGHT));
       messenger = theMessenger;
+      robotPath = aRobotPath;
 
       //Add your constructor info here
       println("creating robot");
@@ -31,6 +34,8 @@ class Robot extends Being  {
       robotShape = new RobotShape(new Rectangle(position, WIDTH, HEIGHT), robotDirection, robotState);
       
       previousAction = new RobotAction(MovementType.NONE, millis(), position);
+      
+      nbSteps = 0;
   }
   
   public void update() {
@@ -39,6 +44,8 @@ class Robot extends Being  {
         _velocity.set(robotDirection.velocity);
         _position.add(_velocity);
         //println("robot after update " + this);
+        nbSteps = (nbSteps + 1) % 10;
+        if (nbSteps == 0) robotPath.trackPath(_position);
     } else {
         _velocity.set(new PVector(0,0));
     }
@@ -65,6 +72,7 @@ class Robot extends Being  {
   }
   
   public void handleTurnRight() {
+      robotPath.trackPath(_position);
       sendActionCompleted();
       currentAction = new RobotAction(MovementType.TURN_RIGHT, millis(), _position);
       robotState.state = RobotState.STEERABLE;
@@ -72,6 +80,7 @@ class Robot extends Being  {
   }
   
   public void handleTurnLeft() {
+      robotPath.trackPath(_position);
       sendActionCompleted();
       currentAction = new RobotAction(MovementType.TURN_LEFT, millis(), _position);
       robotState.state = RobotState.STEERABLE;
@@ -101,6 +110,8 @@ class Robot extends Being  {
         currentAction = new RobotAction(MovementType.NONE, millis(), _position);
         previousAction = currentAction;
         _position.set(zero);
+        robotPath.reset();
+        nbSteps = 0;
         robotState.reset();
         robotDirection.reset();
         robotShape.reset();
@@ -462,4 +473,40 @@ class RobotProgramPlayer {
   
 }
 
+class RobotPath extends Being {
+    ConcurrentLinkedQueue<PVector> path;
+    PVector translation;
+    
+    RobotPath(Rectangle aBoundingBox) {
+        super(aBoundingBox);
+        path = new ConcurrentLinkedQueue<PVector>();
+        translation = new PVector(- _shape.getBoundingBox().getAbsMin().x + Robot.WIDTH/2, - _shape.getBoundingBox().getAbsMin().y + Robot.HEIGHT/2);
+    }
+    
+    public void draw() {
+        stroke(color(256,0,0));
+        strokeWeight(3);
+        
+        pushMatrix();
+        translate(translation.x, translation.y);
+        PVector v = null;
+        Iterator<PVector> it = path.iterator();
+        while (it.hasNext()) {
+            v = it.next();
+            point(v.x, v.y);
+        }
+        popMatrix();
+    }
+    
+    void reset() {
+        path = new ConcurrentLinkedQueue<PVector>();
+    }
+    
+    void trackPath(PVector aPosition) {
+        PVector vertex = new PVector();
+        vertex.set(aPosition);
+        path.add(vertex);
+    }
+
+}
 

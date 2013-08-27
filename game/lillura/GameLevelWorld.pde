@@ -164,10 +164,13 @@ class GameLevelWorld extends World  implements MessageSubscriber {
   
 
   void createRobot() {     
+      RobotPath robotPath = new RobotPath(worldBoundingBox);
+      register(robotPath);
+    
       PVector coordinates = grid.computeRobotCoordinate();
       PVector position = grid.getPositionBottomCentered(coordinates, Robot.WIDTH, Robot.HEIGHT);
       position.add(new PVector(0, GridLayoutManager.GRID_HEIGHT_OFFSET*1/6));
-      robot = new Robot(position, this, messenger);
+      robot = new Robot(position, this, messenger, robotPath);
       register(robot);
       
       robotMouseMovementController =  new RobotMouseMovementController(robot, this, messenger);
