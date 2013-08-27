@@ -40,22 +40,6 @@ class Controller extends HObject implements MessageSubscriber {
     }
 }
 
-//
-// ReplayController : send commands to the robot so that it replays the game level
-//
-
-class ReplayController extends Controller {
-    RobotProgram program;
-  
-    ReplayController(RobotProgram aProgram, World aParentWorld, LilluraMessenger theMessenger) {
-        super(aParentWorld, theMessenger);
-        program = aProgram;
-    }
-
-    void preUpdate() {
-      
-    }
-}
 
 //
 // RobotMouseMovementController : listen to Mouse events and control the robot movement
@@ -84,10 +68,10 @@ class RobotMouseMovementController extends Controller {
               MovementType mt = convertToMovement();
               //println("RobotMouseMovementController received MouseMessage " + mt.name());
               switch (mt) {
-                case LEFT:
+                case TURN_LEFT:
                    robot.handleTurnLeft();
                    break;
-                case RIGHT:
+                case TURN_RIGHT:
                   robot.handleTurnRight();
                   break;
                 case FORWARD:
@@ -118,12 +102,12 @@ class RobotMouseMovementController extends Controller {
           // going up 3PI/2 click right 0 delta 3PI/2 == -PI/2
           // going right 0 click right PI/2 delta  -PI/2 
           // going left PI click right 3PI/2 delta -PI/2
-          mt = MovementType.RIGHT;
+          mt = MovementType.TURN_RIGHT;
         } else if (abs(delta-HALF_PI) < HALF_PI) {
           // going up 3PI/2 click left PI delta  PI/2
           // going right 0 click left 3PI/2  delta -3PI/2 = PI/2
           // going left PI click left PI/2  delta PI/2
-          mt = MovementType.LEFT;
+          mt = MovementType.TURN_LEFT;
         } 
       }  
       return mt;
@@ -165,12 +149,12 @@ class RobotKeyMovementController extends Controller {
                   robot.handlePause();
                   break;
               case POCodes.Key.LEFT:
-                  if (currentAction==null || robot.getCurrentAction().isDistinct(MovementType.LEFT, millis())) {
+                  if (currentAction==null || robot.getCurrentAction().isDistinct(MovementType.TURN_LEFT, millis())) {
                       robot.handleTurnLeft();
                   }
                   break;
               case POCodes.Key.RIGHT:
-                  if (currentAction==null || robot.getCurrentAction().isDistinct(MovementType.RIGHT, millis())) {
+                  if (currentAction==null || robot.getCurrentAction().isDistinct(MovementType.TURN_RIGHT, millis())) {
                     robot.handleTurnRight();
                   }
                   break;

@@ -40,10 +40,13 @@ class Robot extends Being  {
   }
   
   public void update() {
-    if (isOn) {
-      _position.add(_velocity);
-      //path.addPoint(_position);
+    if (isOn || isReplaying) {
+        //println("robot before update " + this);
+        _position.add(_velocity);
+        //path.addPoint(_position);
+        //println("robot after update " + this);
     }
+    
     if (isReset) {
       _position.set(zero);
       isReset = false;
@@ -78,7 +81,7 @@ class Robot extends Being  {
   
   public void handleTurnRight() {
       sendActionCompleted();
-      currentAction = new RobotAction(MovementType.RIGHT, millis(), _position);
+      currentAction = new RobotAction(MovementType.TURN_RIGHT, millis(), _position);
       isOn = true;
       _velocity.rotate(HALF_PI);
       robotShape.rotateRight();
@@ -86,7 +89,7 @@ class Robot extends Being  {
   
   public void handleTurnLeft() {
       sendActionCompleted();
-      currentAction = new RobotAction(MovementType.LEFT, millis(), _position);
+      currentAction = new RobotAction(MovementType.TURN_LEFT, millis(), _position);
       isOn = true;
       _velocity.rotate(-HALF_PI);
       robotShape.rotateLeft();
@@ -117,8 +120,7 @@ class Robot extends Being  {
   public void handleReset() {
     currentAction = new RobotAction(MovementType.NONE, millis(), _position);
     previousAction = currentAction;
-    println("resetting robot");
-    //initializeTriangleUp();
+    _velocity = UP_VELOCITY;
     robotShape.reset();
     isOn = false;
     isGameOver = false;
@@ -128,19 +130,24 @@ class Robot extends Being  {
   }
 
   
-  public void handleReplay(RobotProgram program) {
-     handleReset();
-     isReplaying = true;
-  }
-   
-  private void sendActionCompleted() {
-    if (currentAction != null) currentAction.endPosition = _position;
-    if (currentAction != null && currentAction.movementType != MovementType.NONE) {
-         //println("SEND " + currentAction.movementType.name() + " " + currentAction.startPosition + " -> " +  currentAction.endPosition  + " distance " + currentAction.distance());
-         messenger.sendMessage(new ActionMessage(EventType.ROBOT_ACTION_COMPLETED, currentAction));
-         previousAction = currentAction;
+    public void handleReplay(RobotProgram program) {
+       handleReset();
+       isReplaying = true;
     }
-  }
+   
+    public void handleStopReplay() {
+       isReplaying = false;
+    }
+   
+   
+    private void sendActionCompleted() {
+      if (currentAction != null) currentAction.endPosition = _position;
+      if (currentAction != null && currentAction.movementType != MovementType.NONE) {
+           //println("SEND " + currentAction.movementType.name() + " " + currentAction.startPosition + " -> " +  currentAction.endPosition  + " distance " + currentAction.distance());
+           messenger.sendMessage(new ActionMessage(EventType.ROBOT_ACTION_COMPLETED, currentAction));
+           previousAction = currentAction;
+      }
+    }
 
     public float  getOrientation() {
       return robotShape.getOrientation();
@@ -148,6 +155,26 @@ class Robot extends Being  {
     
     public RobotAction  getCurrentAction() {
       return currentAction;
+    }
+    
+    public void replay(MovementType mvt) {
+      switch (mvt) {
+       case FORWARD:
+          _velocity = UP_VELOCITY;
+          break;
+        case TURN_LEFT:
+          _velocity.rotate(-HALF_PI);
+          break;
+        case TURN_RIGHT:
+          _velocity.rotate(HALF_PI);
+          break;
+        default:
+          //ignore
+      }
+    }
+    
+    String toString() {
+        return "[Robot " + (isOn?"ON":"OFF") + " position " + _position + " ]";
     }
 
 }
@@ -257,6 +284,10 @@ class RobotAction {
   int distance() {
     return int(abs(startPosition.x -  endPosition.x + startPosition.y -  endPosition.y));
   }
+  
+  String toString() {
+    return "[ RobotAction " + movementType.name() + " " + startPosition + " -> " + endPosition  + " ]";
+  }
 }
 
 //
@@ -272,6 +303,10 @@ class RobotOperation {
     movementType = aMovementType;
     distance = aDistance;
   }
+  
+  String toString() {
+    return "[ RobotOperation " + movementType.name() + " " + distance + " ]";
+  }
 }
 
 //
@@ -280,7 +315,6 @@ class RobotOperation {
 
 class RobotProgram {
   ArrayList<RobotOperation> program;
-  int currentLine = 0;
   
   RobotProgram() {
     program = new ArrayList<RobotOperation>();
@@ -290,18 +324,71 @@ class RobotProgram {
     program.add(anOperation);
   }  
   
-  void run() {
-    currentLine = 0;
+  int getNbLines() {
+    return program.size();
   }
   
+  RobotOperation getOperation(int line) {
+    return program.get(line);
+  }  
   
-  boolean hasMoreOperation() {
-    return currentLine < program.size();
+  String toString() {
+    return "[ RobotProgram " + program.size() + " operations ]";
   }
+}
+
+//
+// RobotProgramPlayer : play the robot program
+// 
+
+class RobotProgramPlayer {
+    LilluraMessenger messenger;
+    RobotProgram program;
+    Robot robot;
+    int currentLine = 0;
+    RobotOperation currentOperation;
+    int remainingDistance;
+    boolean isCompleted;
+    
+    RobotProgramPlayer(Robot aRobot, RobotProgram aProgram, LilluraMessenger theMessenger) {
+        program = aProgram;
+        robot = aRobot;
+        messenger = theMessenger;
+        
+        currentLine = 0;
+        isCompleted = false;
+    }
   
-  RobotOperation readOperation() {
-    return program.get(currentLine++);
-  }
+    boolean preUpdate() {
+        if (remainingDistance == 0) pickNextOperation();
+        if (!isCompleted) runStep();
+        return !isCompleted;
+    }
+    
+    void whenProgramCompleted() {
+          isCompleted = true;
+          messenger.sendMessage(new ActionMessage(EventType.ROBOT_PROGRAM_COMPLETED));
+    }
+    
+    void pickNextOperation() {
+       if (currentLine == program.getNbLines()) {
+            whenProgramCompleted();
+        } else {
+            currentOperation = program.getOperation(currentLine);
+            remainingDistance = currentOperation.distance;
+            println(this);
+        }
+        currentLine++;
+     }
+    
+    void runStep() {
+        robot.replay(currentOperation.movementType);
+        remainingDistance--;
+    }
+    
+    String toString() {
+        return "[ RobotProgramPlayer " + currentLine + " of " + program + " " +  (isCompleted?"DONE":"RUNNING") +" ]";
+    }
   
 }
 

@@ -42,9 +42,9 @@ class Card extends Being {
       textSize(12);
       if (movementType ==  MovementType.FORWARD) {
           text("Up", 10, 20);
-      } else if (movementType ==  MovementType.RIGHT) {
+      } else if (movementType ==  MovementType.TURN_RIGHT) {
           text("Right", 10, 20);
-      } else if (movementType ==  MovementType.LEFT) {
+      } else if (movementType ==  MovementType.TURN_LEFT) {
           text("Left", 10, 20);
       }
       text(" " + distance, 10, HEIGHT - 20);

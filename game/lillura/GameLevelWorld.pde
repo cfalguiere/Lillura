@@ -18,6 +18,7 @@ class GameLevelWorld extends World  implements MessageSubscriber {
   RobotMouseMovementController robotMouseMovementController;
   RobotKeyMovementController robotKeyMovementController;
   RobotPerceptualMovementController robotPerceptualMovementController;
+  RobotProgramPlayer robotProgramPlayer;
   
   boolean hasPerceptualFocus = true;
   
@@ -50,14 +51,19 @@ class GameLevelWorld extends World  implements MessageSubscriber {
       println("GameLevel world set up");
   }
 
-  //
-  // World interface
-  //
-  
-  void preUpdate() {
-      robotMouseMovementController.preUpdate();
-  }
-  
+    //
+    // World interface
+    //
+    
+    void preUpdate() {
+        robotMouseMovementController.preUpdate();
+        
+        if (robotProgramPlayer != null) {
+            robotProgramPlayer.preUpdate();
+        }
+      
+    }
+    
   
     //
     // behavior implementation 
@@ -70,14 +76,21 @@ class GameLevelWorld extends World  implements MessageSubscriber {
             case COMMAND_RESTART:
                 restartLevel();
                 break;
-            case PLAY_PROGRAM:
+            case PLAY_ROBOT_PROGRAM:
                 replayLevel(message.program);
+                println("robot ready for replay " + robot);
+                robotProgramPlayer = new RobotProgramPlayer(robot, message.program, messenger);
+                println("replay player setup " + robotProgramPlayer);
+                break;
+            case ROBOT_PROGRAM_COMPLETED:
+                robot.handleStopReplay();
+                robotProgramPlayer = null;
                 break;
             case PERCEPTUAL_HAND_MOVED_TOP_LEFT:
             case PERCEPTUAL_HAND_MOVED_TOP_RIGHT:
             case SWITCH_TO_VIEW_0:
             case SWITCH_TO_VIEW_2:
-                 robotPerceptualMovementController.disable();
+                robotPerceptualMovementController.disable();
                 robotKeyMovementController.disable();
                 hasPerceptualFocus = false;
                 break;

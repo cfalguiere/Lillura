@@ -1,4 +1,4 @@
 public enum MovementType {
-  NONE, RIGHT, BACKWARD, LEFT, FORWARD
+  NONE, TURN_RIGHT, BACKWARD, TURN_LEFT, FORWARD
 };
 

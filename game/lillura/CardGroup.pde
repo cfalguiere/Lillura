@@ -93,12 +93,12 @@ class CardGroup extends Group<Card> {
     }
     
     RobotProgram makeProgram() {
-      RobotProgram program = new RobotProgram();
-      for (Card card : getObjects()) {
-        program.addOperation(new RobotOperation(card.movementType, card.distance));
-      }
-      println("program created");
-      return program;
+        RobotProgram program = new RobotProgram();
+        for (Card card : getObjects()) {
+          program.addOperation(new RobotOperation(card.movementType, card.distance));
+        }
+        println("program created for cards " + program);
+        return program;
     }
 }
 

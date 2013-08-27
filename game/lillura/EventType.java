@@ -9,7 +9,8 @@ public enum EventType {
     
     ROBOT_ACTION_COMPLETED,
 
-    PLAY_PROGRAM,
+    PLAY_ROBOT_PROGRAM,
+    ROBOT_PROGRAM_COMPLETED,
     
     SWITCH_TO_VIEW_0,  
     SWITCH_TO_VIEW_1,  

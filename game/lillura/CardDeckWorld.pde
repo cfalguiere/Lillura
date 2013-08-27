@@ -71,36 +71,36 @@ class CardDeckWorld extends World implements MessageSubscriber  {
   // World construction
   //
     
-  void createDeck() {      
-      cards = new CardGroup(this, deckBoundingBox); 
-      register(cards);
-      subscribe(cards, POCodes.Button.LEFT, deckBoundingBox);
-      
-      CardDeckCanvas cardDeck = new CardDeckCanvas(deckBoundingBox, cards); 
-      register(cardDeck);
-      
-      PVector position3D = new PVector(deckBoundingBox.getPosition().x, deckBoundingBox.getPosition().y, -1);
-      Rectangle mouseMarker = new Rectangle(position3D, deckBoundingBox.getWidth() -12, 1);
-      
-      cardMouseMarker = new CardDeckMouseMarker(mouseMarker, cards);
-      register(cardMouseMarker);
-      
-      cardDeckMouseController =  new CardDeckMouseController(cardDeck, cards, this, messenger);
-      subscribe(cardDeckMouseController, POCodes.Button.LEFT, deckBoundingBox);
-      
-      cardDeckPerceptualController =  new CardDeckPerceptualController(cardDeck, cards, this, messenger);
-      messenger.subscribe(cardDeckPerceptualController);
-  }
+    void createDeck() {      
+        cards = new CardGroup(this, deckBoundingBox); 
+        register(cards);
+        subscribe(cards, POCodes.Button.LEFT, deckBoundingBox);
+        
+        CardDeckCanvas cardDeck = new CardDeckCanvas(deckBoundingBox, cards); 
+        register(cardDeck);
+        
+        PVector position3D = new PVector(deckBoundingBox.getPosition().x, deckBoundingBox.getPosition().y, -1);
+        Rectangle mouseMarker = new Rectangle(position3D, deckBoundingBox.getWidth() -12, 1);
+        
+        cardMouseMarker = new CardDeckMouseMarker(mouseMarker, cards);
+        register(cardMouseMarker);
+        
+        cardDeckMouseController =  new CardDeckMouseController(cardDeck, cards, this, messenger);
+        subscribe(cardDeckMouseController, POCodes.Button.LEFT, deckBoundingBox);
+        
+        cardDeckPerceptualController =  new CardDeckPerceptualController(cardDeck, cards, this, messenger);
+        messenger.subscribe(cardDeckPerceptualController);
+    }
 
-  void resetDeck() {
-       cards.destroy();
-       createDeck();
-  }
-
-
-  void replayDeck() {
-    RobotProgram program = cards.makeProgram();
-    messenger.sendMessage(new ActionMessage(EventType.PLAY_PROGRAM, program));
-  }
+    void resetDeck() {
+         cards.destroy();
+         createDeck();
+    }
+  
+  
+    void replayDeck() {
+        RobotProgram program = cards.makeProgram();
+        messenger.sendMessage(new ActionMessage(EventType.PLAY_ROBOT_PROGRAM, program));
+    }
 }
 
