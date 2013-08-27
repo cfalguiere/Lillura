@@ -7,6 +7,7 @@
  * https://github.com/rdlester/hermes/wiki/Tutorial-Pt.-1:-Worlds-and-Beings
  */
 
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.LinkedList;
 import java.util.Iterator;
 

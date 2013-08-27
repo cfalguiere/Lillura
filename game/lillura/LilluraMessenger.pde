@@ -6,13 +6,15 @@ public class LilluraMessenger {
   PerCSensor perCSensor;
   */
   // subscriber
-  private final ArrayList<MessageSubscriber> messageSubscribers;
+  //private final ArrayList<MessageSubscriber> messageSubscribers;
+  private final ConcurrentLinkedQueue<MessageSubscriber> messageSubscribers;
   // message queue
   private LinkedList<ActionMessage> actionMessageQueue;
   private LinkedList<PerCMessage> perCMessageQueue;
 
   LilluraMessenger() {
-    messageSubscribers = new ArrayList<MessageSubscriber>();
+    //messageSubscribers = new ArrayList<MessageSubscriber>();
+    messageSubscribers = new ConcurrentLinkedQueue<MessageSubscriber>();
     actionMessageQueue = new LinkedList<ActionMessage>();
     perCMessageQueue = new LinkedList<PerCMessage>();
     /*
@@ -38,12 +40,13 @@ public class LilluraMessenger {
 
   protected void fireMessages() {
       while(!actionMessageQueue.isEmpty()) {
-          ActionMessage m = actionMessageQueue.poll();
+          ActionMessage m = null;
+          synchronized(actionMessageQueue) {
+              m = actionMessageQueue.poll();
+          }
           println("firing message " + m);
-          synchronized(messageSubscribers) {
-              for(MessageSubscriber subscriber : messageSubscribers) {
-                  subscriber.actionSent(m);
-              }
+          for(MessageSubscriber subscriber : messageSubscribers) {
+              subscriber.actionSent(m);
           }
       }
   }
