@@ -35,11 +35,11 @@ class GameLevelWorld extends World  implements MessageSubscriber {
       
       createTerrain(); //TODO draw borders
   
+      createGoal();
+      
       createBlocks();
       
       createRobot();
-      
-      createGoal();
       
       // TODO origin
       
@@ -124,8 +124,7 @@ class GameLevelWorld extends World  implements MessageSubscriber {
     }
 
     void replayLevel(RobotProgram program) {
-        println("requesting a replay of the level");
-        robot.handleReplay(program);
+        robot.handleReplay();
     }
 
     
@@ -209,6 +208,8 @@ class GridLayoutManager {
     final float surfaceHeight;
     final int nrCols;
     final int nrLines;
+    
+    PVector goalCoordinates;
   
     GridLayoutManager(PVector anOrigin, float aTerrainWidth, float aTerrainHeight) {
         surfaceWidth = aTerrainWidth - GRID_WIDTH_OFFSET*2;
@@ -225,27 +226,38 @@ class GridLayoutManager {
         int nrLinesOfBlocks = nrLines - TOP_LINES_OFFSET - BOTTOM_LINES_OFFSET;
         for (int ic=0; ic<nrCols; ic++) {
            for (int il=0; il<nrLinesOfBlocks; il++) {
-             float remainingCells = (nrLinesOfBlocks-il-1) + (nrCols-ic-1)*nrLinesOfBlocks;
-             float rate = remainingBlocks/remainingCells;
-             float dice =  random(1) ;
-             //println("ic=" + ic + "/" + nrCols + " il=" + il + "/" + nrLinesOfBlocks + " dice=" + dice + " remainingBlocks=" + remainingBlocks + " rate=" + rate + " remainingCells=" + remainingCells);
-             boolean hasBlock = dice <  rate;
-             if (hasBlock && remainingBlocks>0) {
-                 PVector cellCoordinate = new PVector(ic, il + TOP_LINES_OFFSET);
-                 cellCoordinates.add(cellCoordinate);
-                 remainingBlocks--;
-             }
+             if (! isNearGoal(ic, il)) {
+               float remainingCells = (nrLinesOfBlocks-il-1) + (nrCols-ic-1)*nrLinesOfBlocks;
+               if (hasBlock(remainingBlocks, remainingCells)  && remainingBlocks>0) {
+                   PVector cellCoordinate = new PVector(ic, il + TOP_LINES_OFFSET);
+                   cellCoordinates.add(cellCoordinate);
+                   remainingBlocks--;
+               }
+             } 
            }
        }
        return cellCoordinates;
     }
     
+    private boolean hasBlock(int remainingBlocks, float remainingCells) { 
+         float rate = remainingBlocks/remainingCells;
+         float dice =  random(1) ;
+         return dice <  rate;
+    }
+    
+    private boolean isNearGoal(int ic, int il) {
+      boolean isNextLine = (il == 0);
+      boolean isNearColumn = (ic >= goalCoordinates.x-1) && (ic <= goalCoordinates.x+1);
+      return isNextLine && isNearColumn;
+    }
+      
     
     PVector computeGoalCoordinate() {
         randomSeed(millis());
         int goalLine = 0;
         int dice =  int(random(1, nrCols-1));
-        return new PVector(dice, goalLine);
+        goalCoordinates =  new PVector(dice, goalLine);
+        return goalCoordinates;
     }
     
     PVector computeRobotCoordinate() {
