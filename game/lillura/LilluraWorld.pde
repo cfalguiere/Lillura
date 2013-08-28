@@ -2,7 +2,7 @@
  * Template World
  * You'll need to add stuff to setup().
  */
-class LilluraWorld extends World {
+class LilluraWorld extends World implements MessageSubscriber {
   
   HashMap<String, Rectangle>  boundingBoxes;
   Rectangle headerBoundingBox;
@@ -21,6 +21,7 @@ class LilluraWorld extends World {
 
   void setup() {
       //IMPORTANT: put all other setup hereterBeing(TemplateBeing);
+      messenger.subscribe(this);
 
       PerceptualEventEmulatorController perceptualEmulator =  new PerceptualEventEmulatorController(this, messenger);
       subscribe(perceptualEmulator, POCodes.Button.RIGHT);
@@ -36,11 +37,25 @@ class LilluraWorld extends World {
       
       createMenu();
     
-      createHand();
-            
       println("Lillura world set up");
   }
 
+    //
+    // behavior implementation 
+    //
+    void actionSent(ActionMessage message) {
+        switch(message.eventType) {
+            case PERCEPTUAL_AVAILABLE:
+                createHand();
+                break;
+            default:
+                 // ignore other events
+          }
+    }
+    
+    void perCChanged(PerCMessage event) {
+      // don't care
+    }
 
   //
   // World construction

@@ -3,8 +3,6 @@ acquire data from the camera and dispatch to subscribers
 */
 public class LilluraMessenger {
   
-  PerCSensor perCSensor;
-  
   // subscriber
   //private final ArrayList<MessageSubscriber> messageSubscribers;
   private final ConcurrentLinkedQueue<MessageSubscriber> messageSubscribers;
@@ -17,23 +15,14 @@ public class LilluraMessenger {
     messageSubscribers = new ConcurrentLinkedQueue<MessageSubscriber>();
     actionMessageQueue = new LinkedList<ActionMessage>();
     perCMessageQueue = new LinkedList<PerCMessage>();
-    
-    try {  //FIXME move elsewhere
-        perCSensor = new PerCSensor(this);
-        println("Initialized Perceptual features");
-    } catch(Exception e) {
-        println("Could not initialize Perceptual features" + e);
-    }
+
     println("Messenger created");
   }
   
   void setup() {
-    perCSensor.setup();
-    println("Messenger set up");
   }
   
   public void checkMessages() {
-    perCSensor.acquireEvents();
     fireMessages();
     firePerCChanged();
   } 

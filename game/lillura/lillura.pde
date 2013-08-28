@@ -61,7 +61,7 @@ static final String CARD_DECK_BBOX = "CDBB";
 
 LilluraWorld mainWorld;
 MessengerWorld messengerWorld;
-//PerCWorld perCWorld;
+PerceptualWorld perceptualWorld;
 GameLevelWorld gameLevelWorld;
 CardDeckWorld cardDeckWorld;
 
@@ -77,8 +77,8 @@ void setup() {
     messengerWorld = new MessengerWorld(PORT_IN+1, PORT_OUT+1);
     messengerWorld.start();
   
-    //perCWorld = new PerCWorld(PORT_IN+1, PORT_OUT+1);
-    //perCWorld.start(); // this should be the last line in setup() method
+    perceptualWorld = new PerceptualWorld(PORT_IN+4, PORT_OUT+4, messengerWorld.getMessenger());
+    perceptualWorld.start(); 
   
     HashMap<String, Rectangle> boundingBoxes = new HashMap<String, Rectangle>();
     int lpY = VRT_SPACER*2 + HEADER_HEIGHT;

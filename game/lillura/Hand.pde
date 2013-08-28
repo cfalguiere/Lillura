@@ -92,7 +92,7 @@ class Hand extends Being implements MessageSubscriber {
 //
 
 class HandCanvas extends Being implements MessageSubscriber {
-  boolean isOn = true;
+  boolean isPerceptualOn = true;
   
   HandCanvas(int x, int y, int w, int h) {
         super(new Rectangle(x, y, w, h));
@@ -108,19 +108,19 @@ class HandCanvas extends Being implements MessageSubscriber {
         noStroke();
         _shape.draw();
         
-        if (isOn) 
-          fill(color(0,256,0));
+        if (isPerceptualOn) 
+            fill(color(0,256,0));
         else 
-          fill(color(256,0,0));
+            fill(color(256,0,0));
         textSize(10);  
-        text((isOn?"ON":"OFF"), 5, 10);
+        text((isPerceptualOn?"ON":"OFF"), 5, 10);
         
   }
   
     void actionSent(ActionMessage message) {
         switch(message.eventType) {
-            case PERCEPTUAL_MODE_SWITCH:
-                isOn = ! isOn;
+            case PERCEPTUAL_SWITCH:
+                isPerceptualOn = ! isPerceptualOn;
                 println("Perceptual switched mode");
                 break;
         }
