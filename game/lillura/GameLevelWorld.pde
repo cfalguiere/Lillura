@@ -37,9 +37,9 @@ class GameLevelWorld extends World  implements MessageSubscriber {
   
       createGoal();
       
-      createBlocks();
-      
       createRobot();
+      
+      createBlocks();
       
       // TODO origin
       
@@ -234,6 +234,7 @@ class GridLayoutManager {
     final int nrLines;
     
     PVector goalCoordinates;
+    PVector robotCoordinates;
     PVector cellSize;
   
     GridLayoutManager(PVector anOrigin, float aTerrainWidth, float aTerrainHeight) {
@@ -252,7 +253,7 @@ class GridLayoutManager {
         int nrLinesOfBlocks = nrLines - TOP_LINES_OFFSET - BOTTOM_LINES_OFFSET;
         for (int ic=0; ic<nrCols; ic++) {
            for (int il=0; il<nrLinesOfBlocks; il++) {
-             if (! isNearGoal(ic, il)) {
+             if (! isNearGoal(ic, il) && ! isNearRobot(ic, il)) {
                float remainingCells = (nrLinesOfBlocks-il-1) + (nrCols-ic-1)*nrLinesOfBlocks;
                if (hasBlock(remainingBlocks, remainingCells)  && remainingBlocks>0) {
                    PVector cellCoordinate = new PVector(ic, il + TOP_LINES_OFFSET);
@@ -277,6 +278,12 @@ class GridLayoutManager {
       return isNextLine && isNearColumn;
     }
       
+    private boolean isNearRobot(int ic, int il) {
+      boolean isNextLine = (il >= robotCoordinates.y-2);
+      boolean isNearColumn = (ic >= robotCoordinates.x-1) && (ic <= robotCoordinates.x+1);
+      return isNextLine && isNearColumn;
+    }
+      
     
     PVector computeGoalCoordinate() {
         randomSeed(millis());
@@ -289,7 +296,8 @@ class GridLayoutManager {
     PVector computeRobotCoordinate() {
         int robotLine = nrLines-1;
         int robotCol = int(nrCols/2);
-        return new PVector(robotCol, robotLine);
+        robotCoordinates =  new PVector(robotCol, robotLine);
+        return robotCoordinates;
     }
     
     
