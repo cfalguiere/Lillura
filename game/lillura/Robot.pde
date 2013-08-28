@@ -377,7 +377,7 @@ class RobotOperation {
   }
   
   String toString() {
-    return "[ RobotOperation " + movementType.name() + " " + distance + " ]";
+    return "RobotOperation:[ " + movementType.name() + " " + distance + " ]";
   }
 }
 
@@ -405,7 +405,7 @@ class RobotProgram {
   }  
   
   String toString() {
-    return "[ RobotProgram " + program.size() + " operations ]";
+    return "RobotProgram:[ " + program.size() + " operations ]";
   }
 }
 
@@ -453,10 +453,15 @@ class RobotProgramPlayer {
        if (currentLine == program.getNbLines()) {
             whenProgramCompleted();
         } else {
-            currentOperation = program.getOperation(currentLine);
-            remainingDistance = int(currentOperation.distance * cellSize.x); //FIXME won't work if cell is not square
-            runFirstStep();
-            println(this);
+            try {
+                currentOperation = program.getOperation(currentLine);
+                println("starting " + currentOperation);
+                remainingDistance = int(currentOperation.distance * cellSize.x); //FIXME won't work if cell is not square
+                runFirstStep();
+                println(this);
+            } catch (IndexOutOfBoundsException e) {
+                whenProgramCompleted(); //FIXME can't figure out why
+            }
         }
         currentLine++;
      }
@@ -472,7 +477,7 @@ class RobotProgramPlayer {
     }
     
     String toString() {
-        return "[ RobotProgramPlayer " + currentLine + " of " + program + " " +  (isCompleted?"DONE":"RUNNING") +" ]";
+        return "RobotProgramPlayer:[ " + currentLine + " of " + program + " " +  (isCompleted?"DONE":"RUNNING") +" ]";
     }
   
 }
