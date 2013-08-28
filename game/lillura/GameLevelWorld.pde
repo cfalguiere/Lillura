@@ -70,6 +70,14 @@ class GameLevelWorld extends World  implements MessageSubscriber {
     //
     void actionSent(ActionMessage message) {
         switch(message.eventType) {
+            case NOTIFICATION_PLAYER_LOST:
+                robot.handleStop();
+                println("after crashed " + robot);
+                break;
+            case NOTIFICATION_PLAYER_WON:
+                robot.handleCompleted();
+                println("after complete game " + robot);
+                break;
             case COMMAND_NEWGAME:
                 resetLevel();
                 break;

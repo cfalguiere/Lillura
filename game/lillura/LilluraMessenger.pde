@@ -20,23 +20,20 @@ public class LilluraMessenger {
     
     try {  //FIXME move elsewhere
         perCSensor = new PerCSensor(this);
+        println("Initialized Perceptual features");
     } catch(Exception e) {
-        println("Could not initialize Perceptual " + e);
+        println("Could not initialize Perceptual features" + e);
     }
     println("Messenger created");
   }
   
   void setup() {
-    /*
     perCSensor.setup();
-    */
     println("Messenger set up");
   }
   
   public void checkMessages() {
-    /*
     perCSensor.acquireEvents();
-    */
     fireMessages();
     firePerCChanged();
   } 
@@ -84,7 +81,7 @@ public class LilluraMessenger {
   }
 
   synchronized public void sendPerCMessage(PerCMessage event) {
-    println("received capture");
+    //println("received capture");
     perCMessageQueue.add(event);
   }
   

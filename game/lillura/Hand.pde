@@ -57,7 +57,7 @@ class Hand extends Being implements MessageSubscriber {
   }
 
   void perCChanged(PerCMessage handSensor) {
-    println("received perc changed " + handSensor);
+    //println("received perc changed " + handSensor);
     openness = handSensor.openness;
     
     handX = flipXAxisAndScale(handSensor.x); 

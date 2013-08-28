@@ -11,8 +11,6 @@ class LilluraWorld extends World {
   
   LilluraMessenger messenger = null;  
   
-  //GameLevel _gameLevel;  
-  
   LilluraWorld(int portIn, int portOut, HashMap<String, Rectangle> allBoundingBoxes,  LilluraMessenger theMessenger) {
       super(portIn, portOut);
       boundingBoxes = allBoundingBoxes;

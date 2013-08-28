@@ -28,7 +28,7 @@ class PerCSensor {
     }
   }
   
-  void acquireEvents() { //TODO buimd the status message
+  void acquireEvents() { //TODO build the status message
       if(session.AcquireFrame(false))
       {
           PerCMessage event = null;

@@ -92,6 +92,7 @@ class Robot extends Being  {
   
   public void handleStop() {
       robotState.state = RobotState.CRASHED;
+        robotDirection.pause(); //FIXME
   }
   
   public void handleCompleted() {
@@ -99,6 +100,7 @@ class Robot extends Being  {
          notifyActionCompleted();
          robotState.state = RobotState.PARKED;
       }
+        robotDirection.pause(); //FIXME
   }
   
     public void handleReset() {
@@ -160,7 +162,7 @@ class Robot extends Being  {
     }
     
     String toString() {
-        return "Robot:[ " + robotState + " " + robotDirection + " position:" + _position + " ]";
+        return "Robot:[ " + robotState + " " + robotDirection + " velocity:" + _velocity + " position:" + _position + " ]";
     }
 
 }
@@ -203,6 +205,7 @@ class RobotDirection {
     static final int SPEED = 1;
     static final float DEFAULT_ORIENTATION = -HALF_PI; 
     final PVector UP_VELOCITY  = PVector.fromAngle(DEFAULT_ORIENTATION); // (0,-1)
+    final PVector NO_VELOCITY  = new PVector(0,0);
 
     float orientation;
     PVector velocity;
@@ -213,6 +216,10 @@ class RobotDirection {
     
     void reset() {
         forward();   
+    }
+    
+    void pause() {
+        velocity = NO_VELOCITY;   
     }
     
     void forward() {
@@ -502,12 +509,14 @@ class RobotTracker extends Being {
     private void completedAction(RobotAction currentAction) {
         PVector startCoordinates = grid.getCoordinates(currentAction.startPosition);
         currentAction.startCoordinates = startCoordinates;
-        println("startCoordinates " + startCoordinates);
+        //println("startCoordinates " + startCoordinates);
         PVector endCoordinates = grid.getCoordinates(currentAction.endPosition);
         currentAction.endCoordinates = endCoordinates;
-        println("endCoordinates " + endCoordinates);
+        //println("endCoordinates " + endCoordinates);
         
-        messenger.sendMessage(new ActionMessage(EventType.ROBOT_ACTION_COMPLETED, currentAction));
+        if (endCoordinates.dist(startCoordinates) > 0 ) {
+            messenger.sendMessage(new ActionMessage(EventType.ROBOT_ACTION_COMPLETED, currentAction));
+        }
     }
 
     public void draw() {
