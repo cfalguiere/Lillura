@@ -59,9 +59,8 @@ class Terrain extends Being {
     protected void drawGrid() {
         pushMatrix();
         translate(-_shape.getBoundingBox().getAbsMin().x, -_shape.getBoundingBox().getAbsMin().y);
-        //println("showing grid");
         for (PVector cell : cells) {
-          stroke(192);
+          stroke(232);
           line(cell.x, cell.y, cell.x+cellWidth, cell.y );
           line(cell.x, cell.y, cell.x, cell.y+cellHeight );
         }
