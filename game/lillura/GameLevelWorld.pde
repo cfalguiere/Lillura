@@ -131,6 +131,7 @@ class GameLevelWorld extends World  implements MessageSubscriber {
     void restartLevel() {
         println("requesting level to restart");
         robot.handleReset();
+        blocks.resetAllBlocks();
     }
 
     void replayLevel(RobotProgram program) {

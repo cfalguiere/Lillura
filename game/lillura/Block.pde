@@ -53,6 +53,10 @@ class Block extends Being {
     _stroke = true;
   }
  
+  public void reset() {
+    _stroke = false;
+  }
+ 
 }
 
 //
@@ -80,6 +84,13 @@ class BlockGroup extends Group<Block> {
       _world.register(b);
       add(b);
       blocks.add(b);
+  }
+  
+
+  public void resetAllBlocks() {
+      for (Block b : getObjects()) {
+          b.reset();
+      }
   }
   
 
