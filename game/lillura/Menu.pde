@@ -56,11 +56,13 @@ class MenuButton extends Being {
     }
   
     public void draw() {
+        pushMatrix();
         if (_shape.getBoundingBox().contains(mouseX, mouseY)) {
             drawBackground();
         }   
         drawIcon();
         drawText();
+        popMatrix();
     }
   
     protected void drawBackground() {
