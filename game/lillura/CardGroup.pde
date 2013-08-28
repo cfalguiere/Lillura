@@ -77,12 +77,14 @@ class CardGroup extends Group<Card> {
   
 
     void moveCardTo(Card card, int newPos) {
-      int currentPos = getObjects().indexOf(card);
-      getObjects().add(newPos, card);
-      if(newPos < currentPos) currentPos++;
-      getObjects().remove(currentPos);
-      
-      resetCardsPosition();
+        int currentPos = getObjects().indexOf(card);
+        if (currentPos >= 0) {
+            getObjects().add(newPos, card);
+            if(newPos < currentPos) currentPos++;
+            getObjects().remove(currentPos);
+            
+            resetCardsPosition();
+        }
     }
   
     void removeCard(Card card) {
