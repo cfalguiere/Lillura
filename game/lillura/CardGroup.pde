@@ -63,9 +63,9 @@ class CardGroup extends Group<Card> {
        return selectedCardIndex;
     }
   
-    Card getCard(int i) throws IllegalStateException  {
+    Card getCard(int i) throws IllegalArgumentException  {
        if (i >= getObjects().size()) {
-           IllegalStateException e = new IllegalStateException("No card found at position " + i);
+           IllegalArgumentException e = new IllegalArgumentException("No card found at position " + i);
            e.printStackTrace();
            throw e;
        }

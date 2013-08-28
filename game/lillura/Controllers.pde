@@ -242,7 +242,7 @@ class PerceptualEventEmulatorController extends Controller {
           EventType et = null;
           
           float distance = currentMousePosition.dist(lastMousePosition);
-          println("distance " + distance);
+          //println("distance " + distance);
           if ( distance > width*0.1) {
               et = (lastMousePosition.x > currentMousePosition.x) ? EventType.PERCEPTUAL_SWIPE_LEFT : EventType.PERCEPTUAL_SWIPE_RIGHT;
           } else {
@@ -405,11 +405,11 @@ class CardDeckController extends Controller {
     
     void selectCurrentCard() {
         if (hoverPosition >= 0) {
-            println("hover position " + hoverPosition);
+            //println("hover position " + hoverPosition);
             actionCardIndex = int(hoverPosition);
-            println("selected card at " + actionCardIndex);
+            //println("selected card at " + actionCardIndex);
             Card card = cards.getCard(actionCardIndex);
-            println("selected card is "  + card);
+            //println("selected card is "  + card);
             card.select();
         }
     }
@@ -418,9 +418,9 @@ class CardDeckController extends Controller {
         if (actionCardIndex >= 0) {
             Card card = cards.getCard(actionCardIndex);
             float index = cards.getCardIndexForMouse(mouseY);
-            println("releasing card at index " + index);
+            //println("releasing card at index " + index);
             int newPos = (index == int(index)) ? floor(index) : ceil(index);
-            println("releasing card at pos " + newPos);
+            //println("releasing card at pos " + newPos);
             cards.moveCardTo(card, newPos);
             card.deselect();
             actionCardIndex = -1;
@@ -483,15 +483,15 @@ class CardDeckPerceptualController extends CardDeckController {
     }
 
     void perCChanged(PerCMessage handSensor) {
-      if (! isActive) return;
-      
-          println(" card deck sensor " );
-      if (handSensor.isHandOpen() && !handSensor.isTooFar()) {
-          println(" card deck y " + handSensor.y);
-          hoverPosition = -1;
-      } else {
-          hoverPosition = -1;    
-      }
+        if (! isActive) return;
+        
+            println(" card deck sensor " );
+        if (handSensor.isHandOpen() && !handSensor.isTooFar()) {
+            println(" card deck y " + handSensor.y);
+            hoverPosition = -1;
+        } else {
+            hoverPosition = -1;    
+        }
     }
 
     void actionSent(ActionMessage message) {
@@ -566,16 +566,16 @@ class ViewFocusPerceptualController extends Controller {
     }
     
     void incrementActivePos() {
-      int newPos = (activePos + 1) % nbPos;
-      println("inc activePos " + activePos + " newPos " + newPos);
-      activePos = newPos;
+        int newPos = (activePos + 1) % nbPos;
+        //println("inc activePos " + activePos + " newPos " + newPos);
+        activePos = newPos;
     }
 
     
     void decrementActivePos() {
-      int newPos = (activePos - 1 + nbPos) % nbPos;
-      println("dec activePos " + activePos + " newPos " + newPos);
-      activePos = newPos;
+        int newPos = (activePos - 1 + nbPos) % nbPos;
+        //println("dec activePos " + activePos + " newPos " + newPos);
+        activePos = newPos;
     }
 
 }
