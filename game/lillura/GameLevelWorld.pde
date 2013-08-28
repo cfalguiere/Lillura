@@ -70,6 +70,9 @@ class GameLevelWorld extends World  implements MessageSubscriber {
     //
     void actionSent(ActionMessage message) {
         switch(message.eventType) {
+             case PERCEPTUAL_AVAILABLE:
+                createPerceptualControllerForRobot();
+                break;
             case NOTIFICATION_PLAYER_LOST:
                 robot.handleStop();
                 println("after crashed " + robot);
@@ -192,12 +195,15 @@ class GameLevelWorld extends World  implements MessageSubscriber {
       subscribe(robotKeyMovementController, POCodes.Key.RIGHT);
       subscribe(robotKeyMovementController, POCodes.Key.SPACE);
       
-      robotPerceptualMovementController =  new RobotPerceptualMovementController(robot, this, messenger);
-      messenger.subscribe(robotPerceptualMovementController);
-      
       terrain.setDeparture(grid.getPosition(coordinates));
 
   }
+  
+    void createPerceptualControllerForRobot() {     
+        robotPerceptualMovementController =  new RobotPerceptualMovementController(robot, this, messenger);
+        messenger.subscribe(robotPerceptualMovementController);
+    }
+
   
   void createGoal() { 
       PVector position = getGoalPosition();

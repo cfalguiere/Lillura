@@ -4,7 +4,8 @@ class CardDeckWorld extends World implements MessageSubscriber  {
     
     LilluraMessenger messenger = null;  
     CardGroup cards;
-  
+    CardDeckCanvas cardDeck;
+
     CardDeckMouseMarker cardMouseMarker;
   
     CardDeckMouseController cardDeckMouseController;
@@ -18,7 +19,9 @@ class CardDeckWorld extends World implements MessageSubscriber  {
 
     void preUpdate() {
         cardDeckMouseController.preUpdate();
-        cardDeckPerceptualController.preUpdate();
+        if ( cardDeckPerceptualController != null) {
+            cardDeckPerceptualController.preUpdate();
+        }
     }
   
   void setup() {
@@ -35,6 +38,9 @@ class CardDeckWorld extends World implements MessageSubscriber  {
   //
     void actionSent(ActionMessage message) {
         switch (message.eventType) {
+             case PERCEPTUAL_AVAILABLE:
+                createPerceptualControllerForCardDeck();
+                break;
             case ROBOT_ACTION_COMPLETED :
                 cards.addCard(message.robotAction.movementType, message.robotAction.distance());
                 break;
@@ -76,7 +82,7 @@ class CardDeckWorld extends World implements MessageSubscriber  {
         register(cards);
         subscribe(cards, POCodes.Button.LEFT, deckBoundingBox);
         
-        CardDeckCanvas cardDeck = new CardDeckCanvas(deckBoundingBox, cards); 
+        cardDeck = new CardDeckCanvas(deckBoundingBox, cards); 
         register(cardDeck);
         
         PVector position3D = new PVector(deckBoundingBox.getPosition().x, deckBoundingBox.getPosition().y, -1);
@@ -87,12 +93,14 @@ class CardDeckWorld extends World implements MessageSubscriber  {
         
         cardDeckMouseController =  new CardDeckMouseController(cardDeck, cards, this, messenger);
         subscribe(cardDeckMouseController, POCodes.Button.LEFT, deckBoundingBox);
-        
+    }
+
+    void createPerceptualControllerForCardDeck() {
         cardDeckPerceptualController =  new CardDeckPerceptualController(cardDeck, cards, this, messenger);
         cardDeckPerceptualController.disable();
         messenger.subscribe(cardDeckPerceptualController);
     }
-
+    
     void resetDeck() {
         cardDeckMouseController.reset();
         cardDeckPerceptualController.reset();
