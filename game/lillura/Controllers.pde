@@ -249,6 +249,9 @@ class PerceptualEventEmulatorController extends Controller {
                 case POCodes.Key.O:
                     messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_HAND_OPEN));
                     break;
+                case POCodes.Key.P:
+                    messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_MODE_SWITCH));
+                    break;
               default:
                   // ignore other events
             }
@@ -264,6 +267,7 @@ class PerceptualEventEmulatorController extends Controller {
 class RobotPerceptualMovementController extends Controller {
     Robot robot;
     float lastMouseX;
+    boolean isOn = true;
     
     RobotPerceptualMovementController(Robot aRobot, World aParentWorld, LilluraMessenger theMessenger) {
         super(aParentWorld, theMessenger);
@@ -272,6 +276,7 @@ class RobotPerceptualMovementController extends Controller {
   
     void perCChanged(PerCMessage handSensor) {
       if (! isActive) return;
+      if (! isOn) return;
       
       //if (isReplaying) return;
   
@@ -286,26 +291,37 @@ class RobotPerceptualMovementController extends Controller {
         if (! isActive) return;
 
         switch(message.eventType) {
-            case PERCEPTUAL_HAND_OPEN:
-                robot.handleGoOn();
-                break;
-            case PERCEPTUAL_HAND_CLOSE:
-                robot.handlePause();
-                break;
-            case PERCEPTUAL_HAND_MOVED_CENTER:
-                robot.handleGoOn();
-                break;
-            case PERCEPTUAL_HAND_MOVED_RIGHT:
-                robot.handleTurnRight();
-                break;
-            case PERCEPTUAL_HAND_MOVED_LEFT:
-                robot.handleTurnLeft();
-                break;
-            case PERCEPTUAL_HAND_MOVED_BOTTOM_LEFT:
-                robot.handleReset();
+            case PERCEPTUAL_MODE_SWITCH:
+                isOn = ! isOn;
+                println("Perceptual switched mode");
                 break;
             default:
                 // ignore other events
+        }
+        
+        if (isOn) {
+            switch(message.eventType) {
+                case PERCEPTUAL_HAND_OPEN:
+                    robot.handleGoOn();
+                    break;
+                case PERCEPTUAL_HAND_CLOSE:
+                    robot.handlePause();
+                    break;
+                case PERCEPTUAL_HAND_MOVED_CENTER:
+                    robot.handleGoOn();
+                    break;
+                case PERCEPTUAL_HAND_MOVED_RIGHT:
+                    robot.handleTurnRight();
+                    break;
+                case PERCEPTUAL_HAND_MOVED_LEFT:
+                    robot.handleTurnLeft();
+                    break;
+                case PERCEPTUAL_HAND_MOVED_BOTTOM_LEFT:
+                    robot.handleReset();
+                    break;
+                default:
+                    // ignore other events
+            }
         }
     }
 }
@@ -395,12 +411,15 @@ class CardDeckMouseController extends CardDeckController {
 //
 
 class CardDeckPerceptualController extends CardDeckController {
+    boolean isOn = true;
     
     CardDeckPerceptualController(CardDeckCanvas aCardDeckCanvas, CardGroup aCardGroup, World aParentWorld, LilluraMessenger theMessenger) {
         super(aCardDeckCanvas, aCardGroup, aParentWorld, theMessenger);
     }
 
     public void preUpdate() {
+        if (! isOn) return;
+
         if (! isActive) {
            hoverPosition = -1;
           return;
@@ -413,15 +432,25 @@ class CardDeckPerceptualController extends CardDeckController {
         if (! isActive) return;
 
         switch(message.eventType) {
-            case PERCEPTUAL_HAND_OPEN:
-                deselectCurrentCard();
+            case PERCEPTUAL_MODE_SWITCH:
+                isOn = ! isOn;
+                println("Perceptual switched mode");
                 break;
-            case PERCEPTUAL_HAND_CLOSE:
-                selectCurrentCard();
-                break;
-            default:
-                // ignore other events
         }
+
+        if (isOn) {
+            switch(message.eventType) {
+                case PERCEPTUAL_HAND_OPEN:
+                    deselectCurrentCard();
+                    break;
+                case PERCEPTUAL_HAND_CLOSE:
+                    selectCurrentCard();
+                    break;
+                default:
+                    // ignore other events
+            }
+        }
+        
     }
 
 }

@@ -26,6 +26,7 @@ class LilluraWorld extends World {
       subscribe(perceptualEmulator, POCodes.Button.RIGHT);
       subscribe(perceptualEmulator, POCodes.Key.C);
       subscribe(perceptualEmulator, POCodes.Key.O);
+      subscribe(perceptualEmulator, POCodes.Key.P);
 
       ViewFocusPerceptualController viewFocusController =  new ViewFocusPerceptualController(3, this, messenger);
       viewFocusController.setActivePos(1);
@@ -89,6 +90,7 @@ class LilluraWorld extends World {
       int y = (int)(WINDOW_HEIGHT - h) - VRT_SPACER;
       HandCanvas handCanvas = new HandCanvas(x, y, w, h);
       register(handCanvas);
+      messenger.subscribe(handCanvas);
       
       Hand hand = new Hand(0, y, w, h);
       register(hand);

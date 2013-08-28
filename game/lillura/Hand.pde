@@ -74,7 +74,8 @@ class Hand extends Being implements MessageSubscriber {
 // HandCanvas : manage the background
 //
 
-class HandCanvas extends Being {
+class HandCanvas extends Being implements MessageSubscriber {
+  boolean isOn = true;
   
   HandCanvas(int x, int y, int w, int h) {
         super(new Rectangle(x, y, w, h));
@@ -89,7 +90,28 @@ class HandCanvas extends Being {
         fill(HAND_BG);
         noStroke();
         _shape.draw();
+        
+        if (isOn) 
+          fill(color(0,256,0));
+        else 
+          fill(color(256,0,0));
+        textSize(10);  
+        text((isOn?"ON":"OFF"), 5, 10);
+        
   }
+  
+    void actionSent(ActionMessage message) {
+        switch(message.eventType) {
+            case PERCEPTUAL_MODE_SWITCH:
+                isOn = ! isOn;
+                println("Perceptual switched mode");
+                break;
+        }
+    }
+    
+    void perCChanged(PerCMessage handSensor) {
+    }
+
 }
 
 
