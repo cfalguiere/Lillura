@@ -2,6 +2,7 @@ class CardGroup extends Group<Card> {
     Rectangle boundingBox;
     Rectangle usedBoundingBox;
     PVector offset;
+    PFont font;
   
     int selectedCardIndex;
   
@@ -11,6 +12,8 @@ class CardGroup extends Group<Card> {
       usedBoundingBox = new Rectangle(aBoundingBox.getPosition(), aBoundingBox.getWidth(), 0);
       
       offset = new PVector(0, Card.HEIGHT + VRT_SPACER);
+      font = createFont("Verdana", 12); //FIXME creates a font per button
+
     }
 
     public void update() {
@@ -32,7 +35,7 @@ class CardGroup extends Group<Card> {
     public void addCard(MovementType movementType, int aDistance) {
       int pos = size();
   
-      Card c = new Card(getCardPosition(pos) , movementType, aDistance);
+      Card c = new Card(getCardPosition(pos) , movementType, aDistance, font);
       _world.register(c);
       add(c);
       
@@ -48,6 +51,10 @@ class CardGroup extends Group<Card> {
       return position;
     }
 
+    PFont getFont() {
+        return font;
+    }
+    
     public void setSelectedCardIndex(int index) {
        selectedCardIndex = index;
     }

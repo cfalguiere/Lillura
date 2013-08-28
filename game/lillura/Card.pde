@@ -9,13 +9,15 @@ class Card extends Being {
   boolean isSelected = false;
   HashMap<MovementType, CardShapeArrow> shapes;
   CardShapeForward shapeForward;
+  PFont font;
 
-  Card(PVector position, MovementType aMovementType, int aDistance) {
+  Card(PVector position, MovementType aMovementType, int aDistance, PFont aFont) {
       super(new Rectangle(position, WIDTH, HEIGHT));
       //Add your constructor info here
       println("creating card at " + position);
       movementType = aMovementType;
       distance = aDistance;
+      font = aFont;
       
       Rectangle boundingBox = new Rectangle(position, WIDTH, HEIGHT);
       shapes = new HashMap<MovementType, CardShapeArrow>();
@@ -50,9 +52,12 @@ class Card extends Being {
       cardShape.draw();
       
       fill(0);
-      textSize(8);
-      String label = movementType.name() + " " + distance;
+      textFont(font);
+      textSize(6);
+      String label = movementType.name(); // + " " + distance;
       text(label, 5, HEIGHT - 8);
+      textSize(18);
+      text(distance, WIDTH*0.8, HEIGHT - 8);
   }
    
   public String toString() {
