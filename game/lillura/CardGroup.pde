@@ -63,7 +63,12 @@ class CardGroup extends Group<Card> {
        return selectedCardIndex;
     }
   
-    Card getCard(int i) {
+    Card getCard(int i) throws IllegalStateException  {
+       if (i >= getObjects().size()) {
+           IllegalStateException e = new IllegalStateException("No card found at position " + i);
+           e.printStackTrace();
+           throw e;
+       }
        return getObjects().get(i);
     }
     
@@ -76,7 +81,7 @@ class CardGroup extends Group<Card> {
     }
   
 
-    void moveCardTo(Card card, int newPos) {
+    void moveCardTo(Card card, int newPos) throws IllegalStateException {
         int currentPos = getObjects().indexOf(card);
         if (currentPos >= 0) {
             getObjects().add(newPos, card);
@@ -84,7 +89,7 @@ class CardGroup extends Group<Card> {
             getObjects().remove(currentPos);
             
             resetCardsPosition();
-        }
+        } else throw new IllegalStateException("Card does not exist " + card);
     }
   
     void removeCard(Card card) {

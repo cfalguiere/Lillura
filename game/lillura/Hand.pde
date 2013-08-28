@@ -13,6 +13,7 @@ class Hand extends Being implements MessageSubscriber {
   float openness;
   boolean _isTooFar;
   int _c;
+  String label = "";
 
   Hand(int x, int y, int w, int h) {
     super(new Rectangle(x, y, w, h));
@@ -43,18 +44,34 @@ class Hand extends Being implements MessageSubscriber {
   }
 
 
-  public void draw() {
-    fill(_c); 
-    ellipse(handX, handY, handW, handH);
-  }
+    public void draw() {
+        pushMatrix();
+        fill(_c); 
+        noStroke();
+        ellipse(handX, handY, handW, handH);
+        
+        textSize(15);
+        text(label, handX - 10, handY - 30); // FIXME magic numbers
+        popMatrix();
+    }
   
   //
   // behavior
   //
   
-  void actionSent(ActionMessage event) {
-    // don't care
-  }
+    void actionSent(ActionMessage message) {
+        switch(message.eventType) {
+            case PERCEPTUAL_THUMB_UP:
+                label = "Go! !";
+                break;
+            case PERCEPTUAL_HAND_MOVED_CLOSER:
+                label = "Go! O";
+                break;
+            default:
+                label = "";
+                break;
+        }
+    }
 
   void perCChanged(PerCMessage handSensor) {
     //println("received perc changed " + handSensor);

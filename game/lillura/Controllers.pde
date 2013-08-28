@@ -38,6 +38,10 @@ class Controller extends HObject implements MessageSubscriber {
         isActive = false;
         println("Controller " + getClass().getName() + " is disabled");
     }
+    
+    String toString() {
+        return getClass().getName() + ":[ " + (isActive?"ACTIVE":"INACTIVE") + " ]";
+    }
 }
 
 
@@ -268,6 +272,7 @@ class RobotPerceptualMovementController extends Controller {
     Robot robot;
     float lastMouseX;
     boolean isOn = true;
+    EventType handOpennessStatus;
     
     RobotPerceptualMovementController(Robot aRobot, World aParentWorld, LilluraMessenger theMessenger) {
         super(aParentWorld, theMessenger);
@@ -278,7 +283,7 @@ class RobotPerceptualMovementController extends Controller {
       if (! isActive) return;
       if (! isOn) return;
       
-      //if (isReplaying) return;
+      if (! robot.robotState.isSteerable()) return;
   
       if (handSensor.isHandOpen() && !handSensor.isTooFar()) {
           robot.handleGoOn();
@@ -300,28 +305,58 @@ class RobotPerceptualMovementController extends Controller {
         }
         
         if (isOn) {
-            switch(message.eventType) {
-                case PERCEPTUAL_HAND_OPEN:
-                    robot.handleGoOn();
-                    break;
-                case PERCEPTUAL_HAND_CLOSE:
-                    robot.handlePause();
-                    break;
-                case PERCEPTUAL_HAND_MOVED_CENTER:
-                    robot.handleGoOn();
-                    break;
-                case PERCEPTUAL_HAND_MOVED_RIGHT:
-                    robot.handleTurnRight();
-                    break;
-                case PERCEPTUAL_HAND_MOVED_LEFT:
-                    robot.handleTurnLeft();
-                    break;
-                case PERCEPTUAL_HAND_MOVED_BOTTOM_LEFT:
-                    robot.handleReset();
-                    break;
-                default:
-                    // ignore other events
-            }
+          switch(message.eventType) {
+              case PERCEPTUAL_THUMB_UP:
+                  if (robot.robotState.isOff()) {
+                      robot.handleGoOn();
+                      robot.handlePause();
+                  }
+                  break;
+              case PERCEPTUAL_HAND_MOVED_CLOSER:
+                  if (handOpennessStatus == EventType.PERCEPTUAL_HAND_OPEN) {
+                      if (robot.robotState.isOff()) {
+                          robot.handleGoOn();
+                          robot.handlePause();
+                      } else {
+                          robot.handleGoOn();
+                      }
+                  }
+                  break;
+            default:
+                // ignore other events
+          }
+        }
+        
+        if (isOn && robot.robotState.isSteerable()) {
+            handleRoboMovementEvents(message);
+        }
+
+    }
+    
+    private void handleRoboMovementEvents(ActionMessage message) {
+        switch(message.eventType) {
+            case PERCEPTUAL_HAND_OPEN:
+                robot.handleGoOn();
+                handOpennessStatus = message.eventType;
+                break;
+            case PERCEPTUAL_HAND_CLOSE:
+                robot.handlePause();
+                handOpennessStatus = message.eventType;
+                break;
+            case PERCEPTUAL_HAND_MOVED_CENTER:
+                robot.handleGoOn();
+                break;
+            case PERCEPTUAL_HAND_MOVED_RIGHT:
+                robot.handleTurnRight();
+                break;
+            case PERCEPTUAL_HAND_MOVED_LEFT:
+                robot.handleTurnLeft();
+                break;
+            case PERCEPTUAL_HAND_MOVED_BOTTOM_LEFT:
+                robot.handleReset();
+                break;
+            default:
+                // ignore other events
         }
     }
 }
@@ -343,6 +378,10 @@ class CardDeckController extends Controller {
         super(aParentWorld, theMessenger);
         cards = aCardGroup;
         cardDeckCanvas = aCardDeckCanvas;
+    }
+    
+    void reset() {
+        actionCardIndex = -1;
     }
     
     void selectCurrentCard() {
@@ -437,20 +476,24 @@ class CardDeckPerceptualController extends CardDeckController {
                 println("Perceptual switched mode");
                 break;
         }
-
-        if (isOn) {
-            switch(message.eventType) {
-                case PERCEPTUAL_HAND_OPEN:
-                    deselectCurrentCard();
-                    break;
-                case PERCEPTUAL_HAND_CLOSE:
-                    selectCurrentCard();
-                    break;
-                default:
-                    // ignore other events
-            }
-        }
         
+        try {
+            if (isOn) {
+                switch(message.eventType) {
+                    case PERCEPTUAL_HAND_OPEN:
+                        deselectCurrentCard();
+                        break;
+                    case PERCEPTUAL_HAND_CLOSE:
+                        selectCurrentCard();
+                        break;
+                    default:
+                        // ignore other events
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            println("controller " + this);
+        }  
     }
 
 }
@@ -520,4 +563,3 @@ class ViewFocusPerceptualController extends Controller {
 }
 
 
-//TODO add focus controller 

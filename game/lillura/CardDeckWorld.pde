@@ -89,12 +89,15 @@ class CardDeckWorld extends World implements MessageSubscriber  {
         subscribe(cardDeckMouseController, POCodes.Button.LEFT, deckBoundingBox);
         
         cardDeckPerceptualController =  new CardDeckPerceptualController(cardDeck, cards, this, messenger);
+        cardDeckPerceptualController.disable();
         messenger.subscribe(cardDeckPerceptualController);
     }
 
     void resetDeck() {
-         cards.destroy();
-         createDeck();
+        cardDeckMouseController.reset();
+        cardDeckPerceptualController.reset();
+        cards.destroy();
+        createDeck();
     }
   
   

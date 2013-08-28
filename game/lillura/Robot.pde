@@ -172,12 +172,13 @@ class Robot extends Being  {
 //
 
 public class  RobotState {
-    static final int WAITING = 0;
-    static final int STEERABLE = 1;
-    static final int REPLAYING = 2;
-    static final int CRASHED = 3;
-    static final int PARKED = 4;
-    final String[] labels = {"WAITING", "STEERABLE", "REPLAYING", "CRASHED", "PARKED"};
+    static final int OFF = 0;
+    static final int WAITING = 1;
+    static final int STEERABLE = 2;
+    static final int REPLAYING = 3;
+    static final int CRASHED = 4;
+    static final int PARKED = 5;
+    final String[] labels = {"OFF", "WAITING", "STEERABLE", "REPLAYING", "CRASHED", "PARKED"};
     int state;
     
     RobotState() {
@@ -185,11 +186,19 @@ public class  RobotState {
     }
     
     void reset() {
-        state = WAITING;
+        state = OFF;
     }
     
     boolean canMove() {
         return state == STEERABLE || state == REPLAYING;
+    }
+    
+    boolean isSteerable() {
+        return state == STEERABLE  || state == WAITING;
+    }
+    
+    boolean isOff() {
+        return state == OFF;
     }
     
     String toString() {
