@@ -79,7 +79,7 @@ class GameLevelWorld extends World  implements MessageSubscriber {
             case PLAY_ROBOT_PROGRAM:
                 replayLevel(message.program);
                 println("robot ready for replay " + robot);
-                robotProgramPlayer = new RobotProgramPlayer(robot, message.program, messenger);
+                robotProgramPlayer = new RobotProgramPlayer(robot, message.program, grid.getCellSize(), messenger);
                 println("replay player setup " + robotProgramPlayer);
                 break;
             case ROBOT_PROGRAM_COMPLETED:
@@ -164,13 +164,14 @@ class GameLevelWorld extends World  implements MessageSubscriber {
   
 
   void createRobot() {     
-      RobotPath robotPath = new RobotPath(worldBoundingBox);
-      register(robotPath);
     
+      RobotTracker robotTracker = new RobotTracker(worldBoundingBox, messenger, grid);
+      register(robotTracker);
+      
       PVector coordinates = grid.computeRobotCoordinate();
       PVector position = grid.getPositionBottomCentered(coordinates, Robot.WIDTH, Robot.HEIGHT);
       position.add(new PVector(0, GridLayoutManager.GRID_HEIGHT_OFFSET*1/6));
-      robot = new Robot(position, this, messenger, robotPath);
+      robot = new Robot(position, this, robotTracker);
       register(robot);
       
       robotMouseMovementController =  new RobotMouseMovementController(robot, this, messenger);
@@ -225,6 +226,7 @@ class GridLayoutManager {
     final int nrLines;
     
     PVector goalCoordinates;
+    PVector cellSize;
   
     GridLayoutManager(PVector anOrigin, float aTerrainWidth, float aTerrainHeight) {
         surfaceWidth = aTerrainWidth - GRID_WIDTH_OFFSET*2;
@@ -232,6 +234,7 @@ class GridLayoutManager {
         nrCols = (int)(surfaceWidth / GRID_CELL_WIDTH);
         nrLines = (int)(surfaceHeight / GRID_CELL_HEIGHT);
         origin = anOrigin;
+        cellSize = new PVector (GRID_CELL_WIDTH, GRID_CELL_HEIGHT);
     }
     
     ArrayList<PVector> computeBlockCoordinates(int numberOfBlocks) {
@@ -314,5 +317,16 @@ class GridLayoutManager {
        position.add(new PVector(hrzOffset, vertOffset));
        return position;
     }
+
+    PVector getCoordinates(PVector position) {
+       int x = floor( (position.x - origin.x - GRID_WIDTH_OFFSET) / GRID_CELL_WIDTH);
+       int y = floor( (position.y - origin.y - GRID_HEIGHT_OFFSET) / GRID_CELL_HEIGHT);
+       return new PVector(x,y);
+    }
+
+    PVector getCellSize() {
+       return cellSize;
+    }
+
 
 }

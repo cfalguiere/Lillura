@@ -2,41 +2,38 @@
  * Template being
  */
 class Robot extends Being  {
-  static final int WIDTH = 30;
-  static final int HEIGHT = 30;
-
-  LilluraMessenger messenger;
-
-  PVector zero;
+    static final int WIDTH = 30;
+    static final int HEIGHT = 30;
   
-  RobotState robotState;
-  RobotDirection robotDirection;
-  RobotShape robotShape;
+    PVector zero;
+    
+    RobotState robotState;
+    RobotDirection robotDirection;
+    RobotShape robotShape;
+  
+    RobotAction currentAction;
+    RobotAction previousAction;
+    RobotTracker robotTracker;
+    int nbSteps;
 
-  RobotAction currentAction;
-  RobotAction previousAction;
-  RobotPath robotPath;
-  int nbSteps;
-
-  Robot(PVector position, World w, LilluraMessenger theMessenger, RobotPath aRobotPath) {  
-      super(new Rectangle(position, WIDTH, HEIGHT));
-      messenger = theMessenger;
-      robotPath = aRobotPath;
-
-      //Add your constructor info here
-      println("creating robot");
-      
-      zero = new PVector();
-      zero.set(position);
-
-      robotState = new RobotState();
-      robotDirection = new RobotDirection();
-      robotShape = new RobotShape(new Rectangle(position, WIDTH, HEIGHT), robotDirection, robotState);
-      
-      previousAction = new RobotAction(MovementType.NONE, millis(), position);
-      
-      nbSteps = 0;
-  }
+    Robot(PVector position, World w, RobotTracker aRobotTracker) {  
+        super(new Rectangle(position, WIDTH, HEIGHT));
+        robotTracker = aRobotTracker;
+  
+        //Add your constructor info here
+        println("creating robot");
+        
+        zero = new PVector();
+        zero.set(position);
+  
+        robotState = new RobotState();
+        robotDirection = new RobotDirection();
+        robotShape = new RobotShape(new Rectangle(position, WIDTH, HEIGHT), robotDirection, robotState);
+        
+        previousAction = new RobotAction(MovementType.NONE, millis(), position);
+        
+        nbSteps = 0;
+    }
   
   public void update() {
     if (robotState.canMove()) {
@@ -45,7 +42,7 @@ class Robot extends Being  {
         _position.add(_velocity);
         //println("robot after update " + this);
         nbSteps = (nbSteps + 1) % 10;
-        if (nbSteps == 0) robotPath.trackPath(_position);
+        if (nbSteps == 0) robotTracker.trackPath(_position);
     } else {
         _velocity.set(new PVector(0,0));
     }
@@ -67,21 +64,19 @@ class Robot extends Being  {
   
   public void handlePause() {
       robotState.state = RobotState.WAITING;
-      sendActionCompleted();
+      notifyActionCompleted();
       currentAction = new RobotAction(MovementType.NONE, millis(), _position);
   }
   
   public void handleTurnRight() {
-      robotPath.trackPath(_position);
-      sendActionCompleted();
+      notifyActionCompleted();
       currentAction = new RobotAction(MovementType.TURN_RIGHT, millis(), _position);
       robotState.state = RobotState.STEERABLE;
       robotDirection.turnRight();
   }
   
   public void handleTurnLeft() {
-      robotPath.trackPath(_position);
-      sendActionCompleted();
+      notifyActionCompleted();
       currentAction = new RobotAction(MovementType.TURN_LEFT, millis(), _position);
       robotState.state = RobotState.STEERABLE;
       robotDirection.turnLeft();
@@ -101,7 +96,7 @@ class Robot extends Being  {
   
   public void handleCompleted() {
       if (robotState.state != RobotState.PARKED) {
-         sendActionCompleted();
+         notifyActionCompleted();
          robotState.state = RobotState.PARKED;
       }
   }
@@ -110,7 +105,7 @@ class Robot extends Being  {
         currentAction = new RobotAction(MovementType.NONE, millis(), _position);
         previousAction = currentAction;
         _position.set(zero);
-        robotPath.reset();
+        robotTracker.reset();
         nbSteps = 0;
         robotState.reset();
         robotDirection.reset();
@@ -128,18 +123,18 @@ class Robot extends Being  {
     }
    
    
-    private void sendActionCompleted() {
-      if (currentAction != null) currentAction.endPosition = _position;
+    public float  getOrientation() {
+      return robotDirection.orientation;
+    }
+
+    private void notifyActionCompleted() {
+      if (currentAction != null) currentAction.endPosition =  _position;
       if (currentAction != null && currentAction.movementType != MovementType.NONE) {
-           //println("SEND " + currentAction.movementType.name() + " " + currentAction.startPosition + " -> " +  currentAction.endPosition  + " distance " + currentAction.distance());
-           messenger.sendMessage(new ActionMessage(EventType.ROBOT_ACTION_COMPLETED, currentAction));
+           robotTracker.completedAction(currentAction);
            previousAction = currentAction;
       }
     }
 
-    public float  getOrientation() {
-      return robotDirection.orientation;
-    }
     
     public RobotAction  getCurrentAction() {
       return currentAction;
@@ -340,6 +335,8 @@ class RobotAction {
   long timeStarted;
   PVector startPosition;
   PVector endPosition;
+  PVector startCoordinates;
+  PVector endCoordinates;
   
   RobotAction(MovementType aMovementType, long theTimeStarted, PVector theStartPosition) {
     movementType = aMovementType;
@@ -352,8 +349,12 @@ class RobotAction {
     return movementType != aMovementType || timeStarted+STABILIZER <  aTime;
   }
   
-  int distance() {
+  int actualDistance() {
     return int(abs(startPosition.x -  endPosition.x + startPosition.y -  endPosition.y));
+  }
+  
+  int distance() {
+    return int(abs(startCoordinates.x -  endCoordinates.x + startCoordinates.y -  endCoordinates.y));
   }
   
   String toString() {
@@ -415,15 +416,18 @@ class RobotProgram {
 class RobotProgramPlayer {
     LilluraMessenger messenger;
     RobotProgram program;
+    PVector cellSize;
     Robot robot;
+    
     int currentLine = 0;
     RobotOperation currentOperation;
     int remainingDistance;
     boolean isCompleted;
     
-    RobotProgramPlayer(Robot aRobot, RobotProgram aProgram, LilluraMessenger theMessenger) {
+    RobotProgramPlayer(Robot aRobot, RobotProgram aProgram, PVector aCellSize, LilluraMessenger theMessenger) {
         program = aProgram;
         robot = aRobot;
+        cellSize = aCellSize;
         messenger = theMessenger;
         
         currentLine = 0;
@@ -450,7 +454,7 @@ class RobotProgramPlayer {
             whenProgramCompleted();
         } else {
             currentOperation = program.getOperation(currentLine);
-            remainingDistance = currentOperation.distance;
+            remainingDistance = int(currentOperation.distance * cellSize.x); //FIXME won't work if cell is not square
             runFirstStep();
             println(this);
         }
@@ -473,16 +477,34 @@ class RobotProgramPlayer {
   
 }
 
-class RobotPath extends Being {
+
+
+class RobotTracker extends Being {
+    LilluraMessenger messenger;
+
     ConcurrentLinkedQueue<PVector> path;
     PVector translation;
+    GridLayoutManager grid;
     
-    RobotPath(Rectangle aBoundingBox) {
+    RobotTracker(Rectangle aBoundingBox, LilluraMessenger theMessenger, GridLayoutManager aGrid) {
         super(aBoundingBox);
+        grid = aGrid;
+        messenger = theMessenger;
         path = new ConcurrentLinkedQueue<PVector>();
         translation = new PVector(- _shape.getBoundingBox().getAbsMin().x + Robot.WIDTH/2, - _shape.getBoundingBox().getAbsMin().y + Robot.HEIGHT/2);
     }
-    
+
+    private void completedAction(RobotAction currentAction) {
+        PVector startCoordinates = grid.getCoordinates(currentAction.startPosition);
+        currentAction.startCoordinates = startCoordinates;
+        println("startCoordinates " + startCoordinates);
+        PVector endCoordinates = grid.getCoordinates(currentAction.endPosition);
+        currentAction.endCoordinates = endCoordinates;
+        println("endCoordinates " + endCoordinates);
+        
+        messenger.sendMessage(new ActionMessage(EventType.ROBOT_ACTION_COMPLETED, currentAction));
+    }
+
     public void draw() {
         stroke(color(256,0,0));
         strokeWeight(3);
