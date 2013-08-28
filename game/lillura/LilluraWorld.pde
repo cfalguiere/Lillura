@@ -23,11 +23,14 @@ class LilluraWorld extends World implements MessageSubscriber {
       //IMPORTANT: put all other setup hereterBeing(TemplateBeing);
       messenger.subscribe(this);
 
+      GeneralKeyController controller =  new GeneralKeyController(this, messenger);
+      subscribe(controller, POCodes.Key.D);
+      subscribe(controller, POCodes.Key.P);
+
       PerceptualEventEmulatorController perceptualEmulator =  new PerceptualEventEmulatorController(this, messenger);
       subscribe(perceptualEmulator, POCodes.Button.RIGHT);
       subscribe(perceptualEmulator, POCodes.Key.C);
       subscribe(perceptualEmulator, POCodes.Key.O);
-      subscribe(perceptualEmulator, POCodes.Key.P);
 
       ViewFocusPerceptualController viewFocusController =  new ViewFocusPerceptualController(3, this, messenger);
       viewFocusController.setActivePos(1);

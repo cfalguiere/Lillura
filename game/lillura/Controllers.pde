@@ -44,6 +44,36 @@ class Controller extends HObject implements MessageSubscriber {
     }
 }
 
+//
+//
+//
+
+class GeneralKeyController extends Controller { 
+
+    GeneralKeyController(World aParentWorld, LilluraMessenger theMessenger) {
+        super(aParentWorld, theMessenger);
+    }
+  
+    public void receive(KeyMessage m) { //FIXME generates a command, and update do the switch
+        int code = m.getKeyCode();
+        if (m.isPressed()) {
+            switch (code) {
+                case POCodes.Key.D:
+                    messenger.sendMessage(new ActionMessage(EventType.DEBUG_MODE));
+                    break;
+                case POCodes.Key.P:
+                    messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_SWITCH));
+                    break;
+              default:
+                  // ignore other events
+            }
+        }
+    }   
+  
+}
+
+
+
 
 //
 // RobotMouseMovementController : listen to Mouse events and control the robot movement
@@ -253,9 +283,6 @@ class PerceptualEventEmulatorController extends Controller {
                 case POCodes.Key.O:
                     messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_HAND_OPEN));
                     break;
-                case POCodes.Key.P:
-                    messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_SWITCH));
-                    break;
               default:
                   // ignore other events
             }
@@ -263,6 +290,8 @@ class PerceptualEventEmulatorController extends Controller {
     }   
   
 }
+
+
 
 //
 // RobotPerceptualMovementController : listen to perceptual events and control the robot movement

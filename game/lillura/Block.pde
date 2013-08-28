@@ -12,7 +12,7 @@ class Block extends Being {
         super(new Rectangle(aPosition, aWidth, aHeight));
         _c = pc;
         //Add your constructor info here
-        println("creating bloc at " + aPosition);
+        //println("creating bloc at " + aPosition);
         
         initializeHouse(aWidth, aHeight);
   }

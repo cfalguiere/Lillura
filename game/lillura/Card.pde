@@ -14,7 +14,7 @@ class Card extends Being {
   Card(PVector position, MovementType aMovementType, int aDistance, PFont aFont) {
       super(new Rectangle(position, WIDTH, HEIGHT));
       //Add your constructor info here
-      println("creating card at " + position);
+      //println("creating card at " + position);
       movementType = aMovementType;
       distance = aDistance;
       font = aFont;

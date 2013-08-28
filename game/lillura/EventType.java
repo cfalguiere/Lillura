@@ -1,6 +1,9 @@
 public enum EventType {
     NONE,
-    COMMAND_NEWGAME, //TODO new game / restart
+    
+    DEBUG_MODE, 
+    
+    COMMAND_NEWGAME, 
     COMMAND_RESTART, 
     COMMAND_PLAY, 
     

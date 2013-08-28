@@ -1,17 +1,15 @@
 /*
 acquire data from the camera and dispatch to subscribers
 */
-public class LilluraMessenger {
+public class LilluraMessenger implements MessageSubscriber {
   
-  // subscriber
-  //private final ArrayList<MessageSubscriber> messageSubscribers;
   private final ConcurrentLinkedQueue<MessageSubscriber> messageSubscribers;
-  // message queue
   private LinkedList<ActionMessage> actionMessageQueue;
   private LinkedList<PerCMessage> perCMessageQueue;
-
+  
+  boolean useDebugMode = false;
+  
   LilluraMessenger() {
-    //messageSubscribers = new ArrayList<MessageSubscriber>();
     messageSubscribers = new ConcurrentLinkedQueue<MessageSubscriber>();
     actionMessageQueue = new LinkedList<ActionMessage>();
     perCMessageQueue = new LinkedList<PerCMessage>();
@@ -20,6 +18,7 @@ public class LilluraMessenger {
   }
   
   void setup() {
+      subscribe(this);
   }
   
   public void checkMessages() {
@@ -33,21 +32,22 @@ public class LilluraMessenger {
           synchronized(actionMessageQueue) {
               m = actionMessageQueue.poll();
           }
-          println("firing message " + m);
+          
+          if (useDebugMode) println("firing message " + m);
           for(MessageSubscriber subscriber : messageSubscribers) {
               subscriber.actionSent(m);
           }
       }
   }
 
-  protected void firePerCChanged() {
-    while(!perCMessageQueue.isEmpty()) {
-      PerCMessage m = perCMessageQueue.poll();
-      for(MessageSubscriber subscriber : messageSubscribers) {
-        subscriber.perCChanged(m);
-      }
+    protected void firePerCChanged() {
+        while(!perCMessageQueue.isEmpty()) {
+            PerCMessage m = perCMessageQueue.poll();
+            for(MessageSubscriber subscriber : messageSubscribers) {
+                subscriber.perCChanged(m);
+            }
+        }
     }
-  }
   
   
   //
@@ -75,6 +75,22 @@ public class LilluraMessenger {
   }
   
   
+    //
+    // behavior implementation 
+    //
+    void actionSent(ActionMessage message) {
+        switch(message.eventType) {
+            case DEBUG_MODE:
+                useDebugMode = ! useDebugMode;
+                break;
+            default:
+                 // ignore other events
+          }
+    }
+    
+    void perCChanged(PerCMessage event) {
+      // don't care
+    }
 
 }
 
