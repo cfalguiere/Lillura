@@ -50,8 +50,8 @@ class Hand extends Being implements MessageSubscriber {
         noStroke();
         ellipse(handX, handY, handW, handH);
         
-        textSize(15);
-        text(label, handX - 10, handY - 30); // FIXME magic numbers
+        textSize(20);
+        text(label, handX, handY - 30); // FIXME magic numbers
         popMatrix();
     }
   
@@ -62,10 +62,10 @@ class Hand extends Being implements MessageSubscriber {
     void actionSent(ActionMessage message) {
         switch(message.eventType) {
             case PERCEPTUAL_THUMB_UP:
-                label = "Go! !";
+                label = "!";
                 break;
             case PERCEPTUAL_HAND_MOVED_CLOSER:
-                label = "Go! O";
+                label = "_";
                 break;
             default:
                 label = "";

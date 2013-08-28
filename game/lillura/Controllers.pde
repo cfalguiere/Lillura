@@ -310,6 +310,9 @@ class RobotPerceptualMovementController extends Controller {
                   if (robot.robotState.isOff()) {
                       robot.handleGoOn();
                       robot.handlePause();
+                  } else {
+                    robot.handlePause();
+                    robot.robotState.state = RobotState.OFF;
                   }
                   break;
               case PERCEPTUAL_HAND_MOVED_CLOSER:
@@ -465,6 +468,19 @@ class CardDeckPerceptualController extends CardDeckController {
         }
 
         hoverPosition = cards.getCardIndexForMouse(mouseY);
+    }
+
+    void perCChanged(PerCMessage handSensor) {
+      if (! isActive) return;
+      if (! isOn) return;
+      
+          println(" card deck sensor " );
+      if (handSensor.isHandOpen() && !handSensor.isTooFar()) {
+          println(" card deck y " + handSensor.y);
+          hoverPosition = -1;
+      } else {
+          hoverPosition = -1;    
+      }
     }
 
     void actionSent(ActionMessage message) {
