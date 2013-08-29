@@ -553,6 +553,7 @@ class ViewFocusPerceptualController extends Controller {
     int activePos;
     int nbPos;
     final ArrayList<ActionMessage> notificationMessages;
+    boolean isTrackingOn = false;
     
     ViewFocusPerceptualController(int aNbPos, World aParentWorld, LilluraMessenger theMessenger) {
         super(aParentWorld, theMessenger);
@@ -575,6 +576,9 @@ class ViewFocusPerceptualController extends Controller {
         if (! isActive) return;
 
         switch(message.eventType) {
+            case PERCEPTUAL_PEACE:
+                isTrackingOn  = true;
+                break;
             case PERCEPTUAL_HAND_MOVED_TOP_LEFT:
                  setActivePos(1);
                  messenger.sendMessage(new ActionMessage(EventType.SWITCH_TO_MENU));
@@ -595,6 +599,26 @@ class ViewFocusPerceptualController extends Controller {
                 break;
             default:
                 // ignore other events
+        }
+        
+        if (isTrackingOn) {
+            switch(message.eventType) {
+                case PERCEPTUAL_HAND_MOVED_LEFT:
+                     setActivePos(1);
+                     messenger.sendMessage(new ActionMessage(EventType.SWITCH_TO_MENU));
+                     isTrackingOn = false;
+                     break;
+                case PERCEPTUAL_HAND_MOVED_CENTER:
+                     setActivePos(2);
+                     messenger.sendMessage(new ActionMessage(EventType.SWITCH_TO_GAME_BOARD));
+                     isTrackingOn = false;
+                     break;
+                case PERCEPTUAL_HAND_MOVED_RIGHT:
+                     setActivePos(3);
+                     messenger.sendMessage(new ActionMessage(EventType.SWITCH_TO_CARD_DECK));
+                     isTrackingOn = false;
+                     break;
+            }
         }
     }
     
