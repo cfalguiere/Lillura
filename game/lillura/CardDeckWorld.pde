@@ -105,6 +105,7 @@ class CardDeckWorld extends World implements MessageSubscriber  {
         subscribe(cardDeckKeyController, POCodes.Key.S);
         subscribe(cardDeckKeyController, POCodes.Key.UP);
         subscribe(cardDeckKeyController, POCodes.Key.DOWN); 
+        subscribe(cardDeckKeyController, POCodes.Key.SPACE); 
         
         cardDeckMouseController =  new CardDeckMouseController(cardDeck, cards, cardMouseMarker, this, messenger);
         subscribe(cardDeckMouseController, POCodes.Button.LEFT, deckBoundingBox);

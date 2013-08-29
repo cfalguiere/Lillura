@@ -97,7 +97,11 @@ class CardDeckKeyController extends CardDeckController {
                    removeCurrentCard();
                   break;
               case POCodes.Key.SPACE:
-                   selectCurrentCard();
+                  if (actionCardIndex>=0) {
+                      deselectCurrentCard();
+                  } else {
+                      selectCurrentCard();
+                  }
                   break;
               default:
                   // go ahead
