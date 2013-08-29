@@ -83,13 +83,13 @@ class HeaderCanvas extends Being implements MessageSubscriber  {
          case COMMAND_PLAY :
              gameMessage = "Playing robot program ...";
              break;
-         case SWITCH_TO_VIEW_0:
+         case SWITCH_TO_MENU:
              activeArea = LEFT_PANEL_BBOX;
              break;
-         case SWITCH_TO_VIEW_1:
+         case SWITCH_TO_GAME_BOARD:
              activeArea = GAME_LEVEL_BBOX;
              break;
-         case SWITCH_TO_VIEW_2:
+         case SWITCH_TO_CARD_DECK:
              activeArea = CARD_DECK_BBOX;
              break;
          default :

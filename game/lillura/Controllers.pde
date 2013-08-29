@@ -552,10 +552,16 @@ class ViewFocusPerceptualController extends Controller {
     
     int activePos;
     int nbPos;
+    final ArrayList<ActionMessage> notificationMessages;
     
     ViewFocusPerceptualController(int aNbPos, World aParentWorld, LilluraMessenger theMessenger) {
         super(aParentWorld, theMessenger);
         nbPos = aNbPos;
+        
+        notificationMessages = new ArrayList<ActionMessage> ();
+        notificationMessages.add(new ActionMessage(EventType.SWITCH_TO_MENU));
+        notificationMessages.add(new ActionMessage(EventType.SWITCH_TO_GAME_BOARD));
+        notificationMessages.add(new ActionMessage(EventType.SWITCH_TO_CARD_DECK));
     }
 
     /**
@@ -571,22 +577,21 @@ class ViewFocusPerceptualController extends Controller {
         switch(message.eventType) {
             case PERCEPTUAL_HAND_MOVED_TOP_LEFT:
                  setActivePos(1);
+                 messenger.sendMessage(new ActionMessage(EventType.SWITCH_TO_MENU));
                  break;
             case PERCEPTUAL_HAND_MOVED_TOP_CENTER:
                  setActivePos(2);
+                 messenger.sendMessage(new ActionMessage(EventType.SWITCH_TO_GAME_BOARD));
                  break;
             case PERCEPTUAL_HAND_MOVED_TOP_RIGHT:
                  setActivePos(3);
+                 messenger.sendMessage(new ActionMessage(EventType.SWITCH_TO_CARD_DECK));
                  break;
             case PERCEPTUAL_SWIPE_LEFT:
                 incrementActivePos();
-                EventType et1 = EventType.valueOf("SWITCH_TO_VIEW_" + activePos); 
-                messenger.sendMessage(new ActionMessage(et1));
                 break;
             case PERCEPTUAL_SWIPE_RIGHT:
                 decrementActivePos();
-                EventType et2 = EventType.valueOf("SWITCH_TO_VIEW_" + activePos); 
-                messenger.sendMessage(new ActionMessage(et2));
                 break;
             default:
                 // ignore other events
@@ -597,6 +602,7 @@ class ViewFocusPerceptualController extends Controller {
         int newPos = (activePos + 1) % nbPos;
         //println("inc activePos " + activePos + " newPos " + newPos);
         activePos = newPos;
+        messenger.sendMessage(notificationMessages.get(activePos));
     }
 
     
@@ -604,7 +610,9 @@ class ViewFocusPerceptualController extends Controller {
         int newPos = (activePos - 1 + nbPos) % nbPos;
         //println("dec activePos " + activePos + " newPos " + newPos);
         activePos = newPos;
+        messenger.sendMessage(notificationMessages.get(activePos));
     }
+
 
 }
 

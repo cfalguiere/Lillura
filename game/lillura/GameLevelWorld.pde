@@ -38,6 +38,7 @@ class GameLevelWorld extends World  implements MessageSubscriber {
       createGoal();
       
       createRobot();
+      createPerceptualControllerForRobot();
       
       createBlocks();
       
@@ -71,7 +72,7 @@ class GameLevelWorld extends World  implements MessageSubscriber {
     void actionSent(ActionMessage message) {
         switch(message.eventType) {
              case PERCEPTUAL_AVAILABLE:
-                createPerceptualControllerForRobot();
+                //createPerceptualControllerForRobot();
                 break;
             case NOTIFICATION_PLAYER_LOST:
                 robot.handleStop();
@@ -97,19 +98,12 @@ class GameLevelWorld extends World  implements MessageSubscriber {
                 robot.handleStopReplay();
                 robotProgramPlayer = null;
                 break;
-            case PERCEPTUAL_HAND_MOVED_TOP_LEFT:
-            case PERCEPTUAL_HAND_MOVED_TOP_RIGHT:
-            case SWITCH_TO_VIEW_0:
-            case SWITCH_TO_VIEW_2:
-                robotPerceptualMovementController.disable();
-                robotKeyMovementController.disable();
-                hasPerceptualFocus = false;
+            case SWITCH_TO_GAME_BOARD:
+                gainFocus();
                 break;
-            case PERCEPTUAL_HAND_MOVED_TOP_CENTER:
-            case SWITCH_TO_VIEW_1:
-                robotPerceptualMovementController.enable();
-                robotKeyMovementController.enable();
-                hasPerceptualFocus = false;
+            case SWITCH_TO_MENU:
+            case SWITCH_TO_CARD_DECK:
+                lostFocus();
                 break;
             default:
                  // ignore other events
@@ -118,6 +112,18 @@ class GameLevelWorld extends World  implements MessageSubscriber {
     
     void perCChanged(PerCMessage event) {
       // don't care
+    }
+    
+    void gainFocus() {
+        robotPerceptualMovementController.enable();
+        robotKeyMovementController.enable();
+        hasPerceptualFocus = false; // FIXME ???
+    }
+    
+    void lostFocus() {
+        robotPerceptualMovementController.disable();
+        robotKeyMovementController.disable();
+        hasPerceptualFocus = false;
     }
   
     void resetLevel() {

@@ -27,6 +27,7 @@ class CardDeckWorld extends World implements MessageSubscriber  {
   void setup() {
       //IMPORTANT: put all other setup hereterBeing(TemplateBeing);
       createDeck();
+      createPerceptualControllerForCardDeck();
 
       messenger.subscribe(this);
     
@@ -39,7 +40,7 @@ class CardDeckWorld extends World implements MessageSubscriber  {
     void actionSent(ActionMessage message) {
         switch (message.eventType) {
              case PERCEPTUAL_AVAILABLE:
-                createPerceptualControllerForCardDeck();
+                //createPerceptualControllerForCardDeck();
                 break;
             case ROBOT_ACTION_COMPLETED :
                 cards.addCard(message.robotAction.movementType, message.robotAction.distance());
@@ -51,19 +52,12 @@ class CardDeckWorld extends World implements MessageSubscriber  {
             case COMMAND_PLAY :
                 replayDeck();
                 break;
-            case PERCEPTUAL_HAND_MOVED_TOP_RIGHT:
-            case SWITCH_TO_VIEW_2:
-                cardDeckMouseController.enable();
-                cardDeckPerceptualController.disable();
-                cardMouseMarker.setPerceptualMode(true);
+            case SWITCH_TO_CARD_DECK:
+                gainFocus();
                 break;
-            case PERCEPTUAL_HAND_MOVED_TOP_CENTER:
-            case PERCEPTUAL_HAND_MOVED_TOP_LEFT:
-            case SWITCH_TO_VIEW_0:
-            case SWITCH_TO_VIEW_1:
-                cardDeckMouseController.disable();
-                cardDeckPerceptualController.enable();
-                cardMouseMarker.setPerceptualMode(false);
+            case SWITCH_TO_GAME_BOARD:
+            case SWITCH_TO_MENU:
+                lostFocus();
                 break;
             default :
                 break;
@@ -73,9 +67,24 @@ class CardDeckWorld extends World implements MessageSubscriber  {
     void perCChanged(PerCMessage event) {
       // don't care
     }
-  //
-  // World construction
-  //
+    
+    
+    void gainFocus() {
+        cardDeckMouseController.disable();
+        cardDeckPerceptualController.enable();
+        cardMouseMarker.setPerceptualMode(true);
+    }
+
+    
+    void lostFocus() {
+        cardDeckMouseController.enable();
+        cardDeckPerceptualController.disable();
+        cardMouseMarker.setPerceptualMode(false);
+    }
+    
+    //
+    // World construction
+    //
     
     void createDeck() {      
         cards = new CardGroup(this, deckBoundingBox); 
