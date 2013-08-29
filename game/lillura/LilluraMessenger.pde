@@ -4,15 +4,15 @@ acquire data from the camera and dispatch to subscribers
 public class LilluraMessenger implements MessageSubscriber {
   
   private final ConcurrentLinkedQueue<MessageSubscriber> messageSubscribers;
-  private LinkedList<ActionMessage> actionMessageQueue;
-  private LinkedList<PerCMessage> perCMessageQueue;
+  private ConcurrentLinkedQueue<ActionMessage> actionMessageQueue;
+  private ConcurrentLinkedQueue<PerCMessage> perCMessageQueue;
   
   boolean useDebugMode = false;
   
   LilluraMessenger() {
     messageSubscribers = new ConcurrentLinkedQueue<MessageSubscriber>();
-    actionMessageQueue = new LinkedList<ActionMessage>();
-    perCMessageQueue = new LinkedList<PerCMessage>();
+    actionMessageQueue = new ConcurrentLinkedQueue<ActionMessage>();
+    perCMessageQueue = new ConcurrentLinkedQueue<PerCMessage>();
 
     println("Messenger created");
   }
@@ -61,15 +61,15 @@ public class LilluraMessenger implements MessageSubscriber {
     messageSubscribers.remove(subscriber);
   }
   
-  synchronized public void sendMessage(ActionMessage message) {
+  public void sendMessage(ActionMessage message) {
     actionMessageQueue.add(message);
   }
   
-  synchronized public void sendActionMessage(EventType eventType) {
+  public void sendActionMessage(EventType eventType) {
     actionMessageQueue.add(new ActionMessage(eventType));
   }
 
-  synchronized public void sendPerCMessage(PerCMessage event) {
+  public void sendPerCMessage(PerCMessage event) {
     //println("received capture");
     perCMessageQueue.add(event);
   }
