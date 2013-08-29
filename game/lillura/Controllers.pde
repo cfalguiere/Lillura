@@ -311,6 +311,9 @@ class PerceptualEventEmulatorController extends Controller {
                 case POCodes.Key.T:
                     messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_THUMB_UP));
                     break;
+                case POCodes.Key.F:
+                    messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_HAND_AWAY));
+                    break;
                 case POCodes.Key.H:
                     emulateHand();
                     break;
@@ -402,6 +405,9 @@ class RobotPerceptualMovementController extends Controller {
             case PERCEPTUAL_HAND_CLOSE:
                 robot.handlePause();
                 handOpennessStatus = message.eventType;
+                break;
+            case PERCEPTUAL_PEACE:
+                robot.robotState.state = RobotState.OFF;
                 break;
             case PERCEPTUAL_HAND_MOVED_CENTER:
                 robot.handleGoOn();
@@ -574,6 +580,10 @@ class CardDeckPerceptualController extends CardDeckController {
                     break;
                 case PERCEPTUAL_HAND_CLOSE:
                     selectCurrentCard();
+                    break;
+                case PERCEPTUAL_HAND_AWAY:
+                println("hand away");
+                    removeCurrentCard();
                     break;
                 default:
                     // ignore other events
