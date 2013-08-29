@@ -467,6 +467,35 @@ class CardDeckController extends Controller {
             actionCardIndex = -1;
         }
     }
+    
+    void removeCurrentCard() {
+        cards.removeSelectedCard();
+        actionCardIndex = -1;
+    }
+}
+
+class CardDeckKeyController extends CardDeckController {
+  
+    CardDeckKeyController(CardDeckCanvas aCardDeckCanvas, CardGroup aCardGroup, World aParentWorld, LilluraMessenger theMessenger) {
+        super(aCardDeckCanvas, aCardGroup, aParentWorld, theMessenger);
+    }
+    
+    public void receive(KeyMessage m) { //FIXME generates a command, and update do the switch
+      if (! isActive) return;
+
+      int code = m.getKeyCode();
+      if (m.isPressed()) {
+          switch (code) {
+              case POCodes.Key.S:
+                   removeCurrentCard();
+                  break;
+              default:
+                  // go ahead
+                  break;
+        }
+      }
+    }
+
 }
 
 //
@@ -491,16 +520,16 @@ class CardDeckMouseController extends CardDeckController {
     }
     
     public void receive(MouseMessage m) {
-       if (! isActive) return;
-
-      if (hoverPosition < 0) return;
-      
-      if (m.getAction() == POCodes.Click.PRESSED) {
-          selectCurrentCard();
-      }  
-      if (m.getAction() == POCodes.Click.RELEASED) {
-          deselectCurrentCard();
-      }  
+         if (! isActive) return;
+  
+        if (hoverPosition < 0) return;
+        
+        if (m.getAction() == POCodes.Click.PRESSED) {
+            selectCurrentCard();
+        }  
+        if (m.getAction() == POCodes.Click.RELEASED) {
+            deselectCurrentCard();
+        }  
     }
 
 }

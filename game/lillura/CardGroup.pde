@@ -92,10 +92,15 @@ class CardGroup extends Group<Card> {
         } else throw new IllegalStateException("Card does not exist " + card);
     }
   
-    void removeCard(Card card) {
-      int currentPos = getObjects().indexOf(card);
-      getObjects().remove(currentPos);    
-      resetCardsPosition();
+    void removeSelectedCard() {
+        if (selectedCardIndex>=0) {
+            Card card = getObjects().get(selectedCardIndex);
+            card.discard();
+            getObjects().remove(selectedCardIndex);    
+            selectedCardIndex = -1;
+            println("removing");
+            resetCardsPosition();
+        }
     }
   
     void resetCardsPosition() {

@@ -8,6 +8,7 @@ class CardDeckWorld extends World implements MessageSubscriber  {
 
     CardDeckMouseMarker cardMouseMarker;
   
+    CardDeckKeyController cardDeckKeyController;
     CardDeckMouseController cardDeckMouseController;
     CardDeckPerceptualController cardDeckPerceptualController;
     
@@ -99,6 +100,9 @@ class CardDeckWorld extends World implements MessageSubscriber  {
         
         cardMouseMarker = new CardDeckMouseMarker(mouseMarker, cards);
         register(cardMouseMarker);
+        
+        cardDeckKeyController =  new CardDeckKeyController(cardDeck, cards, this, messenger);
+        subscribe(cardDeckKeyController, POCodes.Key.S);
         
         cardDeckMouseController =  new CardDeckMouseController(cardDeck, cards, this, messenger);
         subscribe(cardDeckMouseController, POCodes.Button.LEFT, deckBoundingBox);

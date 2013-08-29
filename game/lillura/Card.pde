@@ -10,6 +10,7 @@ class Card extends Being {
   HashMap<MovementType, CardShapeArrow> shapes;
   CardShapeForward shapeForward;
   PFont font;
+  boolean isDiscarded = false;
 
   Card(PVector position, MovementType aMovementType, int aDistance, PFont aFont) {
       super(new Rectangle(position, WIDTH, HEIGHT));
@@ -39,6 +40,10 @@ class Card extends Being {
   }
   
   public void draw() {
+      if (isDiscarded)  return;
+      //FIXME reuse of dicarded cards
+      //FIXME create functions
+      
       if (isSelected) {
         fill(color(GREEN));
       } else {
@@ -59,10 +64,14 @@ class Card extends Being {
       textSize(18);
       text(distance, WIDTH*0.8, HEIGHT - 8);
   }
-   
-  public String toString() {
-    return movementType.name() + " " + distance;
-  }
+
+    void discard() {
+        isDiscarded = true;
+    }  
+     
+    public String toString() {
+      return movementType.name() + " " + distance;
+    }
   
 }
 
@@ -92,15 +101,14 @@ class CardShapeArrow {
     }
 
     public void draw() {
-      pushMatrix();
-      strokeWeight(3);
-      stroke(GREEN);
-      for (PVector v : vertices) {
-          line(origin.x, origin.y, v.x, v.y);
-      }
-      popMatrix();
+        pushMatrix();
+        strokeWeight(3);
+        stroke(GREEN);
+        for (PVector v : vertices) {
+            line(origin.x, origin.y, v.x, v.y);
+        }
+        popMatrix();
     }
-
 }
 
 class CardShapeForward extends CardShapeArrow {
