@@ -433,7 +433,7 @@ class RobotPerceptualMovementController extends Controller {
 //TODO move some card deck operations to gui List classes  
 //
 
-class CardDeckController extends Controller {
+class CardDeckController extends Controller { //FIXME synchronizaton of controllers
     CardGroup cards;
     CardDeckCanvas cardDeckCanvas;
 
@@ -452,16 +452,18 @@ class CardDeckController extends Controller {
     
     void selectCurrentCard() {
         if (hoverPosition >= 0) {
-            //println("hover position " + hoverPosition);
-            actionCardIndex = int(hoverPosition);
-            //println("selected card at " + actionCardIndex);
-            Card card = cards.getCard(actionCardIndex);
-            //println("selected card is "  + card);
-            card.select();
+            selectCard(int(hoverPosition));
         }
     }
     
-    void deselectCurrentCard() {
+    void selectCard(int pos) {
+        actionCardIndex = pos;
+        cards.setSelectedCardIndex(actionCardIndex);
+        Card card = cards.getCard(actionCardIndex);
+        card.select();
+    }
+    
+    void moveAndDeselectCurrentCard() {
         if (actionCardIndex >= 0) {
             Card card = cards.getCard(actionCardIndex);
             float index = cards.getCardIndexForMouse(mouseY);
@@ -469,6 +471,14 @@ class CardDeckController extends Controller {
             int newPos = (index == int(index)) ? floor(index) : ceil(index);
             //println("releasing card at pos " + newPos);
             cards.moveCardTo(card, newPos);
+            card.deselect();
+            actionCardIndex = -1;
+        }
+    }
+    
+    void deselectCurrentCard() {
+        if (actionCardIndex >= 0) {
+            Card card = cards.getCard(actionCardIndex);
             card.deselect();
             actionCardIndex = -1;
         }
@@ -492,6 +502,12 @@ class CardDeckKeyController extends CardDeckController {
       int code = m.getKeyCode();
       if (m.isPressed()) {
           switch (code) {
+              case POCodes.Key.UP:
+                  selectPreviousCard();
+                  break;
+              case POCodes.Key.DOWN:
+                  selectNextCard();
+                  break;
               case POCodes.Key.S:
                    removeCurrentCard();
                   break;
@@ -500,6 +516,28 @@ class CardDeckKeyController extends CardDeckController {
                   break;
         }
       }
+    }
+    
+    void selectPreviousCard() {
+        if (actionCardIndex >= 1) {
+            int previous = actionCardIndex -1;
+            if (actionCardIndex >= 0) {
+                deselectCurrentCard();
+            }
+            actionCardIndex = previous;
+            selectCard(actionCardIndex);
+       }
+    }
+
+    void selectNextCard() { //FIXME mhhh
+       if (actionCardIndex < cards.getNumberOfCards() -1 ) {
+            int next = actionCardIndex +1;
+            if (actionCardIndex >= 0) {
+                deselectCurrentCard();
+            }
+            actionCardIndex = next;
+            selectCard(actionCardIndex);
+        }
     }
 
 }
@@ -534,7 +572,7 @@ class CardDeckMouseController extends CardDeckController {
             selectCurrentCard();
         }  
         if (m.getAction() == POCodes.Click.RELEASED) {
-            deselectCurrentCard();
+            moveAndDeselectCurrentCard();
         }  
     }
 
@@ -576,7 +614,7 @@ class CardDeckPerceptualController extends CardDeckController {
         try {
              switch(message.eventType) {
                 case PERCEPTUAL_HAND_OPEN:
-                    deselectCurrentCard();
+                    moveAndDeselectCurrentCard();
                     break;
                 case PERCEPTUAL_HAND_CLOSE:
                     selectCurrentCard();

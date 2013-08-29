@@ -71,6 +71,7 @@ class CardDeckWorld extends World implements MessageSubscriber  {
     
     
     void gainFocus() {
+        cardDeckKeyController.enable();
         cardDeckMouseController.disable();
         cardDeckPerceptualController.enable();
         cardMouseMarker.setPerceptualMode(true);
@@ -78,6 +79,7 @@ class CardDeckWorld extends World implements MessageSubscriber  {
 
     
     void lostFocus() {
+        cardDeckKeyController.disable();
         cardDeckMouseController.enable();
         cardDeckPerceptualController.disable();
         cardMouseMarker.setPerceptualMode(false);
@@ -103,6 +105,8 @@ class CardDeckWorld extends World implements MessageSubscriber  {
         
         cardDeckKeyController =  new CardDeckKeyController(cardDeck, cards, this, messenger);
         subscribe(cardDeckKeyController, POCodes.Key.S);
+        subscribe(cardDeckKeyController, POCodes.Key.UP);
+        subscribe(cardDeckKeyController, POCodes.Key.DOWN); 
         
         cardDeckMouseController =  new CardDeckMouseController(cardDeck, cards, this, messenger);
         subscribe(cardDeckMouseController, POCodes.Button.LEFT, deckBoundingBox);
