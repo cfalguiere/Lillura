@@ -49,9 +49,11 @@ class PerceptualWorld extends World implements MessageSubscriber {
     //
     void actionSent(ActionMessage message) {
         switch(message.eventType) {
-            case PERCEPTUAL_SWITCH:
-                isPerceptualActive = ! isPerceptualActive;
-                println("Perceptual " + (isPerceptualActive?"ON":"OFF"));
+            case PERCEPTUAL_MODE_ON:
+                isPerceptualActive = true;
+                break;
+            case PERCEPTUAL_MODE_OFF:
+                isPerceptualActive = true;
                 break;
             default:
                  // ignore other events

@@ -50,6 +50,7 @@ class Controller extends HObject implements MessageSubscriber {
 
 class GeneralKeyController extends Controller { 
     boolean isDebugModeOn = false;
+    boolean isPerceptualModeOn = true;
 
     GeneralKeyController(World aParentWorld, LilluraMessenger theMessenger) {
         super(aParentWorld, theMessenger);
@@ -60,20 +61,33 @@ class GeneralKeyController extends Controller {
         if (m.isPressed()) {
             switch (code) {
                 case POCodes.Key.D:
-                    isDebugModeOn = ! isDebugModeOn;
-                    String label = (isDebugModeOn?"ON":"OFF");
-                    EventType et = EventType.valueOf("DEBUG_MODE_" + label);
-                    messenger.sendMessage(new ActionMessage(et));
-                    println("debug mode is now " + label);
+                    switchDebugMode();
                     break;
                 case POCodes.Key.P:
-                    messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_SWITCH));
+                    switchPerceptualMode();
                     break;
               default:
                   // ignore other events
             }
         }
     }   
+    
+    void switchDebugMode() {
+        isDebugModeOn = ! isDebugModeOn;
+        String label = (isDebugModeOn?"ON":"OFF");
+        EventType et = EventType.valueOf("DEBUG_MODE_" + label);
+        messenger.sendMessage(new ActionMessage(et));
+        println("debug mode is now " + label);
+    }
+  
+    
+    void switchPerceptualMode() {
+        isPerceptualModeOn = ! isPerceptualModeOn;
+        String pLabel = (isPerceptualModeOn?"ON":"OFF");
+        EventType et = EventType.valueOf("PERCEPTUAL_MODE_" + pLabel);
+        messenger.sendMessage(new ActionMessage(et));
+        println("perceptual mode is now " + pLabel);
+    }
   
 }
 

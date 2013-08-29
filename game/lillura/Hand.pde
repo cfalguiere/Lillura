@@ -119,9 +119,11 @@ class HandCanvas extends Being implements MessageSubscriber {
   
     void actionSent(ActionMessage message) {
         switch(message.eventType) {
-            case PERCEPTUAL_SWITCH:
-                isPerceptualOn = ! isPerceptualOn;
-                println("Perceptual switched mode");
+            case PERCEPTUAL_MODE_ON:
+                isPerceptualOn = true;
+                break;
+            case PERCEPTUAL_MODE_OFF:
+                isPerceptualOn = false;
                 break;
         }
     }
