@@ -13,7 +13,9 @@ class Hand extends Being implements MessageSubscriber {
   float openness;
   boolean _isTooFar;
   int _c;
+  
   String label = "";
+  int state = -1;
 
   Hand(int x, int y, int w, int h) {
     super(new Rectangle(x, y, w, h));
@@ -48,21 +50,55 @@ class Hand extends Being implements MessageSubscriber {
         pushMatrix();
         fill(_c); 
         noStroke();
-        ellipse(handX, handY, handW, handH);
+        if (state == 1) {
+            drawThumbUp();
+        } else if (state == 2) {
+            drawPeace();
+        } else {
+            ellipse(handX, handY, handW, handH);
+        }
         
-        textSize(20);
-        text(label, handX, handY - 30); // FIXME magic numbers
+        textSize(10);
+        text(label, handX + handW*0.7, handY); // FIXME magic numbers
         popMatrix();
     }
   
-  //
-  // behavior
-  //
+    public void drawThumbUp() {
+        ellipse(handX, handY, handW, handW*.8);
+        stroke(_c);
+        strokeWeight(5);
+        line(handX + handW*.2 , handY, handX + handW*.2, handY  - handW*0.7);
+    }
+    
+    public void drawPeace() {
+        ellipse(handX, handY, handW, handW*.8);
+        stroke(_c);
+        strokeWeight(5);
+        line(handX + handW*.2 , handY, handX + handW*.2, handY  - handW*0.8);
+        line(handX - handW*.2 , handY, handX - handW*.2, handY  - handW*0.8);
+    }
+    
+    //
+    // behavior
+    //
   
     void actionSent(ActionMessage message) {
         switch(message.eventType) {
+            case PERCEPTUAL_HAND_OPEN:
+                openness = 90;
+                state = 8;
+                break;
+            case PERCEPTUAL_HAND_CLOSE:
+                openness = 10;
+                state = 0;
+                break;
             case PERCEPTUAL_THUMB_UP:
-                label = "!";
+                label = "T";
+                state = 1;
+                break;
+            case PERCEPTUAL_PEACE:
+                label = "P";
+                state = 2;
                 break;
             case PERCEPTUAL_HAND_MOVED_CLOSER:
                 label = "_";
@@ -73,18 +109,18 @@ class Hand extends Being implements MessageSubscriber {
         }
     }
 
-  void perCChanged(PerCMessage handSensor) {
-    //println("received perc changed " + handSensor);
-    openness = handSensor.openness;
-    
-    handX = flipXAxisAndScale(handSensor.x); 
-    handY = scaleYAxis(handSensor.y); 
-    
-    handW = (int)map(handSensor.depth, 0, 1, 30, 0);
-    
-    _isTooFar = handSensor.isTooFar();
-  }
-
+    void perCChanged(PerCMessage handSensor) {
+        //println("received perc changed " + handSensor);
+        openness = handSensor.openness;
+        
+        handX = flipXAxisAndScale(handSensor.x); 
+        handY = scaleYAxis(handSensor.y); 
+        
+        handW = (int)map(handSensor.depth, 0, 1, 30, 0);
+        
+        _isTooFar = handSensor.isTooFar();
+    }
+  
 }
 
 //

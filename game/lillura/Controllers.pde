@@ -311,12 +311,25 @@ class PerceptualEventEmulatorController extends Controller {
                 case POCodes.Key.T:
                     messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_THUMB_UP));
                     break;
+                case POCodes.Key.H:
+                    emulateHand();
+                    break;
               default:
                   // ignore other events
             }
         }
     }   
   
+    void emulateHand() {
+        messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_AVAILABLE));
+        PerCMessage event = new PerCMessage();
+        event.x = mouseX;
+        event.y = mouseY;
+        event.depth = 0.2;
+        event.openness = 1;
+        event.opennessState = 1;
+        messenger.sendPerCMessage(event);
+    }
 }
 
 
