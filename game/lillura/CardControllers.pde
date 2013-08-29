@@ -48,10 +48,10 @@ class CardDeckController extends Controller { //FIXME synchronizaton of controll
         }
     }
     
-    void moveAndDeselectCurrentCard() {
+    void moveAndDeselectCurrentCard(float y) {
         if (actionCardIndex >= 0) {
             Card card = cards.getCard(actionCardIndex);
-            float index = cards.getCardIndexForMouse(mouseY);
+            float index = cards.getCardIndexForMouse(y);
             //println("releasing card at index " + index);
             int newPos = (index == int(index)) ? floor(index) : ceil(index);
             //println("releasing card at pos " + newPos);
@@ -131,7 +131,7 @@ class CardDeckMouseController extends CardDeckController {
         Rectangle cardsBoundingBox = cards.getUsedBoundingBox();
         if (cardsBoundingBox.contains(mouseX, mouseY)) {
             float relativeY = mouseY - cardDeckCanvas.getBoundingBox().getAbsMin().y;
-            hoverPosition = cards.getCardIndexForMouse(mouseY);
+            hoverPosition = cards.getCardIndexForMouse(relativeY);
             cardDeckMouseMarker.setY(relativeY + cardDeckCanvas.getBoundingBox().getAbsMin().y);
             cardDeckMouseMarker.isVisible = true;
         } else {
@@ -151,7 +151,8 @@ class CardDeckMouseController extends CardDeckController {
             selectCurrentCard();
         }  
         if (m.getAction() == POCodes.Click.RELEASED) {
-            moveAndDeselectCurrentCard();
+            float relativeY = mouseY - cardDeckCanvas.getBoundingBox().getAbsMin().y;
+            moveAndDeselectCurrentCard(relativeY);
         }  
     }
 
@@ -163,6 +164,7 @@ class CardDeckMouseController extends CardDeckController {
 
 class CardDeckPerceptualController extends CardDeckController {
     private CardDeckMouseMarker cardDeckMouseMarker;
+    private float relativeY;
   
     CardDeckPerceptualController(CardDeckCanvas aCardDeckCanvas, CardGroup aCardGroup, CardDeckMouseMarker aCardDeckMouseMarker, World aParentWorld, LilluraMessenger theMessenger) {
         super(aCardDeckCanvas, aCardGroup, aParentWorld, theMessenger);
@@ -173,9 +175,9 @@ class CardDeckPerceptualController extends CardDeckController {
         if (! isActive) return;
         
         Rectangle cardsBoundingBox = cards.getUsedBoundingBox();
-        if (true) { //handSensor.isHandOpen() && !handSensor.isTooFar()) {
-            float relativeY = handSensor.y - cardDeckCanvas.getBoundingBox().getAbsMin().y;
-            hoverPosition = cards.getCardIndexForMouse(mouseY);
+        if (true) { 
+            relativeY = (handSensor.y - cardDeckCanvas.getBoundingBox().getAbsMin().y) * 2;
+            hoverPosition = cards.getCardIndexForMouse(relativeY);
             cardDeckMouseMarker.setY(relativeY + cardDeckCanvas.getBoundingBox().getAbsMin().y);
             cardDeckMouseMarker.isVisible = true;
         } else {
@@ -183,7 +185,7 @@ class CardDeckPerceptualController extends CardDeckController {
             cardDeckMouseMarker.isVisible = false;
         }   
         
-        println("changed hoverPosition to " + hoverPosition);
+        //println("changed hoverPosition to " + hoverPosition);
         if (hoverPosition == int(hoverPosition)) cards.setSelectedCardIndex(floor(hoverPosition));
      }
 
@@ -193,7 +195,7 @@ class CardDeckPerceptualController extends CardDeckController {
         try {
              switch(message.eventType) {
                 case PERCEPTUAL_HAND_OPEN:
-                    moveAndDeselectCurrentCard();
+                    moveAndDeselectCurrentCard(relativeY);
                     break;
                 case PERCEPTUAL_HAND_CLOSE:
                     selectCurrentCard();
@@ -204,9 +206,9 @@ class CardDeckPerceptualController extends CardDeckController {
                 case PERCEPTUAL_SWIPE_DOWN:
                     hoverNextCard();
                   break;
-                case PERCEPTUAL_HAND_MOVED_AWAY:
-                    removeCurrentCard();
-                    break;
+                //case PERCEPTUAL_HAND_MOVED_AWAY:
+                //    removeCurrentCard();
+                //    break;
                 default:
                     // ignore other events
             }
