@@ -50,7 +50,7 @@ final color GOLD = color(256, 200, 32);
 final color GOLD_75 = color(256, 200, 32, 192); 
 final color GOLD_50 = color(256, 200, 32, 128); 
 final color GREEN = color(160, 200, 128); 
-final color GREEN_25 = color(160, 200, 160, 64); 
+final color LIGHT_GREEN = color(216, 256, 208); 
 final color ORANGE = color(256, 64, 64); 
   
 

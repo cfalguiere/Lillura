@@ -205,7 +205,6 @@ class CardDeckPerceptualController extends CardDeckController {
                     hoverNextCard();
                   break;
                 case PERCEPTUAL_HAND_MOVED_AWAY:
-                println("hand away");
                     removeCurrentCard();
                     break;
                 default:

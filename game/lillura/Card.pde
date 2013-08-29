@@ -45,7 +45,7 @@ class Card extends Being {
       //FIXME create functions
       
       if (isSelected) {
-        fill(color(GREEN));
+        fill(color(LIGHT_GREEN));
       } else {
         fill(color(256,256,256));
       }
