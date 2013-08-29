@@ -312,7 +312,7 @@ class PerceptualEventEmulatorController extends Controller {
                     messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_THUMB_UP));
                     break;
                 case POCodes.Key.F:
-                    messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_HAND_AWAY));
+                    messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_HAND_MOVED_AWAY));
                     break;
                 case POCodes.Key.H:
                     emulateHand();
@@ -584,6 +584,8 @@ class CardDeckMouseController extends CardDeckController {
 //
 
 class CardDeckPerceptualController extends CardDeckController {
+    EventType memLast = EventType.NONE;
+    
     CardDeckPerceptualController(CardDeckCanvas aCardDeckCanvas, CardGroup aCardGroup, World aParentWorld, LilluraMessenger theMessenger) {
         super(aCardDeckCanvas, aCardGroup, aParentWorld, theMessenger);
     }
@@ -600,7 +602,6 @@ class CardDeckPerceptualController extends CardDeckController {
     void perCChanged(PerCMessage handSensor) {
         if (! isActive) return;
         
-            println(" card deck sensor " );
         if (handSensor.isHandOpen() && !handSensor.isTooFar()) {
             println(" card deck y " + handSensor.y);
             hoverPosition = -1;
@@ -621,18 +622,30 @@ class CardDeckPerceptualController extends CardDeckController {
                     selectCurrentCard();
                     break;
                 case PERCEPTUAL_SWIPE_UP:
-                    selectPreviousCard();
+                    if (memLast != EventType.PERCEPTUAL_SWIPE_UP) {
+                        selectPreviousCard();
+                    }
+                    memLast = message.eventType;
                     break;
                 case PERCEPTUAL_SWIPE_DOWN:
-                    selectNextCard();
+                    if (memLast != EventType.PERCEPTUAL_SWIPE_UP) {
+                        selectNextCard();
+                    }
+                    memLast = message.eventType;
                   break;
-                case PERCEPTUAL_HAND_AWAY:
+                case PERCEPTUAL_HAND_MOVED_AWAY:
                 println("hand away");
                     removeCurrentCard();
                     break;
                 default:
                     // ignore other events
             }
+            
+            if (message.eventType != EventType.PERCEPTUAL_SWIPE_UP &&
+                message.eventType != EventType.PERCEPTUAL_SWIPE_DOWN)  {
+                    memLast = EventType.NONE;
+                }  
+
         } catch (Exception e) {
             e.printStackTrace();
             println("controller " + this);

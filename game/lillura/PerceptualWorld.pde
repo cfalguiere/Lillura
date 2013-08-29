@@ -140,6 +140,43 @@ class PerceptualSensor {
           foundGesture = true;
       }
 
+      if (event.gesture == PXCMGesture.Gesture.LABEL_POSE_PEACE) {
+          if (lastEvent == null || lastEvent.gesture != event.gesture) {
+             messenger.sendActionMessage(EventType.PERCEPTUAL_PEACE);
+          }
+          foundGesture = true;
+      }
+
+      if (event.gesture == PXCMGesture.Gesture.LABEL_HAND_WAVE) {
+          if (lastEvent == null || lastEvent.gesture != event.gesture) {
+             messenger.sendActionMessage(EventType.PERCEPTUAL_WAVE);
+          }
+          foundGesture = true;
+      }
+
+      if (event.gesture == PXCMGesture.Gesture.LABEL_HAND_CIRCLE) {
+          if (lastEvent == null || lastEvent.gesture != event.gesture) {
+             messenger.sendActionMessage(EventType.PERCEPTUAL_CIRCLE);
+          }
+          foundGesture = true;
+      }
+
+
+
+      if (event.gesture == PXCMGesture.Gesture.LABEL_NAV_SWIPE_UP) {
+          if (lastEvent == null || lastEvent.gesture != event.gesture) {
+             messenger.sendActionMessage(EventType.PERCEPTUAL_SWIPE_UP);
+          }
+          foundGesture = true;
+      }
+
+      if (event.gesture == PXCMGesture.Gesture.LABEL_NAV_SWIPE_DOWN) {
+          if (lastEvent == null || lastEvent.gesture != event.gesture) {
+             messenger.sendActionMessage(EventType.PERCEPTUAL_SWIPE_DOWN);
+          }
+          foundGesture = true;
+      }
+
       if (event.gesture == PXCMGesture.Gesture.LABEL_NAV_SWIPE_LEFT) {
           if (lastEvent == null || lastEvent.gesture != event.gesture) {
              messenger.sendActionMessage(EventType.PERCEPTUAL_SWIPE_LEFT);
@@ -154,12 +191,15 @@ class PerceptualSensor {
           foundGesture = true;
       }
 
-  
+        
       if (! foundGesture && lastEvent!=null) { 
           //println("depth change " + lastEvent.depth + " -> " +  event.depth);
           float avgDepth = (lastEvent.depth / event.depth) / 2;
           if (lastEvent.depth > 0.15 && avgDepth < 0.15) {
               messenger.sendActionMessage(EventType.PERCEPTUAL_HAND_MOVED_CLOSER);
+              foundGesture = true;
+          } else  if (avgDepth > 0.6) {
+              messenger.sendActionMessage(EventType.PERCEPTUAL_HAND_MOVED_AWAY);
               foundGesture = true;
           }
           
@@ -168,7 +208,7 @@ class PerceptualSensor {
           //int area = int(event.x / (CAMERA_WIDTH/8) );
           int area = int(avgX / (CAMERA_WIDTH/6) );
           //println( "area  " + area);
-          if (true) { //(memArea >= 0 && memArea == area) {
+          if (! event.isTooFar()) { //(memArea >= 0 && memArea == area) {
               if (area == 0 && lastArea !=0) { // view is mirrored, lower x is on the left from the camera perspective
                   messenger.sendActionMessage(EventType.PERCEPTUAL_HAND_MOVED_RIGHT);
                   foundGesture = true;
