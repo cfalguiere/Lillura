@@ -22,11 +22,11 @@ class CardDeckCanvas extends Being {
         
         int selectedCardIndex = cardGroup.getSelectedCardIndex(); //TODO refactoring - dedicated object
         if (selectedCardIndex >= 0) {
-          stroke(GREEN);
-          strokeWeight(2);
-          float y = cardGroup.getCardOffset().y*selectedCardIndex;
-          line(HRZ_SPACER, y+3, HRZ_SPACER, y+Card.HEIGHT-3);
-          line(HRZ_SPACER+Card.WIDTH+4, y+3, HRZ_SPACER+Card.WIDTH+4, y+Card.HEIGHT-3);
+            stroke(GREEN);
+            strokeWeight(2);
+            float y = cardGroup.getCardOffset().y*selectedCardIndex;
+            line(HRZ_SPACER, y+3, HRZ_SPACER, y+Card.HEIGHT-3);
+            line(HRZ_SPACER+Card.WIDTH+4, y+3, HRZ_SPACER+Card.WIDTH+4, y+Card.HEIGHT-3);
         }
 
   }
@@ -50,7 +50,6 @@ class CardDeckMouseMarker extends Being {
 
     public void update() {
         if (isVisible) {
-            println("update y with  " + currentY + " abs y " + _shape.getBoundingBox().getAbsMin().y);
             _position.set(new PVector(_shape.getBoundingBox().getAbsMin().x, currentY));
         }
     }

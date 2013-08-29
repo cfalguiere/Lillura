@@ -11,6 +11,8 @@ class LilluraWorld extends World implements MessageSubscriber {
   
   LilluraMessenger messenger = null;  
   
+  private PerceptualEventEmulatorController perceptualEmulator;
+  
   LilluraWorld(int portIn, int portOut, HashMap<String, Rectangle> allBoundingBoxes,  LilluraMessenger theMessenger) {
       super(portIn, portOut);
       boundingBoxes = allBoundingBoxes;
@@ -19,34 +21,39 @@ class LilluraWorld extends World implements MessageSubscriber {
       leftPanelBoundingBox = allBoundingBoxes.get(LEFT_PANEL_BBOX);
   }
 
-  void setup() {
-      //IMPORTANT: put all other setup hereterBeing(TemplateBeing);
-      messenger.subscribe(this);
-
-      GeneralKeyController controller =  new GeneralKeyController(this, messenger);
-      subscribe(controller, POCodes.Key.D);
-      subscribe(controller, POCodes.Key.P);
-
-      PerceptualEventEmulatorController perceptualEmulator =  new PerceptualEventEmulatorController(this, messenger);
-      subscribe(perceptualEmulator, POCodes.Button.RIGHT);
-      subscribe(perceptualEmulator, POCodes.Key.C);
-      subscribe(perceptualEmulator, POCodes.Key.O);
-      subscribe(perceptualEmulator, POCodes.Key.T);
-      subscribe(perceptualEmulator, POCodes.Key.V);
-      subscribe(perceptualEmulator, POCodes.Key.W);
-      subscribe(perceptualEmulator, POCodes.Key.F);
-      subscribe(perceptualEmulator, POCodes.Key.E);
-
-      ViewFocusPerceptualController viewFocusController =  new ViewFocusPerceptualController(3, this, messenger);
-      viewFocusController.setActivePos(1);
-      messenger.subscribe(viewFocusController);
+    void setup() {
+        //IMPORTANT: put all other setup hereterBeing(TemplateBeing);
+        messenger.subscribe(this);
+  
+        GeneralKeyController controller =  new GeneralKeyController(this, messenger);
+        subscribe(controller, POCodes.Key.D);
+        subscribe(controller, POCodes.Key.P);
+  
+        perceptualEmulator =  new PerceptualEventEmulatorController(this, messenger);
+        subscribe(perceptualEmulator, POCodes.Button.RIGHT);
+        subscribe(perceptualEmulator, POCodes.Key.C);
+        subscribe(perceptualEmulator, POCodes.Key.O);
+        subscribe(perceptualEmulator, POCodes.Key.T);
+        subscribe(perceptualEmulator, POCodes.Key.V);
+        subscribe(perceptualEmulator, POCodes.Key.W);
+        subscribe(perceptualEmulator, POCodes.Key.F);
+        subscribe(perceptualEmulator, POCodes.Key.E);
+  
+        ViewFocusPerceptualController viewFocusController =  new ViewFocusPerceptualController(3, this, messenger);
+        viewFocusController.setActivePos(1);
+        messenger.subscribe(viewFocusController);
+        
+        createHeader();
+        
+        createMenu();
       
-      createHeader();
-      
-      createMenu();
-    
-      println("Lillura world set up");
-  }
+        println("Lillura world set up");
+    }
+
+    void preUpdate() {
+        perceptualEmulator.preUpdate();
+    }
+
 
     //
     // behavior implementation 
