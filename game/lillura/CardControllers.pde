@@ -169,7 +169,7 @@ class CardDeckPerceptualController extends CardDeckController {
         if (! isActive) return;
         
         Rectangle cardsBoundingBox = cards.getUsedBoundingBox();
-        if (handSensor.isHandOpen() && !handSensor.isTooFar()) {
+        if (true) { //handSensor.isHandOpen() && !handSensor.isTooFar()) {
             float relativeY = handSensor.y - cardDeckCanvas.getBoundingBox().getAbsMin().y;
             hoverPosition = cards.getCardIndexForMouse(mouseY);
             cardDeckMouseMarker.setY(relativeY + cardDeckCanvas.getBoundingBox().getAbsMin().y);
