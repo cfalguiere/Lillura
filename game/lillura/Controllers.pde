@@ -31,12 +31,12 @@ class Controller extends HObject implements MessageSubscriber {
  
     void enable() {
         isActive = true;
-        println("Controller " + getClass().getName() + " is enabled");
+        //println("Controller " + getClass().getName() + " is enabled");
     }
  
     void disable() {
         isActive = false;
-        println("Controller " + getClass().getName() + " is disabled");
+        //println("Controller " + getClass().getName() + " is disabled");
     }
     
     String toString() {
@@ -260,10 +260,10 @@ class PerceptualEventEmulatorController extends Controller {
           PVector currentMousePosition = m.getPosition();
           EventType et = null;
           
-          float distance = currentMousePosition.dist(lastMousePosition);
-          //println("distance " + distance);
-          if ( distance > width*0.1) {
+          if ( abs(lastMousePosition.x - currentMousePosition.x) > width*0.1) {
               et = (lastMousePosition.x > currentMousePosition.x) ? EventType.PERCEPTUAL_SWIPE_LEFT : EventType.PERCEPTUAL_SWIPE_RIGHT;
+          } else if ( abs(lastMousePosition.y - currentMousePosition.y) > height*0.05) {
+              et = (lastMousePosition.y > currentMousePosition.y) ? EventType.PERCEPTUAL_SWIPE_UP : EventType.PERCEPTUAL_SWIPE_DOWN;
           } else {
               et = getScreenArea();
           }
@@ -462,6 +462,28 @@ class CardDeckController extends Controller { //FIXME synchronizaton of controll
         Card card = cards.getCard(actionCardIndex);
         card.select();
     }
+
+    void selectPreviousCard() {
+        if (actionCardIndex >= 1) {
+            int previous = actionCardIndex -1;
+            if (actionCardIndex >= 0) {
+                deselectCurrentCard();
+            }
+            actionCardIndex = previous;
+            selectCard(actionCardIndex);
+       }
+    }
+
+    void selectNextCard() { //FIXME mhhh
+       if (actionCardIndex < cards.getNumberOfCards() -1 ) {
+            int next = actionCardIndex +1;
+            if (actionCardIndex >= 0) {
+                deselectCurrentCard();
+            }
+            actionCardIndex = next;
+            selectCard(actionCardIndex);
+        }
+    }
     
     void moveAndDeselectCurrentCard() {
         if (actionCardIndex >= 0) {
@@ -518,27 +540,6 @@ class CardDeckKeyController extends CardDeckController {
       }
     }
     
-    void selectPreviousCard() {
-        if (actionCardIndex >= 1) {
-            int previous = actionCardIndex -1;
-            if (actionCardIndex >= 0) {
-                deselectCurrentCard();
-            }
-            actionCardIndex = previous;
-            selectCard(actionCardIndex);
-       }
-    }
-
-    void selectNextCard() { //FIXME mhhh
-       if (actionCardIndex < cards.getNumberOfCards() -1 ) {
-            int next = actionCardIndex +1;
-            if (actionCardIndex >= 0) {
-                deselectCurrentCard();
-            }
-            actionCardIndex = next;
-            selectCard(actionCardIndex);
-        }
-    }
 
 }
 
@@ -619,6 +620,12 @@ class CardDeckPerceptualController extends CardDeckController {
                 case PERCEPTUAL_HAND_CLOSE:
                     selectCurrentCard();
                     break;
+                case PERCEPTUAL_SWIPE_UP:
+                    selectPreviousCard();
+                    break;
+                case PERCEPTUAL_SWIPE_DOWN:
+                    selectNextCard();
+                  break;
                 case PERCEPTUAL_HAND_AWAY:
                 println("hand away");
                     removeCurrentCard();
