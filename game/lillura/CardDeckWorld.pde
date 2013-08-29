@@ -74,7 +74,6 @@ class CardDeckWorld extends World implements MessageSubscriber  {
         cardDeckKeyController.enable();
         cardDeckMouseController.disable();
         cardDeckPerceptualController.enable();
-        cardMouseMarker.setPerceptualMode(true);
     }
 
     
@@ -82,7 +81,6 @@ class CardDeckWorld extends World implements MessageSubscriber  {
         cardDeckKeyController.disable();
         cardDeckMouseController.enable();
         cardDeckPerceptualController.disable();
-        cardMouseMarker.setPerceptualMode(false);
     }
     
     //
@@ -97,7 +95,7 @@ class CardDeckWorld extends World implements MessageSubscriber  {
         cardDeck = new CardDeckCanvas(deckBoundingBox, cards); 
         register(cardDeck);
         
-        PVector position3D = new PVector(deckBoundingBox.getPosition().x, deckBoundingBox.getPosition().y, -1);
+        PVector position3D = new PVector(deckBoundingBox.getPosition().x, deckBoundingBox.getPosition().y, 1);
         Rectangle mouseMarker = new Rectangle(position3D, deckBoundingBox.getWidth() -12, 1);
         
         cardMouseMarker = new CardDeckMouseMarker(mouseMarker, cards);
@@ -108,12 +106,12 @@ class CardDeckWorld extends World implements MessageSubscriber  {
         subscribe(cardDeckKeyController, POCodes.Key.UP);
         subscribe(cardDeckKeyController, POCodes.Key.DOWN); 
         
-        cardDeckMouseController =  new CardDeckMouseController(cardDeck, cards, this, messenger);
+        cardDeckMouseController =  new CardDeckMouseController(cardDeck, cards, cardMouseMarker, this, messenger);
         subscribe(cardDeckMouseController, POCodes.Button.LEFT, deckBoundingBox);
     }
 
     void createPerceptualControllerForCardDeck() {
-        cardDeckPerceptualController =  new CardDeckPerceptualController(cardDeck, cards, this, messenger);
+        cardDeckPerceptualController =  new CardDeckPerceptualController(cardDeck, cards, cardMouseMarker, this, messenger);
         cardDeckPerceptualController.disable();
         messenger.subscribe(cardDeckPerceptualController);
     }

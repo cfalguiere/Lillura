@@ -230,12 +230,26 @@ class RobotKeyMovementController extends Controller {
 class PerceptualEventEmulatorController extends Controller { 
 
     PVector lastMousePosition;
+    boolean isActive = false;
 
     PerceptualEventEmulatorController(World aParentWorld, LilluraMessenger theMessenger) {
         super(aParentWorld, theMessenger);
         println("Perceptual event emulator is ON");
     }
-  
+ 
+     void preUpdate() {
+       if (isActive) {
+            messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_AVAILABLE));
+            PerCMessage event = new PerCMessage();
+            event.x = mouseX;
+            event.y = mouseY;
+            event.depth = 0.2;
+            event.openness = 1;
+            event.opennessState = 1;
+            messenger.sendPerCMessage(event);
+       }
+    }
+ 
     /**
      * emulates the perceptual hand movement with keyboard
      */    
@@ -314,8 +328,10 @@ class PerceptualEventEmulatorController extends Controller {
                 case POCodes.Key.F:
                     messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_HAND_MOVED_AWAY));
                     break;
-                case POCodes.Key.H:
-                    emulateHand();
+                case POCodes.Key.E:
+                     messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_AVAILABLE));
+                     isActive = true;
+                     emulateHand();
                     break;
               default:
                   // ignore other events
@@ -324,7 +340,6 @@ class PerceptualEventEmulatorController extends Controller {
     }   
   
     void emulateHand() {
-        messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_AVAILABLE));
         PerCMessage event = new PerCMessage();
         event.x = mouseX;
         event.y = mouseY;
@@ -525,7 +540,7 @@ class CardDeckKeyController extends CardDeckController {
       if (m.isPressed()) {
           switch (code) {
               case POCodes.Key.UP:
-                  selectPreviousCard();
+                  selectPreviousCard(); //FIXME implement hover
                   break;
               case POCodes.Key.DOWN:
                   selectNextCard();
@@ -548,19 +563,28 @@ class CardDeckKeyController extends CardDeckController {
 //
 
 class CardDeckMouseController extends CardDeckController {
+    private CardDeckMouseMarker cardDeckMouseMarker;
     
-    CardDeckMouseController(CardDeckCanvas aCardDeckCanvas, CardGroup aCardGroup, World aParentWorld, LilluraMessenger theMessenger) {
+    CardDeckMouseController(CardDeckCanvas aCardDeckCanvas, CardGroup aCardGroup, CardDeckMouseMarker aCardDeckMouseMarker, World aParentWorld, LilluraMessenger theMessenger) {
         super(aCardDeckCanvas, aCardGroup, aParentWorld, theMessenger);
+        cardDeckMouseMarker = aCardDeckMouseMarker;
     }
 
     public void preUpdate() {
         if (! isActive) return;
 
-        if (cardDeckCanvas.getBoundingBox().contains(mouseX, mouseY)) {
+        Rectangle cardsBoundingBox = cards.getUsedBoundingBox();
+        if (cardsBoundingBox.contains(mouseX, mouseY)) {
+            float relativeY = mouseY - cardDeckCanvas.getBoundingBox().getAbsMin().y;
+            println("mouse over cards " + relativeY);
             hoverPosition = cards.getCardIndexForMouse(mouseY);
+            cardDeckMouseMarker.setY(relativeY + cardDeckCanvas.getBoundingBox().getAbsMin().y);
+            cardDeckMouseMarker.isVisible = true;
         } else {
             hoverPosition = -1;
+            cardDeckMouseMarker.isVisible = false;
         }   
+        
         if (hoverPosition == int(hoverPosition)) cards.setSelectedCardIndex(floor(hoverPosition));
     }
     
@@ -584,27 +608,20 @@ class CardDeckMouseController extends CardDeckController {
 //
 
 class CardDeckPerceptualController extends CardDeckController {
-    EventType memLast = EventType.NONE;
-    
-    CardDeckPerceptualController(CardDeckCanvas aCardDeckCanvas, CardGroup aCardGroup, World aParentWorld, LilluraMessenger theMessenger) {
+    private CardDeckMouseMarker cardDeckMouseMarker;
+  
+    CardDeckPerceptualController(CardDeckCanvas aCardDeckCanvas, CardGroup aCardGroup, CardDeckMouseMarker aCardDeckMouseMarker, World aParentWorld, LilluraMessenger theMessenger) {
         super(aCardDeckCanvas, aCardGroup, aParentWorld, theMessenger);
-    }
-
-    public void preUpdate() {
-        if (! isActive) {
-           hoverPosition = -1;
-          return;
-        }
-
-        hoverPosition = cards.getCardIndexForMouse(mouseY);
+        cardDeckMouseMarker = aCardDeckMouseMarker;
     }
 
     void perCChanged(PerCMessage handSensor) {
         if (! isActive) return;
         
         if (handSensor.isHandOpen() && !handSensor.isTooFar()) {
-            println(" card deck y " + handSensor.y);
-            hoverPosition = -1;
+            //println(" card deck y " + handSensor.y);
+            hoverPosition = cards.getCardIndexForMouse(handSensor.y);
+            cardDeckMouseMarker.setY(handSensor.y);            
         } else {
             hoverPosition = -1;    
         }
@@ -622,16 +639,10 @@ class CardDeckPerceptualController extends CardDeckController {
                     selectCurrentCard();
                     break;
                 case PERCEPTUAL_SWIPE_UP:
-                    if (memLast != EventType.PERCEPTUAL_SWIPE_UP) {
-                        selectPreviousCard();
-                    }
-                    memLast = message.eventType;
+                    selectPreviousCard();
                     break;
                 case PERCEPTUAL_SWIPE_DOWN:
-                    if (memLast != EventType.PERCEPTUAL_SWIPE_UP) {
-                        selectNextCard();
-                    }
-                    memLast = message.eventType;
+                    selectNextCard();
                   break;
                 case PERCEPTUAL_HAND_MOVED_AWAY:
                 println("hand away");
@@ -640,12 +651,6 @@ class CardDeckPerceptualController extends CardDeckController {
                 default:
                     // ignore other events
             }
-            
-            if (message.eventType != EventType.PERCEPTUAL_SWIPE_UP &&
-                message.eventType != EventType.PERCEPTUAL_SWIPE_DOWN)  {
-                    memLast = EventType.NONE;
-                }  
-
         } catch (Exception e) {
             e.printStackTrace();
             println("controller " + this);
