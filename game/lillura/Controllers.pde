@@ -59,7 +59,7 @@ class GeneralKeyController extends Controller {
         if (m.isPressed()) {
             switch (code) {
                 case POCodes.Key.D:
-                    messenger.sendMessage(new ActionMessage(EventType.DEBUG_MODE));
+                   messenger.sendMessage(new ActionMessage(EventType.DEBUG_MODE));
                     break;
                 case POCodes.Key.P:
                     messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_SWITCH));
@@ -282,6 +282,15 @@ class PerceptualEventEmulatorController extends Controller {
                     break;
                 case POCodes.Key.O:
                     messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_HAND_OPEN));
+                    break;
+                case POCodes.Key.W:
+                    messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_WAVE));
+                    break;
+                case POCodes.Key.V:
+                    messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_PEACE));
+                    break;
+                case POCodes.Key.T:
+                    messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_THUMB_UP));
                     break;
               default:
                   // ignore other events

@@ -31,6 +31,9 @@ class LilluraWorld extends World implements MessageSubscriber {
       subscribe(perceptualEmulator, POCodes.Button.RIGHT);
       subscribe(perceptualEmulator, POCodes.Key.C);
       subscribe(perceptualEmulator, POCodes.Key.O);
+      subscribe(perceptualEmulator, POCodes.Key.T);
+      subscribe(perceptualEmulator, POCodes.Key.V);
+      subscribe(perceptualEmulator, POCodes.Key.W);
 
       ViewFocusPerceptualController viewFocusController =  new ViewFocusPerceptualController(3, this, messenger);
       viewFocusController.setActivePos(1);
