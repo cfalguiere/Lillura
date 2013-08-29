@@ -1,7 +1,8 @@
 public enum EventType {
     NONE,
     
-    DEBUG_MODE, 
+    DEBUG_MODE_ON, 
+    DEBUG_MODE_OFF, 
     
     COMMAND_NEWGAME, 
     COMMAND_RESTART, 

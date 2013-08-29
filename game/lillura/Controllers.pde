@@ -49,6 +49,7 @@ class Controller extends HObject implements MessageSubscriber {
 //
 
 class GeneralKeyController extends Controller { 
+    boolean isDebugModeOn = false;
 
     GeneralKeyController(World aParentWorld, LilluraMessenger theMessenger) {
         super(aParentWorld, theMessenger);
@@ -59,7 +60,11 @@ class GeneralKeyController extends Controller {
         if (m.isPressed()) {
             switch (code) {
                 case POCodes.Key.D:
-                   messenger.sendMessage(new ActionMessage(EventType.DEBUG_MODE));
+                    isDebugModeOn = ! isDebugModeOn;
+                    String label = (isDebugModeOn?"ON":"OFF");
+                    EventType et = EventType.valueOf("DEBUG_MODE_" + label);
+                    messenger.sendMessage(new ActionMessage(et));
+                    println("debug mode is now " + label);
                     break;
                 case POCodes.Key.P:
                     messenger.sendMessage(new ActionMessage(EventType.PERCEPTUAL_SWITCH));

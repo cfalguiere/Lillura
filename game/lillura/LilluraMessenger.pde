@@ -80,8 +80,11 @@ public class LilluraMessenger implements MessageSubscriber {
     //
     void actionSent(ActionMessage message) {
         switch(message.eventType) {
-            case DEBUG_MODE:
-                useDebugMode = ! useDebugMode;
+            case DEBUG_MODE_ON:
+                useDebugMode = true;
+                break;
+            case DEBUG_MODE_OFF:
+                useDebugMode = false;
                 break;
             default:
                  // ignore other events
